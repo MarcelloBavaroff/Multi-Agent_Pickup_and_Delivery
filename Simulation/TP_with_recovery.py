@@ -59,6 +59,7 @@ class TokenPassingRecovery(object):
             self.p_iter = 1
         self.new_recovery = new_recovery
         self.init_token()
+        #vedi sotto
 
     def init_token(self):
         self.token['agents'] = {}
@@ -79,11 +80,13 @@ class TokenPassingRecovery(object):
         self.token['agent_at_end_path_pos'] = []
         self.token['agents_in_recovery_trial'] = []
         for a in self.agents:
+            #dovrebbe essere prendi gli agenti del token e poi nello specifico quello col nome specifico
             self.token['agents'][a['name']] = [a['start']]
             self.token['path_ends'].add(tuple(a['start']))
         self.token['prob_exceeded'] = False
         self.token['deadlock_count_per_agent'] = defaultdict(lambda: 0)
 
+    #in teoria agenti in idle hanno il path verso la loro posizione attuale
     def get_idle_agents(self):
         agents = {}
         for name, path in self.token['agents'].items():
@@ -91,9 +94,11 @@ class TokenPassingRecovery(object):
                 agents[name] = path
         return agents
 
+    #distanza in celle verticali ed orizzontali
     def admissible_heuristic(self, task_pos, agent_pos):
         return fabs(task_pos[0] - agent_pos[0]) + fabs(task_pos[1] - agent_pos[1])
 
+    #in teoria task più vicino al robot
     def get_closest_task_name(self, available_tasks, agent_pos):
         closest = random.choice(list(available_tasks.keys()))
         dist = self.admissible_heuristic(available_tasks[closest][0], agent_pos)
@@ -104,7 +109,7 @@ class TokenPassingRecovery(object):
 
     def get_moving_obstacles_agents(self, agents, time_start):
         obstacles = {}
-        for name, path in agents.items():
+        for name, path in agents.items(): #agents.item ritorna un dizionario con nome agente e coordinate dello stesso
             if len(path) > time_start and len(path) > 1:
                 for i in range(time_start, len(path)):
                     k = i - time_start
@@ -273,8 +278,11 @@ class TokenPassingRecovery(object):
     def time_forward(self):
         # Update completed tasks
         for agent_name in self.token['agents']:
+            #pos = posizione attuale agente
             pos = self.simulation.actual_paths[agent_name][-1]
             if agent_name in self.token['agents_to_tasks'] and (pos['x'], pos['y']) == tuple(
+                #self.token['agents_to_tasks'][agent_name]['goal'] posizione goal
+                #self.token['agents'][agent_name] path agente len 1
                     self.token['agents_to_tasks'][agent_name]['goal']) \
                     and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name][
                 'task_name'] != 'safe_idle':
