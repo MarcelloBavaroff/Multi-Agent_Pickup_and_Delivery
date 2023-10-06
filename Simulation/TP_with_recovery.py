@@ -5,8 +5,8 @@ author: Giacomo Lodigiani (@Lodz97)
 from math import fabs
 import random
 from Simulation.CBS.cbs import CBS, Environment
-from Simulation.markov_chains import MarkovChainsMaker
-from collections import defaultdict
+#from Simulation.markov_chains import MarkovChainsMaker
+#from collections import defaultdict
 
 
 class TokenPassingRecovery(object):
@@ -404,7 +404,7 @@ class TokenPassingRecovery(object):
                     #     closest_task = [self.token['agents'][agent_name][0],
                     #                     self.token['agents_to_tasks'][agent_name]['goal']]
                     if False:
-                        nope = 1;
+                        nope = 1
                     else:
                         closest_task = [self.token['agents_to_tasks'][agent_name]['start'],
                                         self.token['agents_to_tasks'][agent_name]['goal']]
