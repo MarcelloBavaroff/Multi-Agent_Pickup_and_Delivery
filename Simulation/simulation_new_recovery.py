@@ -100,6 +100,7 @@ class SimulationNewRecovery(object):
         moved_this_step = -1
         while moved_this_step != 0:
             moved_this_step = 0
+            
             for agent in agents_to_move:
                 current_agent_pos = self.actual_paths[agent['name']][-1]
                 if agent['name'] not in self.delayed_agents:
@@ -120,7 +121,7 @@ class SimulationNewRecovery(object):
                             algorithm.get_token()['agents'][agent['name']] = algorithm.get_token()['agents'][agent['name']][1:]
                             #aggiorno il path dell'agente
                             self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
-            #agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]
+            agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]
 
         # for agent in agents_to_move:
         #     #aggiorno con l'ultima posizione
