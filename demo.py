@@ -12,13 +12,10 @@ import sys
 if __name__ == '__main__':
     #random.seed(1234)
     parser = argparse.ArgumentParser()
-    parser.add_argument('-k', help='Robustness parameter for k-TP', default=None, type=int)
-    parser.add_argument('-p', help='Robustness parameter for p-TP', default=None, type=float)
-    parser.add_argument('-pd', help='Expected probability of an agent of being delayed at any time step (p-TP)',
-                        default=0.02, type=float)
-    parser.add_argument('-p_iter', help='Number of times a new path can be recalculated if the one calculated '
-                                        'before exceeds the probability threshold (p-TP)',
-                        default=1, type=int)
+    #parser.add_argument('-k', help='Robustness parameter for k-TP', default=None, type=int)
+    #parser.add_argument('-p', help='Robustness parameter for p-TP', default=None, type=float)
+    #parser.add_argument('-pd', help='Expected probability of an agent of being delayed at any time step (p-TP)',default=0.02, type=float)
+    #parser.add_argument('-p_iter', help='Number of times a new path can be recalculated if the one calculated ''before exceeds the probability threshold (p-TP)',default=1, type=int)
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=1, type=int)
@@ -26,10 +23,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.k is None:
-        args.k = 0
-    if args.p is None:
-        args.p = 1
+    # if args.k is None:
+    #     args.k = 0
+    # if args.p is None:
+    #     args.p = 1
 
     with open(os.path.join(RoothPath.get_root(), 'config.json'), 'r') as json_file:
         config = json.load(json_file)
@@ -56,16 +53,14 @@ if __name__ == '__main__':
         tasks, delays = gen_tasks_and_delays(agents, param['map']['start_locations'], param['map']['goal_locations'],
                                              param['n_tasks'], param['task_freq'], param['n_delays_per_agent'])
     param['tasks'] = tasks
-    param['delays'] = delays
+    #param['delays'] = delays
     with open(args.param + config['visual_postfix'], 'w') as param_file:
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = SimulationNewRecovery(tasks, agents, delays=delays)
+    simulation = SimulationNewRecovery(tasks, agents)
     tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation,
-                              a_star_max_iter=args.a_star_max_iter, k=args.k,
-                              replan_every_k_delays=False, pd=args.pd, p_max=args.p, p_iter=args.p_iter,
-                              new_recovery=True)
+                              a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 
