@@ -16,8 +16,11 @@ def gen_tasks_and_delays(agents, starts, goals, n_tasks, task_freq, n_delays_per
         # Add the inter-arrival time to the running sum
         arrival_time = arrival_time + inter_arrival_time
         # Generate task
-        tasks.append({'start_time': int(arrival_time), 'start': random.choice(starts), 'goal': random.choice(goals),
-                      'task_name': 'task' + str(i)})
+        single_task = {'start_time': int(arrival_time), 'start': random.choice(starts), 'goal': random.choice(goals),
+                      'task_name': 'task' + str(i)}
+        tasks.append(single_task)
+        print(single_task)
+
 
     for i in range(len(agents)):
         delays[agents[i]['name']] = random.sample(range(delay_interval), n_delays_per_agent)
