@@ -284,6 +284,7 @@ class CBS(object):
             return {}
         start.cost = self.env.compute_solution_cost(start.solution)
 
+        #aggiungo start ad open set
         self.open_set |= {start}
 
         while self.open_set:

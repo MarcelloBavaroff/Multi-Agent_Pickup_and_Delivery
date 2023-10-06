@@ -280,15 +280,17 @@ class TokenPassingRecovery(object):
         for agent_name in self.token['agents']:
             #pos = posizione attuale agente
             pos = self.simulation.actual_paths[agent_name][-1]
+
+            #---------------------CASO AGENTE ARRIVATO------------------
+            #se agente assegnato ad un task E le sue coordinate attuali sono = al suo goal
+            #E il suo path attuale lungo 1 ed il suo taks non è safe idle
             if agent_name in self.token['agents_to_tasks'] and (pos['x'], pos['y']) == tuple(
                 #self.token['agents_to_tasks'][agent_name]['goal'] posizione goal
                 #self.token['agents'][agent_name] path agente len 1
                     self.token['agents_to_tasks'][agent_name]['goal']) \
-                    and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name][
-                'task_name'] != 'safe_idle':
+                    and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name]['task_name'] != 'safe_idle':
                 self.token['completed_tasks'] = self.token['completed_tasks'] + 1
-                self.token['completed_tasks_times'][
-                    self.token['agents_to_tasks'][agent_name]['task_name']] = self.simulation.get_time()
+                self.token['completed_tasks_times'][self.token['agents_to_tasks'][agent_name]['task_name']] = self.simulation.get_time()
                 self.token['agents_to_tasks'].pop(agent_name)
             if agent_name in self.token['agents_to_tasks'] and (pos['x'], pos['y']) == tuple(
                     self.token['agents_to_tasks'][agent_name]['goal']) \
@@ -301,9 +303,12 @@ class TokenPassingRecovery(object):
             self.token['delayed_agents'] = self.simulation.get_delayed_agents()
             for name in self.token['delayed_agents']:
                 print('Agent', name, 'delayed or affected by delay!')
+                #path agente considerato
                 path = self.token['agents'][name]
                 self.token['n_replans'] = self.token['n_replans'] + 1
+                #perché elimino l'ultimo elemento del percorso?
                 self.update_ends(path[-1])
+                #questo penso sia un discorso di celle occupate
                 if path[0] in self.non_task_endpoints:
                     self.token['occupied_non_task_endpoints'].add(tuple(path[0]))
                 else:
@@ -387,10 +392,10 @@ class TokenPassingRecovery(object):
             agent_pos = idle_agents.pop(agent_name)[0]
             available_tasks = {}
             for task_name, task in self.token['tasks'].items():
+                #se inizio e fine task non in path ends degli agenti (meno me) AND nemmeno in
                 if tuple(task[0]) not in self.token['path_ends'].difference({tuple(agent_pos)}) and tuple(
                         task[1]) not in self.token['path_ends'].difference({tuple(agent_pos)}) \
-                        and tuple(task[0]) not in self.get_agents_to_tasks_goals() and tuple(
-                    task[1]) not in self.get_agents_to_tasks_goals():
+                        and tuple(task[0]) not in self.get_agents_to_tasks_goals() and tuple(task[1]) not in self.get_agents_to_tasks_goals():
                     available_tasks[task_name] = task
             if len(available_tasks) > 0 or agent_name in self.token['agents_to_tasks']:
                 if agent_name in self.token['agents_to_tasks']:
@@ -407,6 +412,7 @@ class TokenPassingRecovery(object):
                 moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
                 idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), all_delayed_agents, 0)
                 agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
+                #penso sia l'unione di obstacles e idle_obastacles
                 env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                                   moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
                 cbs = CBS(env)
@@ -453,12 +459,14 @@ class TokenPassingRecovery(object):
                         self.token['agents'][agent_name] = []
                         for el in path_to_task_start[agent_name]:
                             self.token['agents'][agent_name].append([el['x'], el['y']])
-                        # Don't repeat twice same step
+                        # Don't repeat twice same step, elimino ultimo elemento
                         self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
                         for el in path_to_task_goal[agent_name]:
                             self.token['agents'][agent_name].append([el['x'], el['y']])
+            #righe 13-14 alg
             elif self.check_safe_idle(agent_pos):
                 print('No available tasks for agent', agent_name, ' idling at current position...')
+            #righe 15-16 alg
             else:
                 self.go_to_closest_non_task_endpoint(agent_name, agent_pos, all_idle_agents, all_delayed_agents)
 
