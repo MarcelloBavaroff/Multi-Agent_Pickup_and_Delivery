@@ -8,42 +8,28 @@ from Simulation.tasks_and_delays_maker import *
 from Simulation.simulation_new_recovery import SimulationNewRecovery
 import subprocess
 import sys
-import ast
-
-def read_tasks():
-    data_list = []
-    with open('Modified/Hardcoded_Tasks', 'r') as file:
-        for line in file:
-            try:
-                # Valuta la stringa come un dizionario Python
-                line_data = ast.literal_eval(line.strip())
-
-                # Verifica che il dizionario abbia i campi richiesti
-                if all(key in line_data for key in ['start_time', 'start', 'goal', 'task_name']):
-                    data_list.append(line_data)
-                else:
-                    print(f"Errore: La riga '{line.strip()}' non ha tutti i campi richiesti.")
-            except SyntaxError:
-                print(f"Errore nella lettura della riga: {line.strip()}")
-
-    return data_list
-
-
 
 if __name__ == '__main__':
     #random.seed(1234)
     parser = argparse.ArgumentParser()
+    parser.add_argument('-k', help='Robustness parameter for k-TP', default=None, type=int)
+    parser.add_argument('-p', help='Robustness parameter for p-TP', default=None, type=float)
+    parser.add_argument('-pd', help='Expected probability of an agent of being delayed at any time step (p-TP)',
+                        default=0.02, type=float)
+    parser.add_argument('-p_iter', help='Number of times a new path can be recalculated if the one calculated '
+                                        'before exceeds the probability threshold (p-TP)',
+                        default=1, type=int)
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
-    parser.add_argument('-slow_factor', help='Slow factor of visualization', default=3, type=int) #default=1
+    parser.add_argument('-slow_factor', help='Slow factor of visualization', default=5, type=int)
     parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true')
 
     args = parser.parse_args()
 
-    # if args.k is None:
-    #     args.k = 0
-    # if args.p is None:
-    #     args.p = 1
+    if args.k is None:
+        args.k = 0
+    if args.p is None:
+        args.p = 1
 
     with open(os.path.join(RoothPath.get_root(), 'config.json'), 'r') as json_file:
         config = json.load(json_file)
@@ -61,24 +47,25 @@ if __name__ == '__main__':
     obstacles = param['map']['obstacles']
     non_task_endpoints = param['map']['non_task_endpoints']
     agents = param['agents']
-
     if args.not_rand:
-        tasks = read_tasks()
-
+        # Old fixed tasks and delays
+        tasks = param['tasks']
+        delays = param['delays']
     else:
         # Generate random tasks and delays
-        tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'],
+        tasks, delays = gen_tasks_and_delays(agents, param['map']['start_locations'], param['map']['goal_locations'],
                                              param['n_tasks'], param['task_freq'])
-
     param['tasks'] = tasks
-
+    param['delays'] = delays
     with open(args.param + config['visual_postfix'], 'w') as param_file:
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = SimulationNewRecovery(tasks, agents)
+    simulation = SimulationNewRecovery(tasks, agents, delays=delays)
     tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation,
-                              a_star_max_iter=args.a_star_max_iter, new_recovery=True)
+                              a_star_max_iter=args.a_star_max_iter, k=args.k,
+                              replan_every_k_delays=False, pd=args.pd, p_max=args.p, p_iter=args.p_iter,
+                              new_recovery=True)
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 
@@ -91,6 +78,5 @@ if __name__ == '__main__':
     with open(args.output, 'w') as output_yaml:
         yaml.safe_dump(output, output_yaml)
 
-    #legge dal file di output
     create = [sys.executable, '-m', 'Utils.Visualization.visualize', '-slow_factor', str(args.slow_factor)]
     subprocess.call(create)
