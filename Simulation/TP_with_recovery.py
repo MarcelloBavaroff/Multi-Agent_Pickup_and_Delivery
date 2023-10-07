@@ -182,41 +182,22 @@ class TokenPassingRecovery(object):
                     and 0 <= cell[0] < self.dimensions[0] and 0 <= cell[1] < self.dimensions[1]:
                 return cell
 
-    # def deadlock_recovery(self, agent_name, agent_pos, all_idle_agents, all_delayed_agents, r):
-    #     self.token['deadlock_count_per_agent'][agent_name] += 1
-    #     if self.token['deadlock_count_per_agent'][agent_name] >= 5:
-    #         self.token['deadlock_count_per_agent'][agent_name] = 0
-    #         random_close_cell = self.get_random_close_cell(agent_pos, r)
-    #         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
-    #         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), all_delayed_agents, 0)
-    #         agent = {'name': agent_name, 'start': agent_pos, 'goal': random_close_cell}
-    #         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, moving_obstacles_agents,
-    #                           a_star_max_iter=self.a_star_max_iter)
-    #         cbs = CBS(env)
-    #         path_to_non_task_endpoint = self.search(cbs, agent_name, moving_obstacles_agents)
-    #         if not path_to_non_task_endpoint:
-    #             print("No solution to deadlock recovery for agent", agent_name, " retrying later.")
-    #         else:
-    #             # Don't consider this a task, so don't add to agents_to_tasks
-    #             print('Agent', agent_name, 'causing deadlock, moving to safer position...')
-    #             self.update_ends(agent_pos)
-    #             self.token['agents'][agent_name] = []
-    #             for el in path_to_non_task_endpoint[agent_name]:
-    #                 self.token['agents'][agent_name].append([el['x'], el['y']])
-    def time_forward(self):
+    def update_copleted_tasks(self):
         # Update completed tasks
         for agent_name in self.token['agents']:
-            #pos = posizione attuale agente
+            # pos = posizione attuale agente
             pos = self.simulation.actual_paths[agent_name][-1]
 
-            #---------------------CASO AGENTE ARRIVATO------------------
-            #se agente assegnato ad un task E le sue coordinate attuali sono = al suo goal
-            #E il suo path attuale lungo 1 ed il suo taks non è safe idle
-            if agent_name in self.token['agents_to_tasks'] and (pos['x'], pos['y']) == tuple(self.token['agents_to_tasks'][agent_name]['goal']) \
-                    and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name]['task_name'] != 'safe_idle':
-
+            # ---------------------CASO AGENTE ARRIVATO------------------
+            # se agente assegnato ad un task E le sue coordinate attuali sono = al suo goal
+            # E il suo path attuale lungo 1 ed il suo taks non è safe idle
+            if agent_name in self.token['agents_to_tasks'] and (pos['x'], pos['y']) == tuple(
+                    self.token['agents_to_tasks'][agent_name]['goal']) \
+                    and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name][
+                'task_name'] != 'safe_idle':
                 self.token['completed_tasks'] = self.token['completed_tasks'] + 1
-                self.token['completed_tasks_times'][self.token['agents_to_tasks'][agent_name]['task_name']] = self.simulation.get_time()
+                self.token['completed_tasks_times'][
+                    self.token['agents_to_tasks'][agent_name]['task_name']] = self.simulation.get_time()
                 self.token['agents_to_tasks'].pop(agent_name)
             if agent_name in self.token['agents_to_tasks'] and (pos['x'], pos['y']) == tuple(
                     self.token['agents_to_tasks'][agent_name]['goal']) \
@@ -225,33 +206,16 @@ class TokenPassingRecovery(object):
                 self.token['agents_to_tasks'].pop(agent_name)
 
 
-        if not self.new_recovery:
-            for name, path in self.get_idle_agents().items():
-                self.token['agent_at_end_path'].append(name)
-                self.token['agent_at_end_path_pos'].append(path[0])
-            for name, path in self.token['agents'].items():
-                if name not in self.token['agent_at_end_path']:
-                    for i in range(len(path)):
-                        if path[i] in self.token['agent_at_end_path_pos']:
-                            print('Agent', name, 'will impact end task agent, replanning...')
-                            # self.update_ends(path[-1])
-                            if path[0] in self.non_task_endpoints:
-                                self.token['occupied_non_task_endpoints'].add(tuple(path[0]))
-                            else:
-                                self.token['path_ends'].add(tuple(path[0]))
-                            # TODO check this rare keyerror
-                            # if self.token['agents_to_tasks'][name]['start'] not in path:
-                            #     self.token['delayed_agents_to_reach_task_start'].append(name)
-                            self.token['agents'][name] = [path[0]]
-                            break
-            self.token['agent_at_end_path'] = []
-            self.token['agent_at_end_path_pos'] = []
+    def time_forward(self):
+
+        self.update_copleted_tasks()
 
         # Collect new tasks and assign them, if possible
         for t in self.simulation.get_new_tasks():
             self.token['tasks'][t['task_name']] = [t['start'], t['goal']]
             self.token['start_tasks_times'][t['task_name']] = self.simulation.get_time()
         idle_agents = self.get_idle_agents()
+
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
             # agent_name = list(idle_agents.keys())[0]
@@ -326,8 +290,3 @@ class TokenPassingRecovery(object):
             else:
                 self.go_to_closest_non_task_endpoint(agent_name, agent_pos, all_idle_agents)
 
-        # Advance along paths in the token
-        if not self.new_recovery:
-            for name, path in self.token['agents'].items():
-                if len(path) > 1:
-                    self.token['agents'][name] = path[1:]

@@ -39,7 +39,7 @@ if __name__ == '__main__':
     #parser.add_argument('-p_iter', help='Number of times a new path can be recalculated if the one calculated ''before exceeds the probability threshold (p-TP)',default=1, type=int)
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
-    parser.add_argument('-slow_factor', help='Slow factor of visualization', default=5, type=int) #default=1
+    parser.add_argument('-slow_factor', help='Slow factor of visualization', default=3, type=int) #default=1
     parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true')
 
     args = parser.parse_args()
@@ -65,14 +65,6 @@ if __name__ == '__main__':
     obstacles = param['map']['obstacles']
     non_task_endpoints = param['map']['non_task_endpoints']
     agents = param['agents']
-    # if args.not_rand:
-    #     # Old fixed tasks and delays
-    #     tasks = param['tasks']
-    #     delays = param['delays']
-    # else:
-    #     # Generate random tasks and delays
-    #     tasks, delays = gen_tasks_and_delays(agents, param['map']['start_locations'], param['map']['goal_locations'],
-    #                                          param['n_tasks'], param['task_freq'], param['n_delays_per_agent'])
 
     tasks = read_tasks()
     param['tasks'] = tasks
