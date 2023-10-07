@@ -63,6 +63,9 @@ class Animation:
         for e in map["map"]["non_task_endpoints"]:
             x, y = e[0], e[1]
             self.patches.append(Circle((x, y), 0.4, facecolor='green', edgecolor='black'))
+        for c in map["map"]["charging_stations"]:
+            x, y = c[0], c[1]
+            self.patches.append(Circle((x, y), 0.4, facecolor='blue', edgecolor='black'))
 
         task_colors = np.random.rand(len(map["tasks"]), 3)
         for t, i in zip(map["tasks"], range(len(map["tasks"]))):

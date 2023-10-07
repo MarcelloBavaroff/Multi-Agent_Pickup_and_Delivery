@@ -50,7 +50,7 @@ if __name__ == '__main__':
     args.param = os.path.join(RoothPath.get_root(), os.path.join(config['input_path'], config['input_name']))
     args.output = os.path.join(RoothPath.get_root(), 'output.yaml')
 
-    # Read from input file
+    # Read from input file, metto tutto dentro param
     with open(args.param, 'r') as param_file:
         try:
             param = yaml.load(param_file, Loader=yaml.FullLoader)
@@ -61,6 +61,7 @@ if __name__ == '__main__':
     obstacles = param['map']['obstacles']
     non_task_endpoints = param['map']['non_task_endpoints']
     agents = param['agents']
+    charging_stations = param['map']['charging_stations']
 
     if args.not_rand:
         tasks = read_tasks()
@@ -70,6 +71,7 @@ if __name__ == '__main__':
         tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'],
                                              param['n_tasks'], param['task_freq'])
 
+    #assegno i tasks generati così poi li vado a scrivere
     param['tasks'] = tasks
 
     with open(args.param + config['visual_postfix'], 'w') as param_file:
