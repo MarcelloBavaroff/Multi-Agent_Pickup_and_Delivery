@@ -13,11 +13,19 @@ class SimulationNewRecovery(object):
     def __init__(self, tasks, agents):
         self.tasks = tasks
         self.agents = agents
+        #self.n_delays = n_delays
+        #self.delays = delays
+        #if self.delays is not None:
+        #    self.n_delays = len(self.delays)
         self.time = 0
         self.start_times = [] #inizio dei task dei robot
+        #self.delay_times = []
+        #self.delayed_agents = set()
         self.agents_pos_now = set()
         self.agents_moved = set()
         self.actual_paths = {}
+        #self.times_agent_delayed = defaultdict(lambda: 0)
+        #self.delays_now = 0
         self.algo_time = 0
         self.initialize_simulation()
 
@@ -27,12 +35,21 @@ class SimulationNewRecovery(object):
         for agent in self.agents:
             #x e y del path sono presi da 'start' dell'agente (posizione 0 e 1)
             self.actual_paths[agent['name']] = [{'t': 0, 'x': agent['start'][0], 'y': agent['start'][1]}]
+        # if self.delays is None:
+        #     max_t = max(self.start_times)
+        #     self.delay_times = random.choices(range(1, max_t + 10), k=self.n_delays)
 
+    # def increase_delay_counter(self, agent, k):
+    #     self.times_agent_delayed[agent['name']] += 1
+    #     if self.times_agent_delayed[agent['name']] == k:
+    #         self.times_agent_delayed[agent['name']] = 0
+    #         self.delayed_agents.add(agent['name'])
 
     #questa viene chiamata per simulare un singolo timestep in avanti
     def time_forward(self, algorithm):
         self.time = self.time + 1
         print('Time:', self.time)
+        #self.delays_now = self.delay_times.count(self.time)
         start_time = time.time()
         algorithm.time_forward()
         self.algo_time += time.time() - start_time
@@ -50,9 +67,33 @@ class SimulationNewRecovery(object):
             #lunghezza del path dell'agente considerato
 
             if len(algorithm.get_token()['agents'][agent['name']]) == 1:
+                # if algorithm.get_replan_every_k_delays():
+                #     self.times_agent_delayed[agent['name']] = 0
                 self.agents_moved.add(agent['name'])
                 self.actual_paths[agent['name']].append(
                     {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
+            #else:
+                #se ci sono dei ritardi
+                # if self.delays is not None:
+                #     if self.time in self.delays[agent['name']]:
+                #         self.agents_moved.add(agent['name'])
+                #         if algorithm.get_replan_every_k_delays():
+                #             self.increase_delay_counter(agent, algorithm.get_k())
+                #         #self.delayed_agents.add(agent['name'])
+                #         # Don't consider forced replans
+                #         #algorithm.get_token()['n_replans'] = algorithm.get_token()['n_replans'] - 1
+                #         self.actual_paths[agent['name']].append(
+                #             {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
+                # elif self.delays_now > 0:
+                #     self.delays_now = self.delays_now - 1
+                #     self.agents_moved.add(agent['name'])
+                #     if algorithm.get_replan_every_k_delays():
+                #         self.increase_delay_counter(agent, algorithm.get_k())
+                #     #self.delayed_agents.add(agent['name'])
+                #     # Don't consider forced replans
+                #     #algorithm.get_token()['n_replans'] = algorithm.get_token()['n_replans'] - 1
+                #     self.actual_paths[agent['name']].append(
+                #         {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
 
         # Check moving agents doesn't collide with others
         agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]
@@ -82,6 +123,17 @@ class SimulationNewRecovery(object):
                             self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
             agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]
 
+        # for agent in agents_to_move:
+        #     #aggiorno con l'ultima posizione
+        #     current_agent_pos = self.actual_paths[agent['name']][-1]
+        #     if agent['name'] not in self.delayed_agents:
+        #         # self.delayed_agents.add(agent['name'])
+        #         # if algorithm.get_replan_every_k_delays():
+        #         #     self.times_agent_delayed[agent['name']] = 0
+        #         self.agents_pos_now.add(tuple([current_agent_pos['x'], current_agent_pos['y']]))
+        #         self.actual_paths[agent['name']].append(
+        #             {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
+
     def get_time(self):
         return self.time
 
@@ -98,6 +150,8 @@ class SimulationNewRecovery(object):
                 new.append(t)
         return new
 
+    def get_delayed_agents(self):
+        return self.delayed_agents
 
 
 if __name__ == '__main__':
@@ -135,8 +189,9 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = SimulationNewRecovery(tasks, agents)
-    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000, new_recovery=True)
+    simulation = SimulationNewRecovery(tasks, agents, delays=delays)
+    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000, k=1,
+                              replan_every_k_delays=False, pd=0.2, p_max=1, p_iter=1, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 
