@@ -5,14 +5,17 @@ author: Giacomo Lodigiani (@Lodz97)
 from math import fabs
 import random
 from Simulation.CBS.cbs import CBS, Environment
-#from Simulation.markov_chains import MarkovChainsMaker
-#from collections import defaultdict
+
+# from Simulation.markov_chains import MarkovChainsMaker
+# from collections import defaultdict
 
 
 States = ['safe_idle', 'recharging', 'charge_complete']
 
+
 class TokenPassingRecovery(object):
-    def __init__(self, agents, dimesions, obstacles, non_task_endpoints, charging_stations, simulation, a_star_max_iter=4000, new_recovery=False):
+    def __init__(self, agents, dimesions, obstacles, non_task_endpoints, charging_stations, simulation,
+                 a_star_max_iter=4000, new_recovery=False):
         self.agents = agents
         self.dimensions = dimesions
         self.obstacles = set(obstacles)
@@ -27,7 +30,7 @@ class TokenPassingRecovery(object):
         self.new_recovery = new_recovery
         self.charging_stations = charging_stations
         self.init_token()
-        #vedi sotto
+        # vedi sotto
 
     def init_token(self):
         self.token['agents'] = {}
@@ -42,27 +45,30 @@ class TokenPassingRecovery(object):
         self.token['n_replans'] = 0
         self.token['path_ends'] = set()
         self.token['occupied_non_task_endpoints'] = set()
+        #key = coordinates, t = when the agent will finish its recharging process
+        self.token['occupied_charging_stations'] = {}
         self.token['agent_at_end_path'] = []
         self.token['agent_at_end_path_pos'] = []
         self.token['agents_in_recovery_trial'] = []
         for a in self.agents:
-            #dovrebbe essere prendi gli agenti del token e poi nello specifico quello col nome specifico
+            # dovrebbe essere prendi gli agenti del token e poi nello specifico quello col nome specifico
             self.token['agents'][a['name']] = [a['start']]
             self.token['path_ends'].add(tuple(a['start']))
 
-    #in teoria agenti in idle hanno il path verso la loro posizione attuale (se sta caricando no)
+    # in teoria agenti in idle hanno il path verso la loro posizione attuale (se sta caricando no)
     def get_idle_agents(self):
         agents = {}
         for name, path in self.token['agents'].items():
-            if len(path) == 1 and not (name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][name]['task_name'] != 'recharging'):
+            if len(path) == 1 and not (name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][name][
+                'task_name'] != 'recharging'):
                 agents[name] = path
         return agents
 
-    #distanza in celle verticali ed orizzontali
+    # distanza in celle verticali ed orizzontali
     def admissible_heuristic(self, task_pos, agent_pos):
         return fabs(task_pos[0] - agent_pos[0]) + fabs(task_pos[1] - agent_pos[1])
 
-    #in teoria task più vicino al robot
+    # in teoria task più vicino al robot
     def get_closest_task_name(self, available_tasks, agent_pos):
         closest = random.choice(list(available_tasks.keys()))
         dist = self.admissible_heuristic(available_tasks[closest][0], agent_pos)
@@ -73,7 +79,7 @@ class TokenPassingRecovery(object):
 
     def get_moving_obstacles_agents(self, agents, time_start):
         obstacles = {}
-        for name, path in agents.items(): #agents.item ritorna un dizionario con nome agente e coordinate dello stesso
+        for name, path in agents.items():  # agents.item ritorna un dizionario con nome agente e coordinate dello stesso
             if len(path) > time_start and len(path) > 1:
                 for i in range(time_start, len(path)):
                     k = i - time_start
@@ -98,7 +104,7 @@ class TokenPassingRecovery(object):
         for start_goal in self.get_agents_to_tasks_starts_goals():
             if tuple(start_goal) == tuple(agent_pos):
                 return False
-        #dico che la stazioni di ricarica non sono posti safe
+        # dico che la stazioni di ricarica non sono posti safe
         for recharge_station in self.charging_stations:
             if tuple(recharge_station) == tuple(agent_pos):
                 return False
@@ -183,7 +189,8 @@ class TokenPassingRecovery(object):
 
     def get_random_close_cell(self, agent_pos, r):
         while True:
-            cell = (agent_pos[0] + random.choice(range(-r - 1, r + 1)), agent_pos[1] + random.choice(range(-r - 1, r + 1)))
+            cell = (
+            agent_pos[0] + random.choice(range(-r - 1, r + 1)), agent_pos[1] + random.choice(range(-r - 1, r + 1)))
             if cell not in self.obstacles and cell not in self.token['path_ends'] and \
                     cell not in self.token['occupied_non_task_endpoints'] \
                     and cell not in self.get_agents_to_tasks_goals() \
@@ -193,6 +200,7 @@ class TokenPassingRecovery(object):
     def set_task_name(self, agent_name, task_name):
         self.token['agents_to_task'][agent_name]['task_name'] = task_name
 
+    # inoltre rimuove gli agenti dallo stato complete_charge
     def update_completed_tasks(self):
         # Update completed tasks
         for agent_name in self.token['agents']:
@@ -207,28 +215,29 @@ class TokenPassingRecovery(object):
                     and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name][
                 'task_name'] not in States:
                 self.token['completed_tasks'] = self.token['completed_tasks'] + 1
-                self.token['completed_tasks_times'][self.token['agents_to_tasks'][agent_name]['task_name']] = self.simulation.get_time()
+                self.token['completed_tasks_times'][
+                    self.token['agents_to_tasks'][agent_name]['task_name']] = self.simulation.get_time()
                 self.token['agents_to_tasks'].pop(agent_name)
 
-            #se l'agente è in safe_idle o charge_complete lo rimuovo da agents_to_tasks
+            # se l'agente è in safe_idle o charge_complete lo rimuovo da agents_to_tasks
             if agent_name in self.token['agents_to_tasks'] and (pos['x'], pos['y']) == tuple(
                     self.token['agents_to_tasks'][agent_name]['goal']) \
                     and len(self.token['agents'][agent_name]) == 1 and (self.token['agents_to_tasks'][agent_name][
-                'task_name'] == 'safe_idle' or self.token['agents_to_tasks'][agent_name]['task_name'] == 'charge_complete'):
-
+                                                                            'task_name'] == 'safe_idle' or
+                                                                        self.token['agents_to_tasks'][agent_name][
+                                                                            'task_name'] == 'charge_complete'):
                 self.token['agents_to_tasks'].pop(agent_name)
 
     def predicted_consumption(self, path):
 
         consumption = 0
-        for i in range(len(path)-1):
-            if(path[i]['x'] == path[i+1]['x'] and path[i]['y'] == path[i+1]['y']):
+        for i in range(len(path) - 1):
+            if (path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']):
                 consumption += 0.01
             else:
                 consumption += 0.1
 
-        return round(consumption,2)
-
+        return round(consumption, 2)
 
     def time_forward(self):
 
@@ -238,8 +247,8 @@ class TokenPassingRecovery(object):
         for t in self.simulation.get_new_tasks():
             self.token['tasks'][t['task_name']] = [t['start'], t['goal']]
             self.token['start_tasks_times'][t['task_name']] = self.simulation.get_time()
-        idle_agents = self.get_idle_agents()
 
+        idle_agents = self.get_idle_agents()
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
             # agent_name = list(idle_agents.keys())[0]
@@ -249,22 +258,27 @@ class TokenPassingRecovery(object):
             agent_pos = idle_agents.pop(agent_name)[0]
             available_tasks = {}
             for task_name, task in self.token['tasks'].items():
-                #se inizio e fine task non in path ends degli agenti (meno me) AND nemmeno in
+                # se inizio e fine task non in path ends degli agenti (meno me) AND nemmeno in
                 if tuple(task[0]) not in self.token['path_ends'].difference({tuple(agent_pos)}) and tuple(
                         task[1]) not in self.token['path_ends'].difference({tuple(agent_pos)}) \
-                        and tuple(task[0]) not in self.get_agents_to_tasks_goals() and tuple(task[1]) not in self.get_agents_to_tasks_goals():
+                        and tuple(task[0]) not in self.get_agents_to_tasks_goals() and tuple(
+                    task[1]) not in self.get_agents_to_tasks_goals():
                     available_tasks[task_name] = task
+
             if len(available_tasks) > 0 or agent_name in self.token['agents_to_tasks']:
-                if agent_name in self.token['agents_to_tasks']:
-                    closest_task_name = self.token['agents_to_tasks'][agent_name]['task_name']
-                    closest_task = [self.token['agents_to_tasks'][agent_name]['start'], self.token['agents_to_tasks'][agent_name]['goal']]
-                else:
-                    closest_task_name = self.get_closest_task_name(available_tasks, agent_pos)
-                    closest_task = available_tasks[closest_task_name]
+
+                # prima c'era un if - else dovuto probabilmente a qualcosa dei delay
+                closest_task_name = self.get_closest_task_name(available_tasks, agent_pos)
+                closest_task = available_tasks[closest_task_name]
+
+                task_total_cost = self.admissible_heuristic(closest_task[0], agent_pos)
+                task_total_cost += self.admissible_heuristic(closest_task[1], closest_task[0])
+
                 moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
                 idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
+
                 agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
-                #penso sia l'unione di obstacles e idle_obastacles
+                # penso sia l'unione di obstacles e idle_obastacles
                 env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                                   moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
                 cbs = CBS(env)
@@ -309,10 +323,9 @@ class TokenPassingRecovery(object):
                         self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
                         for el in path_to_task_goal[agent_name]:
                             self.token['agents'][agent_name].append([el['x'], el['y']])
-            #righe 13-14 alg
+            # righe 13-14 alg
             elif self.check_safe_idle(agent_pos):
                 print('No available tasks for agent', agent_name, ' idling at current position...')
-            #righe 15-16 alg
+            # righe 15-16 alg
             else:
                 self.go_to_closest_non_task_endpoint(agent_name, agent_pos, all_idle_agents)
-
