@@ -205,6 +205,17 @@ class TokenPassingRecovery(object):
                 'task_name'] == 'safe_idle':
                 self.token['agents_to_tasks'].pop(agent_name)
 
+    def predicted_consumption(self, path):
+
+        consumption = 0
+        for i in range(len(path)-1):
+            if(path[i]['x'] == path[i+1]['x'] and path[i]['y'] == path[i+1]['y']):
+                consumption += 0.01
+            else:
+                consumption += 0.1
+
+        return round(consumption,2)
+
 
     def time_forward(self):
 
@@ -245,6 +256,8 @@ class TokenPassingRecovery(object):
                                   moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
                 cbs = CBS(env)
                 path_to_task_start = self.search(cbs, agent_name, moving_obstacles_agents)
+                consumption = self.predicted_consumption(path_to_task_start[agent_name])
+
                 if not path_to_task_start:
                     print("Solution not found to task start for agent", agent_name, " idling at current position...")
 

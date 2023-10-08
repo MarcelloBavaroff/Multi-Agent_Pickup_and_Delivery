@@ -2,6 +2,7 @@ import argparse
 import yaml
 import json
 import os
+import random
 from Simulation.TP_with_recovery import TokenPassingRecovery
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
@@ -71,6 +72,13 @@ if __name__ == '__main__':
         tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'],
                                              param['n_tasks'], param['task_freq'])
 
+    #batteria casuale tra 80 e 100
+    autonomies = []
+    for i in range(len(agents)):
+        autonomies.append(round(random.uniform(80, 100), 2))
+
+    param['autonomies'] = autonomies
+
     #assegno i tasks generati così poi li vado a scrivere
     param['tasks'] = tasks
 
@@ -78,7 +86,7 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = SimulationNewRecovery(tasks, agents)
+    simulation = SimulationNewRecovery(tasks, agents, autonomies)
     tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation,
                               a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks):
