@@ -9,8 +9,10 @@ from Simulation.CBS.cbs import CBS, Environment
 #from collections import defaultdict
 
 
+States = ['safe_idle', 'recharging', 'charge_complete']
+
 class TokenPassingRecovery(object):
-    def __init__(self, agents, dimesions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000, new_recovery=False):
+    def __init__(self, agents, dimesions, obstacles, non_task_endpoints, charging_stations, simulation, a_star_max_iter=4000, new_recovery=False):
         self.agents = agents
         self.dimensions = dimesions
         self.obstacles = set(obstacles)
@@ -23,6 +25,7 @@ class TokenPassingRecovery(object):
         self.simulation = simulation
         self.a_star_max_iter = a_star_max_iter
         self.new_recovery = new_recovery
+        self.charging_stations = charging_stations
         self.init_token()
         #vedi sotto
 
@@ -47,11 +50,11 @@ class TokenPassingRecovery(object):
             self.token['agents'][a['name']] = [a['start']]
             self.token['path_ends'].add(tuple(a['start']))
 
-    #in teoria agenti in idle hanno il path verso la loro posizione attuale
+    #in teoria agenti in idle hanno il path verso la loro posizione attuale (se sta caricando no)
     def get_idle_agents(self):
         agents = {}
         for name, path in self.token['agents'].items():
-            if len(path) == 1:
+            if len(path) == 1 and not (name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][name]['task_name'] != 'recharging'):
                 agents[name] = path
         return agents
 
@@ -95,6 +98,11 @@ class TokenPassingRecovery(object):
         for start_goal in self.get_agents_to_tasks_starts_goals():
             if tuple(start_goal) == tuple(agent_pos):
                 return False
+        #dico che la stazioni di ricarica non sono posti safe
+        for recharge_station in self.charging_stations:
+            if tuple(recharge_station) == tuple(agent_pos):
+                return False
+
         return True
 
     def get_closest_non_task_endpoint(self, agent_pos):
@@ -182,7 +190,10 @@ class TokenPassingRecovery(object):
                     and 0 <= cell[0] < self.dimensions[0] and 0 <= cell[1] < self.dimensions[1]:
                 return cell
 
-    def update_copleted_tasks(self):
+    def set_task_name(self, agent_name, task_name):
+        self.token['agents_to_task'][agent_name]['task_name'] = task_name
+
+    def update_completed_tasks(self):
         # Update completed tasks
         for agent_name in self.token['agents']:
             # pos = posizione attuale agente
@@ -190,19 +201,21 @@ class TokenPassingRecovery(object):
 
             # ---------------------CASO AGENTE ARRIVATO------------------
             # se agente assegnato ad un task E le sue coordinate attuali sono = al suo goal
-            # E il suo path attuale lungo 1 ed il suo taks non è safe idle
+            # E il suo path attuale lungo 1 ed il suo task non è safe idle, recharging, charge_complete
             if agent_name in self.token['agents_to_tasks'] and (pos['x'], pos['y']) == tuple(
                     self.token['agents_to_tasks'][agent_name]['goal']) \
                     and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name][
-                'task_name'] != 'safe_idle':
+                'task_name'] not in States:
                 self.token['completed_tasks'] = self.token['completed_tasks'] + 1
-                self.token['completed_tasks_times'][
-                    self.token['agents_to_tasks'][agent_name]['task_name']] = self.simulation.get_time()
+                self.token['completed_tasks_times'][self.token['agents_to_tasks'][agent_name]['task_name']] = self.simulation.get_time()
                 self.token['agents_to_tasks'].pop(agent_name)
+
+            #se l'agente è in safe_idle o charge_complete lo rimuovo da agents_to_tasks
             if agent_name in self.token['agents_to_tasks'] and (pos['x'], pos['y']) == tuple(
                     self.token['agents_to_tasks'][agent_name]['goal']) \
-                    and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name][
-                'task_name'] == 'safe_idle':
+                    and len(self.token['agents'][agent_name]) == 1 and (self.token['agents_to_tasks'][agent_name][
+                'task_name'] == 'safe_idle' or self.token['agents_to_tasks'][agent_name]['task_name'] == 'charge_complete'):
+
                 self.token['agents_to_tasks'].pop(agent_name)
 
     def predicted_consumption(self, path):
@@ -219,7 +232,7 @@ class TokenPassingRecovery(object):
 
     def time_forward(self):
 
-        self.update_copleted_tasks()
+        self.update_completed_tasks()
 
         # Collect new tasks and assign them, if possible
         for t in self.simulation.get_new_tasks():

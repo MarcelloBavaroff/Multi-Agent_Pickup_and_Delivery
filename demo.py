@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
     # Simulate
     simulation = SimulationNewRecovery(tasks, agents, autonomies)
-    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation,
+    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                               a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)

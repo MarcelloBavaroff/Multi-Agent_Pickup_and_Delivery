@@ -62,12 +62,12 @@ class SimulationNewRecovery(object):
                     {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
 
                 #se in fase di ricarica aumento il livello della sua batteria (upper bound autonomia massima)
-                if (algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name'] == 'recharging'):
+                if agent['name'] in algorithm.get_token()['agents_to_tasks'] and algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name'] == 'recharging':
                     self.batteries_level[agent['name']] += 10
                     #se carica completa lo metto in idle?
                     if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
                         self.batteries_level[agent['name']] = self.max_autonomies[agent['name']]
-                        #potrebbe servire un setter per agents to task e cambiare in idle??
+                        algorithm.set_task_name(agent['name'], 'charge_complete')
 
 
 
