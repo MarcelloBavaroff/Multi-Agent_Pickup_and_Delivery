@@ -46,7 +46,7 @@ class TokenPassingRecovery(object):
         self.token['n_replans'] = 0
         self.token['path_ends'] = set()
         self.token['occupied_non_task_endpoints'] = set()
-        # key = coordinates, t = when the agent will finish its recharging process
+        # 0,1 = coordinates, 2 = t when the agent will finish its recharging process
         self.token['charging_stations'] = {}
         self.token['agent_at_end_path'] = []
         self.token['agent_at_end_path_pos'] = []
@@ -57,7 +57,12 @@ class TokenPassingRecovery(object):
             self.token['path_ends'].add(tuple(a['start']))
 
         for c in self.charging_stations:
+
+            #ogni stazione contiene un dizionario con posizione e free_time()
+            self.token['charging_stations'][c['name']] = {}
             self.token['charging_stations'][c['name']]['pos'] = c['pos']
+            self.token['charging_stations'][c['name']]['free_time'] = 0
+
 
     # in teoria agenti in idle hanno il path verso la loro posizione attuale (se sta caricando no)
     def get_idle_agents(self):
@@ -225,7 +230,7 @@ class TokenPassingRecovery(object):
                     agent_name])/10
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
-                self.token['charging_stations'][station_name]['occupied'] = self.simulation.get_time() + estimated_time_to_recharge
+                self.token['charging_stations'][station_name]['free_time'] = self.simulation.get_time() + estimated_time_to_recharge
 
 
             # se agente assegnato ad un task E le sue coordinate attuali sono = al suo goal
@@ -250,6 +255,17 @@ class TokenPassingRecovery(object):
                 self.token['agents_to_tasks'].pop(agent_name)
                 #capire se l'agente in carica completa deve cambiare altro
 
+    def collect_new_tasks(self):
+        for t in self.simulation.get_new_tasks():
+            self.token['tasks'][t['task_name']] = [t['start'], t['goal']]
+            self.token['start_tasks_times'][t['task_name']] = self.simulation.get_time()
+
+    # def search_nearest_available_station(self, task_cost):
+    #     for s in self.charging_stations:
+    #         #stazione non assegnata ad un altro agente
+    #         if s['name'] not in self.token['agents_to_task']:
+
+
 
     def predicted_consumption(self, path):
 
@@ -265,29 +281,26 @@ class TokenPassingRecovery(object):
     def time_forward(self):
 
         self.update_completed_tasks()
+        self.collect_new_tasks()
 
-        # Collect new tasks and assign them, if possible
-        for t in self.simulation.get_new_tasks():
-            self.token['tasks'][t['task_name']] = [t['start'], t['goal']]
-            self.token['start_tasks_times'][t['task_name']] = self.simulation.get_time()
 
         idle_agents = self.get_idle_agents()
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
-            # agent_name = list(idle_agents.keys())[0]
             all_idle_agents = self.token['agents'].copy()
             all_idle_agents.pop(agent_name)
 
             agent_pos = idle_agents.pop(agent_name)[0]
             available_tasks = {}
             for task_name, task in self.token['tasks'].items():
-                # se inizio e fine task non in path ends degli agenti (meno me) AND nemmeno in
+                # se inizio e fine task non in path ends degli agenti (meno me) AND nemmeno in goals
                 if tuple(task[0]) not in self.token['path_ends'].difference({tuple(agent_pos)}) and tuple(
                         task[1]) not in self.token['path_ends'].difference({tuple(agent_pos)}) \
                         and tuple(task[0]) not in self.get_agents_to_tasks_goals() and tuple(
                     task[1]) not in self.get_agents_to_tasks_goals():
                     available_tasks[task_name] = task
 
+            #probabilmente mai vera condizione di destra
             if len(available_tasks) > 0 or agent_name in self.token['agents_to_tasks']:
 
                 # prima c'era un if - else dovuto probabilmente a qualcosa dei delay
