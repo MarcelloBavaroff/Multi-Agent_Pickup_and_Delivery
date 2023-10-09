@@ -48,6 +48,7 @@ class SimulationNewRecovery(object):
         self.agents_moved = set()
         agents_to_move = self.agents
         random.shuffle(agents_to_move)
+
         # First "move" idle agents
         for agent in agents_to_move:
 
@@ -68,6 +69,15 @@ class SimulationNewRecovery(object):
                     if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
                         self.batteries_level[agent['name']] = self.max_autonomies[agent['name']]
                         algorithm.set_task_name(agent['name'], 'charge_complete')
+                #abbasso livello di batteria
+                elif self.actual_paths[agent['name']][self.time]['x'] == self.actual_paths[agent['name']][self.time-1]['x'] and \
+                        self.actual_paths[agent['name']][self.time]['y'] == self.actual_paths[agent['name']][self.time - 1]['y']:
+
+                    self.batteries_level[agent['name']] -= 0.01
+                else:
+                    self.batteries_level[agent['name']] -= 0.1
+
+
 
 
 
