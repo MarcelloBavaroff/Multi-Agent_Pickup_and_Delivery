@@ -386,6 +386,7 @@ class TokenPassingRecovery(object):
         self.collect_new_tasks()
 
         idle_agents = self.get_idle_agents()
+        assigned = False
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
             all_idle_agents = self.token['agents'].copy()
@@ -422,7 +423,7 @@ class TokenPassingRecovery(object):
                         discarded_tasks.update(closest_task)
 
             #nessun task assegnato anche se c'erano
-            if not assigned and len(available_tasks) > 0:
+            elif not assigned and len(available_tasks) > 0:
                 print("Nessun task assegnato anche se c'erano")
 
             # righe 13-14 alg

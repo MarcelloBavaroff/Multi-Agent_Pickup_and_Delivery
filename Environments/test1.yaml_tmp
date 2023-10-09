@@ -16,10 +16,10 @@ agents:
   - 12
   - 11
 autonomies:
-- 92.89
-- 91.91
-- 94.46
-- 93.71
+- 80.25
+- 94.5
+- 99.12
+- 89.08
 map:
   charging_stations:
   - name: station0
