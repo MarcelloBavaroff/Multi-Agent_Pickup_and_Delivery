@@ -30,6 +30,8 @@ class TokenPassingRecovery(object):
         self.a_star_max_iter = a_star_max_iter
         self.new_recovery = new_recovery
         self.charging_stations = charging_stations
+        self.move_consumption = 0.1
+        self.wait_consumptio = 0.01
         self.init_token()
         # vedi sotto
 
@@ -57,12 +59,10 @@ class TokenPassingRecovery(object):
             self.token['path_ends'].add(tuple(a['start']))
 
         for c in self.charging_stations:
-
-            #ogni stazione contiene un dizionario con posizione e free_time()
+            # ogni stazione contiene un dizionario con posizione e free_time()
             self.token['charging_stations'][c['name']] = {}
             self.token['charging_stations'][c['name']]['pos'] = c['pos']
             self.token['charging_stations'][c['name']]['free_time'] = 0
-
 
     # in teoria agenti in idle hanno il path verso la loro posizione attuale (se sta caricando no)
     def get_idle_agents(self):
@@ -77,13 +77,22 @@ class TokenPassingRecovery(object):
     def admissible_heuristic(self, task_pos, agent_pos):
         return fabs(task_pos[0] - agent_pos[0]) + fabs(task_pos[1] - agent_pos[1])
 
-    # in teoria task più vicino al robot
-    def get_closest_task_name(self, available_tasks, agent_pos):
-        closest = random.choice(list(available_tasks.keys()))
-        dist = self.admissible_heuristic(available_tasks[closest][0], agent_pos)
-        for task_name, task in available_tasks.items():
+    # in teoria task più vicino al robot, in discarded tasks quelli già considerati e che
+    # non rispettano le condizioni. In teoria ritorna sempre qualcosa, se tutti scartati
+    # non dovrei nemmeno chiamarlo
+    def get_closest_task_name(self, available_tasks, agent_pos, discarded_tasks):
+
+        admissible_tasks = {}
+        for a in available_tasks:
+            if a not in discarded_tasks:
+                admissible_tasks[a] = available_tasks[a]
+
+        closest = random.choice(list(admissible_tasks.keys()))
+        dist = self.admissible_heuristic(admissible_tasks[closest][0], agent_pos)
+        for task_name, task in admissible_tasks.items():
             if self.admissible_heuristic(task[0], agent_pos) < dist:
                 closest = task_name
+
         return closest
 
     def get_moving_obstacles_agents(self, agents, time_start):
@@ -223,15 +232,15 @@ class TokenPassingRecovery(object):
                     self.token['agents_to_tasks'][agent_name]['goal']) \
                     and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name][
                 'task_name'] in self.token['charging_stations']:
-
                 station_name = self.token['agents_to_tasks'][agent_name]['task_name']
                 self.token['agents_to_tasks'][agent_name]['task_name'] = 'recharging'
-                estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] - self.simulation.get_max_autonomies()[
-                    agent_name])/10
+                estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
+                                              self.simulation.get_max_autonomies()[
+                                                  agent_name]) / 10
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
-                self.token['charging_stations'][station_name]['free_time'] = self.simulation.get_time() + estimated_time_to_recharge
-
+                self.token['charging_stations'][station_name][
+                    'free_time'] = self.simulation.get_time() + estimated_time_to_recharge
 
             # se agente assegnato ad un task E le sue coordinate attuali sono = al suo goal
             # E il suo path attuale lungo 1 ed il suo task non è safe idle, recharging, charge_complete
@@ -239,7 +248,6 @@ class TokenPassingRecovery(object):
                     self.token['agents_to_tasks'][agent_name]['goal']) \
                     and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name][
                 'task_name'] not in States:
-
                 self.token['completed_tasks'] = self.token['completed_tasks'] + 1
                 self.token['completed_tasks_times'][
                     self.token['agents_to_tasks'][agent_name]['task_name']] = self.simulation.get_time()
@@ -253,36 +261,118 @@ class TokenPassingRecovery(object):
                                                                         self.token['agents_to_tasks'][agent_name][
                                                                             'task_name'] == 'charge_complete'):
                 self.token['agents_to_tasks'].pop(agent_name)
-                #capire se l'agente in carica completa deve cambiare altro
+                # capire se l'agente in carica completa deve cambiare altro
 
     def collect_new_tasks(self):
         for t in self.simulation.get_new_tasks():
             self.token['tasks'][t['task_name']] = [t['start'], t['goal']]
             self.token['start_tasks_times'][t['task_name']] = self.simulation.get_time()
 
-    # def search_nearest_available_station(self, task_cost):
-    #     for s in self.charging_stations:
-    #         #stazione non assegnata ad un altro agente
-    #         if s['name'] not in self.token['agents_to_task']:
+    def find_available_tasks(self, agent_pos):
+        available_tasks = {}
+        for task_name, task in self.token['tasks'].items():
+            # se inizio e fine task non in path ends degli agenti (meno me) AND nemmeno in goals
+            if tuple(task[0]) not in self.token['path_ends'].difference({tuple(agent_pos)}) and tuple(
+                    task[1]) not in self.token['path_ends'].difference({tuple(agent_pos)}) \
+                    and tuple(task[0]) not in self.get_agents_to_tasks_goals() and tuple(
+                task[1]) not in self.get_agents_to_tasks_goals():
+                available_tasks[task_name] = task
+        return available_tasks
 
+    # restituisce il nome della stazione più vicina a cui è possibile andare a caricarsi una
+    # volta completato il task
+    def search_nearest_available_station(self, task_cost, task_final_pos, agent_name):
 
+        dist_min = -1
+        closest_station_name = None
+
+        for s in self.charging_stations:
+            # stazione non assegnata ad un altro agente
+            if s['name'] not in self.token['agents_to_tasks']:
+                estimated_arrival_cost = task_cost + self.admissible_heuristic(task_final_pos, s['pos'])
+                estimated_arrival_time = estimated_arrival_cost + self.simulation.get_time()
+
+                # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
+                if self.token['charging_stations'][s['name']]['free_time'] < estimated_arrival_time \
+                        and estimated_arrival_cost * self.move_consumption < self.simulation.get_batteries_level()[
+                    agent_name]:
+                    if dist_min == -1:
+                        dist_min = estimated_arrival_cost
+                        closest_station_name = s['name']
+
+                    elif estimated_arrival_time < dist_min:
+                        dist_min = estimated_arrival_cost
+                        closest_station_name = s['name']
+
+        return closest_station_name
+
+    def compute_real_path(self, agent_name, agent_pos, closest_task, closest_task_name, all_idle_agents, available_tasks):
+        moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
+        idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
+
+        agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
+        # penso sia l'unione di obstacles e idle_obastacles
+        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
+                          moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
+        cbs = CBS(env)
+        path_to_task_start = self.search(cbs, agent_name, moving_obstacles_agents)
+        consumption = self.predicted_consumption(path_to_task_start[agent_name])
+
+        if not path_to_task_start:
+            print("Solution not found to task start for agent", agent_name, " idling at current position...")
+
+        else:
+            print("Solution found to task start for agent", agent_name, " searching solution to task goal...")
+            cost1 = env.compute_solution_cost(path_to_task_start)
+            # Use cost - 1 because idle cost is 1
+            moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], cost1 - 1)
+            idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), cost1 - 1)
+            agent = {'name': agent_name, 'start': closest_task[0], 'goal': closest_task[1]}
+            env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
+                              moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
+            cbs = CBS(env)
+            path_to_task_goal = self.search(cbs, agent_name, moving_obstacles_agents)
+            if not path_to_task_goal:
+                print("Solution not found to task goal for agent", agent_name, " idling at current position...")
+
+            else:
+                print("Solution found to task goal for agent", agent_name, " doing task...")
+                cost2 = env.compute_solution_cost(path_to_task_goal)
+                if agent_name not in self.token['agents_to_tasks']:
+                    self.token['tasks'].pop(closest_task_name)
+                    task = available_tasks.pop(closest_task_name)
+                else:
+                    task = closest_task
+
+                last_step = path_to_task_goal[agent_name][-1]
+                self.update_ends(agent_pos)
+                self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
+                self.token['agents_to_tasks'][agent_name] = {'task_name': closest_task_name, 'start': task[0],
+                                                             'goal': task[1], 'predicted_cost': cost1 + cost2}
+                self.token['agents'][agent_name] = []
+                for el in path_to_task_start[agent_name]:
+                    self.token['agents'][agent_name].append([el['x'], el['y']])
+                # Don't repeat twice same step, elimino ultimo elemento
+                self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
+                for el in path_to_task_goal[agent_name]:
+                    self.token['agents'][agent_name].append([el['x'], el['y']])
 
     def predicted_consumption(self, path):
 
         consumption = 0
         for i in range(len(path) - 1):
-            if (path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']):
-                consumption += 0.01
+            if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
+                consumption += self.move_consumption
             else:
-                consumption += 0.1
+                consumption += self.move_consumption
 
         return round(consumption, 2)
+
 
     def time_forward(self):
 
         self.update_completed_tasks()
         self.collect_new_tasks()
-
 
         idle_agents = self.get_idle_agents()
         while len(idle_agents) > 0:
@@ -291,24 +381,26 @@ class TokenPassingRecovery(object):
             all_idle_agents.pop(agent_name)
 
             agent_pos = idle_agents.pop(agent_name)[0]
-            available_tasks = {}
-            for task_name, task in self.token['tasks'].items():
-                # se inizio e fine task non in path ends degli agenti (meno me) AND nemmeno in goals
-                if tuple(task[0]) not in self.token['path_ends'].difference({tuple(agent_pos)}) and tuple(
-                        task[1]) not in self.token['path_ends'].difference({tuple(agent_pos)}) \
-                        and tuple(task[0]) not in self.get_agents_to_tasks_goals() and tuple(
-                    task[1]) not in self.get_agents_to_tasks_goals():
-                    available_tasks[task_name] = task
-
-            #probabilmente mai vera condizione di destra
+            available_tasks = self.find_available_tasks(agent_pos)
+            # probabilmente mai vera condizione di destra
             if len(available_tasks) > 0 or agent_name in self.token['agents_to_tasks']:
 
-                # prima c'era un if - else dovuto probabilmente a qualcosa dei delay
-                closest_task_name = self.get_closest_task_name(available_tasks, agent_pos)
-                closest_task = available_tasks[closest_task_name]
+                assigned = False
+                discarded_tasks = {}
+                while not assigned and len(discarded_tasks) < len(available_tasks):
+                    # prima c'era un if - else dovuto probabilmente a qualcosa dei delay
+                    closest_task_name = self.get_closest_task_name(available_tasks, agent_pos, discarded_tasks)
+                    closest_task = available_tasks[closest_task_name]
 
-                task_total_cost = self.admissible_heuristic(closest_task[0], agent_pos)
-                task_total_cost += self.admissible_heuristic(closest_task[1], closest_task[0])
+                    task_total_cost = self.admissible_heuristic(closest_task[0], agent_pos)
+                    task_total_cost += self.admissible_heuristic(closest_task[1], closest_task[0])
+
+                    nearest_station = self.search_nearest_available_station(task_total_cost, closest_task[1], agent_name)
+                    if nearest_station is not None:
+                        assigned = True
+                    else:
+                        discarded_tasks.update(closest_task)
+
 
                 moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
                 idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)

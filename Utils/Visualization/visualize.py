@@ -64,7 +64,7 @@ class Animation:
             x, y = e[0], e[1]
             self.patches.append(Circle((x, y), 0.4, facecolor='green', edgecolor='black'))
         for c in map["map"]["charging_stations"]:
-            x, y = c[0], c[1]
+            x, y = c['pos'][0], c['pos'][1]
             self.patches.append(Circle((x, y), 0.4, facecolor='blue', edgecolor='black'))
 
         task_colors = np.random.rand(len(map["tasks"]), 3)
