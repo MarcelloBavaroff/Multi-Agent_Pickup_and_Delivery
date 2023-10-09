@@ -116,7 +116,11 @@ class SimulationNewRecovery(object):
                 new.append(t)
         return new
 
+    def get_max_autonomies(self):
+        return self.max_autonomies
 
+    def get_batteries_level(self):
+        return self.batteries_level
 
 if __name__ == '__main__':
     random.seed(1234)
