@@ -285,11 +285,13 @@ class TokenPassingRecovery(object):
 
         dist_min = -1
         closest_station_name = None
+        estimated_station_cost = None
 
         for s in self.charging_stations:
             # stazione non assegnata ad un altro agente
             if s['name'] not in self.token['agents_to_tasks']:
-                estimated_arrival_cost = task_cost + self.admissible_heuristic(task_final_pos, s['pos'])
+                estimated_station_cost = self.admissible_heuristic(task_final_pos, s['pos'])
+                estimated_arrival_cost = task_cost + estimated_station_cost
                 estimated_arrival_time = estimated_arrival_cost + self.simulation.get_time()
 
                 # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
@@ -304,9 +306,10 @@ class TokenPassingRecovery(object):
                         dist_min = estimated_arrival_cost
                         closest_station_name = s['name']
 
-        return closest_station_name
+        return closest_station_name, estimated_station_cost * self.move_consumption
 
-    def compute_real_path(self, agent_name, agent_pos, closest_task, closest_task_name, all_idle_agents, available_tasks):
+    def compute_real_path(self, agent_name, agent_pos, closest_task, closest_task_name, all_idle_agents,
+                          available_tasks, consumption_to_station):
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
 
@@ -316,7 +319,6 @@ class TokenPassingRecovery(object):
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
         path_to_task_start = self.search(cbs, agent_name, moving_obstacles_agents)
-        consumption = self.predicted_consumption(path_to_task_start[agent_name])
 
         if not path_to_task_start:
             print("Solution not found to task start for agent", agent_name, " idling at current position...")
@@ -324,6 +326,7 @@ class TokenPassingRecovery(object):
         else:
             print("Solution found to task start for agent", agent_name, " searching solution to task goal...")
             cost1 = env.compute_solution_cost(path_to_task_start)
+            consumption = self.predicted_consumption(path_to_task_start[agent_name])
             # Use cost - 1 because idle cost is 1
             moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], cost1 - 1)
             idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), cost1 - 1)
@@ -338,24 +341,33 @@ class TokenPassingRecovery(object):
             else:
                 print("Solution found to task goal for agent", agent_name, " doing task...")
                 cost2 = env.compute_solution_cost(path_to_task_goal)
-                if agent_name not in self.token['agents_to_tasks']:
-                    self.token['tasks'].pop(closest_task_name)
-                    task = available_tasks.pop(closest_task_name)
-                else:
-                    task = closest_task
+                consumption += self.predicted_consumption(path_to_task_goal[agent_name])
 
-                last_step = path_to_task_goal[agent_name][-1]
-                self.update_ends(agent_pos)
-                self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
-                self.token['agents_to_tasks'][agent_name] = {'task_name': closest_task_name, 'start': task[0],
-                                                             'goal': task[1], 'predicted_cost': cost1 + cost2}
-                self.token['agents'][agent_name] = []
-                for el in path_to_task_start[agent_name]:
-                    self.token['agents'][agent_name].append([el['x'], el['y']])
-                # Don't repeat twice same step, elimino ultimo elemento
-                self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
-                for el in path_to_task_goal[agent_name]:
-                    self.token['agents'][agent_name].append([el['x'], el['y']])
+                if self.simulation.get_batteries_level()[agent_name] >= consumption + consumption_to_station:
+                    if agent_name not in self.token['agents_to_tasks']:
+                        self.token['tasks'].pop(closest_task_name)
+                        task = available_tasks.pop(closest_task_name)
+                    # ramo else mai in teoria
+                    else:
+                        task = closest_task
+
+                    last_step = path_to_task_goal[agent_name][-1]
+                    self.update_ends(agent_pos)
+                    self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
+                    self.token['agents_to_tasks'][agent_name] = {'task_name': closest_task_name, 'start': task[0],
+                                                                 'goal': task[1], 'predicted_cost': cost1 + cost2}
+                    self.token['agents'][agent_name] = []
+                    for el in path_to_task_start[agent_name]:
+                        self.token['agents'][agent_name].append([el['x'], el['y']])
+                    # Don't repeat twice same step, elimino ultimo elemento
+                    self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
+                    for el in path_to_task_goal[agent_name]:
+                        self.token['agents'][agent_name].append([el['x'], el['y']])
+
+                    # devo fare pop da quello vero, non dalla copia
+                    return True
+                else:
+                    return False
 
     def predicted_consumption(self, path):
 
@@ -367,7 +379,6 @@ class TokenPassingRecovery(object):
                 consumption += self.move_consumption
 
         return round(consumption, 2)
-
 
     def time_forward(self):
 
@@ -395,62 +406,25 @@ class TokenPassingRecovery(object):
                     task_total_cost = self.admissible_heuristic(closest_task[0], agent_pos)
                     task_total_cost += self.admissible_heuristic(closest_task[1], closest_task[0])
 
-                    nearest_station = self.search_nearest_available_station(task_total_cost, closest_task[1], agent_name)
+                    nearest_station, consumption_to_station = self.search_nearest_available_station(task_total_cost,
+                                                                                                    closest_task[1],
+                                                                                                    agent_name)
                     if nearest_station is not None:
-                        assigned = True
+                        assigned = self.compute_real_path(agent_name, agent_pos, closest_task, closest_task_name,
+                                                          all_idle_agents,
+                                                          available_tasks, consumption_to_station)
+                        #mi turba il fatto che la pop di available_tasks funzioni fuori dalla funzione, ma ok
+
+                        if not assigned:
+                            discarded_tasks.update(closest_task)
+
                     else:
                         discarded_tasks.update(closest_task)
 
+            #nessun task assegnato anche se c'erano
+            if not assigned and len(available_tasks) > 0:
+                print("Nessun task assegnato anche se c'erano")
 
-                moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
-                idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
-
-                agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
-                # penso sia l'unione di obstacles e idle_obastacles
-                env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
-                                  moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
-                cbs = CBS(env)
-                path_to_task_start = self.search(cbs, agent_name, moving_obstacles_agents)
-                consumption = self.predicted_consumption(path_to_task_start[agent_name])
-
-                if not path_to_task_start:
-                    print("Solution not found to task start for agent", agent_name, " idling at current position...")
-
-                else:
-                    print("Solution found to task start for agent", agent_name, " searching solution to task goal...")
-                    cost1 = env.compute_solution_cost(path_to_task_start)
-                    # Use cost - 1 because idle cost is 1
-                    moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], cost1 - 1)
-                    idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), cost1 - 1)
-                    agent = {'name': agent_name, 'start': closest_task[0], 'goal': closest_task[1]}
-                    env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
-                                      moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
-                    cbs = CBS(env)
-                    path_to_task_goal = self.search(cbs, agent_name, moving_obstacles_agents)
-                    if not path_to_task_goal:
-                        print("Solution not found to task goal for agent", agent_name, " idling at current position...")
-
-                    else:
-                        print("Solution found to task goal for agent", agent_name, " doing task...")
-                        cost2 = env.compute_solution_cost(path_to_task_goal)
-                        if agent_name not in self.token['agents_to_tasks']:
-                            self.token['tasks'].pop(closest_task_name)
-                            task = available_tasks.pop(closest_task_name)
-                        else:
-                            task = closest_task
-
-                        last_step = path_to_task_goal[agent_name][-1]
-                        self.update_ends(agent_pos)
-                        self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
-                        self.token['agents_to_tasks'][agent_name] = {'task_name': closest_task_name, 'start': task[0],
-                                                                     'goal': task[1], 'predicted_cost': cost1 + cost2}
-                        self.token['agents'][agent_name] = []
-                        for el in path_to_task_start[agent_name]:
-                            self.token['agents'][agent_name].append([el['x'], el['y']])
-                        # Don't repeat twice same step, elimino ultimo elemento
-                        self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
-                        for el in path_to_task_goal[agent_name]:
-                            self.token['agents'][agent_name].append([el['x'], el['y']])
             # righe 13-14 alg
             elif self.check_safe_idle(agent_pos):
                 print('No available tasks for agent', agent_name, ' idling at current position...')
