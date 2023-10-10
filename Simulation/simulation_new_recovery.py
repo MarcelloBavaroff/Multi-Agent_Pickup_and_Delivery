@@ -106,14 +106,14 @@ class SimulationNewRecovery(object):
                         # aggiorno il path dell'agente
                         self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
 
-                        # if self.actual_paths[agent['name']][self.time]['x'] == \
-                        #         self.actual_paths[agent['name']][self.time - 1]['x'] and \
-                        #         self.actual_paths[agent['name']][self.time]['y'] == \
-                        #         self.actual_paths[agent['name']][self.time - 1]['y']:
-                        #
-                        #     self.batteries_level[agent['name']] -= self.wait_consumption
-                        # else:
-                        #     self.batteries_level[agent['name']] -= self.move_consumption
+                        if self.actual_paths[agent['name']][self.time]['x'] == \
+                                self.actual_paths[agent['name']][self.time - 1]['x'] and \
+                                self.actual_paths[agent['name']][self.time]['y'] == \
+                                self.actual_paths[agent['name']][self.time - 1]['y']:
+
+                            self.batteries_level[agent['name']] -= self.wait_consumption
+                        else:
+                            self.batteries_level[agent['name']] -= self.move_consumption
 
             agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]
 

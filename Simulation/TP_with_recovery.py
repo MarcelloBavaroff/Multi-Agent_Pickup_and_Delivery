@@ -436,10 +436,9 @@ class TokenPassingRecovery(object):
                     else:
                         discarded_tasks[closest_task_name] = closest_task
 
+                if not assigned and len(available_tasks) > 0:
+                    print("Nessun task assegnato anche se c'erano")
 
-            # nessun task assegnato anche se c'erano
-            elif not assigned and len(available_tasks) > 0:
-                print("Nessun task assegnato anche se c'erano")
 
             # righe 13-14 alg
             elif self.check_safe_idle(agent_pos):
