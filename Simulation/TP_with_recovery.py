@@ -403,7 +403,7 @@ class TokenPassingRecovery(object):
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
 
         #cambiare goal
-        agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_station'][station_name]['pos']}
+        agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_stations'][station_name]['pos']}
 
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
@@ -426,13 +426,13 @@ class TokenPassingRecovery(object):
                 # # ramo else mai in teoria
                 # else:
                 #     task = closest_task
-                task = self.token['charging_station'][station_name]
+                task = self.token['charging_stations'][station_name]
 
                 last_step = path_to_station[agent_name][-1]
                 self.update_ends(agent_pos)
                 self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
-                self.token['agents_to_tasks'][agent_name] = {'task_name': station_name, 'start': task[0],
-                                                             'goal': task[1], 'predicted_cost': cost1}
+                self.token['agents_to_tasks'][agent_name] = {'task_name': station_name, 'start': last_step,
+                                                             'goal': last_step, 'predicted_cost': cost1}
                 self.token['agents'][agent_name] = []
                 for el in path_to_station[agent_name]:
                     self.token['agents'][agent_name].append([el['x'], el['y']])
@@ -507,6 +507,7 @@ class TokenPassingRecovery(object):
                     else:
                         discarded_tasks[closest_task_name] = closest_task
 
+                #non posso fare nulla quindi vado a caricarmi
                 if not assigned and len(available_tasks) > 0:
                     print("Nessun task assegnato anche se c'erano")
                     # in questo caso parto dalla mia posizione (agent_pos) quindi 0 come costo base
@@ -514,12 +515,33 @@ class TokenPassingRecovery(object):
 
                     discarded_stations = {}
                     theoretically_ok_stations = []
+                    find_feasible_station = False
 
-                    nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(agent_pos, agent_name, discarded_stations)
+                    nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
+                        agent_pos, agent_name, discarded_stations)
+                    while not find_feasible_station and nearest_station is not None:
 
-                    if nearest_station is not None:
-                        #dico questa in teoria va bene
+                        # dico questa in teoria va bene
                         theoretically_ok_stations.append(nearest_station)
+
+                        find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
+                                                                               all_idle_agents, nearest_station)
+                        # se ho True vuol dire che ho assegnato la stazione e sono felice
+                        # altrimenti devo vedere altre stazioni
+                        if not find_feasible_station:
+                            discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
+
+                        nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
+                            agent_pos, agent_name, discarded_stations)
+
+                    #se non ho trovato nessuna stazione al momento stampo un messaggio
+                    #in teoria dovrei provare a fanculizzare gli altri agenti
+                    if not find_feasible_station:
+                        print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
+
+
+
+
 
 
 

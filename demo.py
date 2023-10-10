@@ -88,7 +88,7 @@ if __name__ == '__main__':
     simulation = SimulationNewRecovery(tasks, agents, autonomies)
     tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                               a_star_max_iter=args.a_star_max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks):
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 400:
         simulation.time_forward(tp)
 
     cost = 0
