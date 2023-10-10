@@ -69,7 +69,7 @@ class TokenPassingRecovery(object):
         agents = {}
         for name, path in self.token['agents'].items():
             if len(path) == 1 and not (name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][name][
-                'task_name'] != 'recharging'):
+                'task_name'] == 'recharging'):
                 agents[name] = path
         return agents
 
