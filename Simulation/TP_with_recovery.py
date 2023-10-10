@@ -30,8 +30,8 @@ class TokenPassingRecovery(object):
         self.a_star_max_iter = a_star_max_iter
         self.new_recovery = new_recovery
         self.charging_stations = charging_stations
-        self.move_consumption = 0.1
-        self.wait_consumptio = 0.01
+        self.move_consumption = self.simulation.get_move_consumption()
+        self.wait_consumption = self.simulation.get_wait_consumption()
         self.init_token()
         # vedi sotto
 
@@ -111,6 +111,8 @@ class TokenPassingRecovery(object):
         for path in agents_paths:
             if len(path) == 1:
                 obstacles.add((path[0][0], path[0][1]))
+            #presumo agenti che finiranno il loro percorso e si fermeranno? Quindi metto ultima
+            #loro posizione
             if 1 < len(path) <= time_start:
                 obstacles.add((path[-1][0], path[-1][1]))
         return obstacles
@@ -302,7 +304,7 @@ class TokenPassingRecovery(object):
                         dist_min = estimated_arrival_cost
                         closest_station_name = s['name']
 
-                    elif estimated_arrival_time < dist_min:
+                    elif estimated_arrival_cost < dist_min:
                         dist_min = estimated_arrival_cost
                         closest_station_name = s['name']
 
@@ -365,7 +367,7 @@ class TokenPassingRecovery(object):
                         self.token['agents'][agent_name].append([el['x'], el['y']])
 
                     # devo fare pop da quello vero, non dalla copia
-                    return True
+                    return True,
                 else:
                     return False
 
@@ -389,13 +391,16 @@ class TokenPassingRecovery(object):
         assigned = False
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
+
             all_idle_agents = self.token['agents'].copy()
             all_idle_agents.pop(agent_name)
 
             agent_pos = idle_agents.pop(agent_name)[0]
             available_tasks = self.find_available_tasks(agent_pos)
-            # probabilmente mai vera condizione di destra
-            if len(available_tasks) > 0 or agent_name in self.token['agents_to_tasks']:
+
+            #forse da togliere seconda condizione
+            #if len(available_tasks) > 0 or agent_name in self.token['agents_to_tasks']:
+            if len(available_tasks) > 0:
 
                 assigned = False
                 discarded_tasks = {}
@@ -406,29 +411,40 @@ class TokenPassingRecovery(object):
 
                     task_total_cost = self.admissible_heuristic(closest_task[0], agent_pos)
                     task_total_cost += self.admissible_heuristic(closest_task[1], closest_task[0])
+                    task_total_consumption = task_total_cost * self.move_consumption
 
-                    nearest_station, consumption_to_station = self.search_nearest_available_station(task_total_cost,
-                                                                                                    closest_task[1],
-                                                                                                    agent_name)
-                    if nearest_station is not None:
-                        assigned = self.compute_real_path(agent_name, agent_pos, closest_task, closest_task_name,
-                                                          all_idle_agents,
-                                                          available_tasks, consumption_to_station)
-                        #mi turba il fatto che la pop di available_tasks funzioni fuori dalla funzione, ma ok
+                    if task_total_consumption < self.simulation.get_batteries_level()[agent_name]:
 
-                        if not assigned:
-                            discarded_tasks.update(closest_task)
+                        # consumption to station si intende dal goal alla stazione più vicina
+                        nearest_station, consumption_to_station = self.search_nearest_available_station(task_total_cost,
+                                                                                                        closest_task[1],
+                                                                                                        agent_name)
+                        if nearest_station is not None:
+                            assigned = self.compute_real_path(agent_name, agent_pos, closest_task, closest_task_name,
+                                                              all_idle_agents,
+                                                              available_tasks, consumption_to_station)
+                            # mi turba il fatto che la pop di available_tasks funzioni fuori dalla funzione, ma ok
+
+                            if not assigned:
+                                # discarded_tasks.update(closest_task)
+                                discarded_tasks[closest_task_name] = closest_task
+
+                        else:
+                            # discarded_tasks.update(closest_task)
+                            discarded_tasks[closest_task_name] = closest_task
 
                     else:
-                        discarded_tasks.update(closest_task)
+                        discarded_tasks[closest_task_name] = closest_task
 
-            #nessun task assegnato anche se c'erano
+
+            # nessun task assegnato anche se c'erano
             elif not assigned and len(available_tasks) > 0:
                 print("Nessun task assegnato anche se c'erano")
 
             # righe 13-14 alg
             elif self.check_safe_idle(agent_pos):
                 print('No available tasks for agent', agent_name, ' idling at current position...')
+                print(self.simulation.get_batteries_level()[agent_name])
             # righe 15-16 alg
             else:
                 self.go_to_closest_non_task_endpoint(agent_name, agent_pos, all_idle_agents)
