@@ -238,7 +238,7 @@ class TokenPassingRecovery(object):
                 station_name = self.token['agents_to_tasks'][agent_name]['task_name']
                 self.token['agents_to_tasks'][agent_name]['task_name'] = 'recharging'
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
-                                              self.simulation.get_max_autonomies()[
+                                              self.simulation.get_batteries_level()[
                                                   agent_name]) / 10
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 

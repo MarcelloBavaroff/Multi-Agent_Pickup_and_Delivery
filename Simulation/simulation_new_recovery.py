@@ -66,7 +66,7 @@ class SimulationNewRecovery(object):
 
                 # se in fase di ricarica aumento il livello della sua batteria (upper bound autonomia massima)
                 if agent['name'] in algorithm.get_token()['agents_to_tasks'] and \
-                        algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name'] in algorithm.get_token()['charging_stations']:
+                        algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name'] == 'recharging':
                     #== 'recharging'
                     self.batteries_level[agent['name']] += 10
                     # se carica completa lo metto in idle?
