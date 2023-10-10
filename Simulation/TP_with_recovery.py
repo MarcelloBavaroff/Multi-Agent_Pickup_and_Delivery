@@ -111,8 +111,8 @@ class TokenPassingRecovery(object):
         for path in agents_paths:
             if len(path) == 1:
                 obstacles.add((path[0][0], path[0][1]))
-            #presumo agenti che finiranno il loro percorso e si fermeranno? Quindi metto ultima
-            #loro posizione
+            # presumo agenti che finiranno il loro percorso e si fermeranno? Quindi metto ultima
+            # loro posizione
             if 1 < len(path) <= time_start:
                 obstacles.add((path[-1][0], path[-1][1]))
         return obstacles
@@ -290,7 +290,7 @@ class TokenPassingRecovery(object):
         estimated_station_cost = None
 
         for s in self.charging_stations:
-            # stazione non assegnata ad un altro agente
+            # stazione non assegnata a un altro agente
             if s['name'] not in self.token['agents_to_tasks']:
                 estimated_station_cost = self.admissible_heuristic(task_final_pos, s['pos'])
                 estimated_arrival_cost = task_cost + estimated_station_cost
@@ -306,6 +306,32 @@ class TokenPassingRecovery(object):
 
                     elif estimated_arrival_cost < dist_min:
                         dist_min = estimated_arrival_cost
+                        closest_station_name = s['name']
+
+        return closest_station_name, estimated_station_cost * self.move_consumption
+
+    def search_nearest_available_station_to_agent(self, agent_pos, agent_name, discarded_stations):
+
+        dist_min = -1
+        closest_station_name = None
+        estimated_station_cost = None
+
+        for s in self.charging_stations:
+            # stazione non assegnata a un altro agente
+            if s['name'] not in self.token['agents_to_tasks'] and s['name'] not in discarded_stations:
+                estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
+                estimated_arrival_time = estimated_station_cost + self.simulation.get_time()
+
+                # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
+                if self.token['charging_stations'][s['name']]['free_time'] < estimated_arrival_time \
+                        and estimated_station_cost * self.move_consumption < self.simulation.get_batteries_level()[
+                    agent_name]:
+                    if dist_min == -1:
+                        dist_min = estimated_station_cost
+                        closest_station_name = s['name']
+
+                    elif estimated_station_cost < dist_min:
+                        dist_min = estimated_station_cost
                         closest_station_name = s['name']
 
         return closest_station_name, estimated_station_cost * self.move_consumption
@@ -366,10 +392,59 @@ class TokenPassingRecovery(object):
                     for el in path_to_task_goal[agent_name]:
                         self.token['agents'][agent_name].append([el['x'], el['y']])
 
-                    # devo fare pop da quello vero, non dalla copia
+                    # devo fare pop da quello vero? non dalla copia
                     return True,
                 else:
                     return False
+
+    def compute_real_path_station(self, agent_name, agent_pos, all_idle_agents, station_name):
+
+        moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
+        idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
+
+        #cambiare goal
+        agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_station'][station_name]['pos']}
+
+        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
+                          moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
+        cbs = CBS(env)
+        path_to_station = self.search(cbs, agent_name, moving_obstacles_agents)
+
+        if not path_to_station:
+            print("Solution not found to charging station for agent", agent_name, " idling at current position...")
+
+        else:
+            print("Solution found to charging station for agent", agent_name)
+            cost1 = env.compute_solution_cost(path_to_station)
+            consumption = self.predicted_consumption(path_to_station[agent_name])
+            # Use cost - 1 because idle cost is 1
+
+            if self.simulation.get_batteries_level()[agent_name] >= consumption:
+                # if agent_name not in self.token['agents_to_tasks']:
+                #
+                #     task = self.token['charging_station'][station_name]
+                # # ramo else mai in teoria
+                # else:
+                #     task = closest_task
+                task = self.token['charging_station'][station_name]
+
+                last_step = path_to_station[agent_name][-1]
+                self.update_ends(agent_pos)
+                self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
+                self.token['agents_to_tasks'][agent_name] = {'task_name': station_name, 'start': task[0],
+                                                             'goal': task[1], 'predicted_cost': cost1}
+                self.token['agents'][agent_name] = []
+                for el in path_to_station[agent_name]:
+                    self.token['agents'][agent_name].append([el['x'], el['y']])
+
+                return True
+            else:
+                return False
+
+
+
+    def next_task_recharge(self):
+        print("x")
 
     def predicted_consumption(self, path):
 
@@ -398,8 +473,8 @@ class TokenPassingRecovery(object):
             agent_pos = idle_agents.pop(agent_name)[0]
             available_tasks = self.find_available_tasks(agent_pos)
 
-            #forse da togliere seconda condizione
-            #if len(available_tasks) > 0 or agent_name in self.token['agents_to_tasks']:
+            # forse da togliere seconda condizione
+            # if len(available_tasks) > 0 or agent_name in self.token['agents_to_tasks']:
             if len(available_tasks) > 0:
 
                 assigned = False
@@ -426,18 +501,40 @@ class TokenPassingRecovery(object):
                             # mi turba il fatto che la pop di available_tasks funzioni fuori dalla funzione, ma ok
 
                             if not assigned:
-                                # discarded_tasks.update(closest_task)
                                 discarded_tasks[closest_task_name] = closest_task
-
                         else:
-                            # discarded_tasks.update(closest_task)
                             discarded_tasks[closest_task_name] = closest_task
-
                     else:
                         discarded_tasks[closest_task_name] = closest_task
 
                 if not assigned and len(available_tasks) > 0:
                     print("Nessun task assegnato anche se c'erano")
+                    # in questo caso parto dalla mia posizione (agent_pos) quindi 0 come costo base
+                    # quella restituita è sempre raggiungibile data la mia batteria oppure None
+
+                    discarded_stations = {}
+                    theoretically_ok_stations = []
+
+                    nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(agent_pos, agent_name, discarded_stations)
+
+                    if nearest_station is not None:
+                        #dico questa in teoria va bene
+                        theoretically_ok_stations.append(nearest_station)
+
+
+
+
+                        # calcolo il costo reale
+                        # vedo se è compatibile con la batteria
+                        # se si assegno, altrimenti includo nelle stazioni escluse (modifico la funzione)
+                        # se nessuna stazione va bene: fanculizzo il percorso di qualcuno che non sta andando a caricarsi
+                        # e prendo quella stazione
+
+
+
+
+
+
 
 
             # righe 13-14 alg
