@@ -10,7 +10,7 @@ from Simulation.tasks_and_delays_maker import *
 
 
 class SimulationNewRecovery(object):
-    def __init__(self, tasks, agents, autonomies):
+    def __init__(self, tasks, agents, autonomies, charging_stations):
         self.tasks = tasks
         self.agents = agents
         self.time = 0
@@ -22,6 +22,7 @@ class SimulationNewRecovery(object):
         self.initialize_simulation()
         self.max_autonomies = {}
         self.batteries_level = {}
+        self.charging_stations = charging_stations
         self.move_consumption = 0.5
         self.wait_consumption = 0.05
 
@@ -41,7 +42,9 @@ class SimulationNewRecovery(object):
         self.time = self.time + 1
         print('Time:', self.time)
         start_time = time.time()
+
         algorithm.time_forward()
+
         self.algo_time += time.time() - start_time
         self.agents_pos_now = set()
         self.agents_moved = set()
@@ -63,12 +66,14 @@ class SimulationNewRecovery(object):
 
                 # se in fase di ricarica aumento il livello della sua batteria (upper bound autonomia massima)
                 if agent['name'] in algorithm.get_token()['agents_to_tasks'] and \
-                        algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name'] == 'recharging':
+                        algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name'] in algorithm.get_token()['charging_stations']:
+                    #== 'recharging'
                     self.batteries_level[agent['name']] += 10
                     # se carica completa lo metto in idle?
                     if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
                         self.batteries_level[agent['name']] = self.max_autonomies[agent['name']]
                         algorithm.set_task_name(agent['name'], 'charge_complete')
+
                 # abbasso livello di batteria
                 elif self.actual_paths[agent['name']][self.time]['x'] == \
                         self.actual_paths[agent['name']][self.time - 1]['x'] and \

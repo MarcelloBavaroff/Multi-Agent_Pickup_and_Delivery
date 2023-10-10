@@ -218,7 +218,7 @@ class TokenPassingRecovery(object):
                 return cell
 
     def set_task_name(self, agent_name, task_name):
-        self.token['agents_to_task'][agent_name]['task_name'] = task_name
+        self.token['agents_to_tasks'][agent_name]['task_name'] = task_name
 
     # inoltre rimuove gli agenti dallo stato complete_charge
     def update_completed_tasks(self):
@@ -234,6 +234,7 @@ class TokenPassingRecovery(object):
                     self.token['agents_to_tasks'][agent_name]['goal']) \
                     and len(self.token['agents'][agent_name]) == 1 and self.token['agents_to_tasks'][agent_name][
                 'task_name'] in self.token['charging_stations']:
+
                 station_name = self.token['agents_to_tasks'][agent_name]['task_name']
                 self.token['agents_to_tasks'][agent_name]['task_name'] = 'recharging'
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
@@ -431,8 +432,8 @@ class TokenPassingRecovery(object):
                 last_step = path_to_station[agent_name][-1]
                 self.update_ends(agent_pos)
                 self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
-                self.token['agents_to_tasks'][agent_name] = {'task_name': station_name, 'start': last_step,
-                                                             'goal': last_step, 'predicted_cost': cost1}
+                self.token['agents_to_tasks'][agent_name] = {'task_name': station_name, 'start': tuple([last_step['x'], last_step['y']]),
+                                                             'goal': tuple([last_step['x'], last_step['y']]), 'predicted_cost': cost1}
                 self.token['agents'][agent_name] = []
                 for el in path_to_station[agent_name]:
                     self.token['agents'][agent_name].append([el['x'], el['y']])
@@ -530,9 +531,9 @@ class TokenPassingRecovery(object):
                         # altrimenti devo vedere altre stazioni
                         if not find_feasible_station:
                             discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
+                            nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
+                                agent_pos, agent_name, discarded_stations)
 
-                        nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
-                            agent_pos, agent_name, discarded_stations)
 
                     #se non ho trovato nessuna stazione al momento stampo un messaggio
                     #in teoria dovrei provare a fanculizzare gli altri agenti
