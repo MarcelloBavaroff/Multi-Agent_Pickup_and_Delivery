@@ -316,10 +316,17 @@ class TokenPassingRecovery(object):
         dist_min = -1
         closest_station_name = None
         estimated_station_cost = None
+        ongoing_tasks = []
+
+        for a in self.token['agents_to_tasks']:
+            ongoing_tasks.append(self.token['agents_to_tasks'][a]['task_name'])
+
+
+
 
         for s in self.charging_stations:
             # stazione non assegnata a un altro agente
-            if s['name'] not in self.token['agents_to_tasks'] and s['name'] not in discarded_stations:
+            if s['name'] not in ongoing_tasks and s['name'] not in discarded_stations:
                 estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
                 estimated_arrival_time = estimated_station_cost + self.simulation.get_time()
 
@@ -441,8 +448,6 @@ class TokenPassingRecovery(object):
                 return True
             else:
                 return False
-
-
 
     def next_task_recharge(self):
         print("x")
