@@ -53,6 +53,7 @@ class TokenPassingRecovery(object):
         self.token['agent_at_end_path'] = []
         self.token['agent_at_end_path_pos'] = []
         self.token['agents_in_recovery_trial'] = []
+        self.token['dead_agents'] = []
         for a in self.agents:
             # dovrebbe essere prendi gli agenti del token e poi nello specifico quello col nome specifico
             self.token['agents'][a['name']] = [a['start']]
@@ -321,9 +322,6 @@ class TokenPassingRecovery(object):
         for a in self.token['agents_to_tasks']:
             ongoing_tasks.append(self.token['agents_to_tasks'][a]['task_name'])
 
-
-
-
         for s in self.charging_stations:
             # stazione non assegnata a un altro agente
             if s['name'] not in ongoing_tasks and s['name'] not in discarded_stations:
@@ -404,7 +402,6 @@ class TokenPassingRecovery(object):
                     return True,
                 else:
                     return False
-
     def compute_real_path_station(self, agent_name, agent_pos, all_idle_agents, station_name):
 
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
@@ -526,7 +523,6 @@ class TokenPassingRecovery(object):
                     nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                         agent_pos, agent_name, discarded_stations)
                     while not find_feasible_station and nearest_station is not None:
-
                         # dico questa in teoria va bene
                         theoretically_ok_stations.append(nearest_station)
 
@@ -558,17 +554,30 @@ class TokenPassingRecovery(object):
                         # se nessuna stazione va bene: fanculizzo il percorso di qualcuno che non sta andando a caricarsi
                         # e prendo quella stazione
 
-
-
-
-
-
-
-
             # righe 13-14 alg
             elif self.check_safe_idle(agent_pos):
-                print('No available tasks for agent', agent_name, ' idling at current position...')
-                print(self.simulation.get_batteries_level()[agent_name])
+                print('No available tasks for agent', agent_name)
+                print('Current battery level', self.simulation.get_batteries_level()[agent_name])
+
+                nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
+                    agent_pos, agent_name, {})
+
+                if consumption_to_station == self.simulation.get_batteries_level()[agent_name]:
+                    find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
+                                                                           all_idle_agents, nearest_station)
+                    if find_feasible_station:
+                        print(agent_name, ' is moving to ', nearest_station, ' to recharge')
+                    else:
+                        print(agent_name, ' is dead')
+                        self.token['dead_agents'] = agent_name
+
+                else:
+                    print(agent_name, ' will wait in idle')
+
+
+
+
+
             # righe 15-16 alg
             else:
                 self.go_to_closest_non_task_endpoint(agent_name, agent_pos, all_idle_agents)
