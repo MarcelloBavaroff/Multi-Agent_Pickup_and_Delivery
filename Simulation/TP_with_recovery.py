@@ -93,8 +93,8 @@ class TokenPassingRecovery(object):
             if a not in discarded_tasks:
                 admissible_tasks[a] = available_tasks[a]
 
-        # closest = random.choice(list(admissible_tasks.keys()))
-        closest = list(admissible_tasks.keys())[0]
+        closest = random.choice(list(admissible_tasks.keys()))
+        #closest = list(admissible_tasks.keys())[0]
         dist = self.admissible_heuristic(admissible_tasks[closest][0], agent_pos)
         for task_name, task in admissible_tasks.items():
             if self.admissible_heuristic(task[0], agent_pos) < dist:
@@ -516,8 +516,8 @@ class TokenPassingRecovery(object):
         idle_agents = self.get_idle_agents()
         assigned = False
         while len(idle_agents) > 0:
-            # agent_name = random.choice(list(idle_agents.keys()))
-            agent_name = list(idle_agents.keys())[0]
+            agent_name = random.choice(list(idle_agents.keys()))
+            #agent_name = list(idle_agents.keys())[0]
 
             all_idle_agents = self.token['agents'].copy()
             all_idle_agents.pop(agent_name)

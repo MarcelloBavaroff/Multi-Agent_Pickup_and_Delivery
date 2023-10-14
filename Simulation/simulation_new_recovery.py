@@ -84,7 +84,7 @@ class SimulationNewRecovery(object):
         self.agents_pos_now = set()
         self.agents_moved = set()
         agents_to_move = self.agents
-        #random.shuffle(agents_to_move)
+        random.shuffle(agents_to_move)
 
         # First "move" idle agents
         self.handle_agents_lenPath1(agents_to_move, algorithm)
