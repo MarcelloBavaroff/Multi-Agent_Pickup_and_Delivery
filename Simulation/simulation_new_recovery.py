@@ -23,8 +23,8 @@ class SimulationNewRecovery(object):
         self.max_autonomies = {}
         self.batteries_level = {}
         self.charging_stations = charging_stations
-        self.move_consumption = 0.5
-        self.wait_consumption = 0.05
+        self.move_consumption = 0.1
+        self.wait_consumption = 0.01
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]

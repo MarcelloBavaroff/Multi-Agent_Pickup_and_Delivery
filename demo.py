@@ -41,11 +41,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    # if args.k is None:
-    #     args.k = 0
-    # if args.p is None:
-    #     args.p = 1
-
     with open(os.path.join(RoothPath.get_root(), 'config.json'), 'r') as json_file:
         config = json.load(json_file)
     args.param = os.path.join(RoothPath.get_root(), os.path.join(config['input_path'], config['input_name']))
@@ -70,8 +65,7 @@ if __name__ == '__main__':
         # Generate random tasks and delays
         tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'],
                                              param['n_tasks'], param['task_freq'])
-        for t in tasks:
-            print(t)
+
 
     #batteria casuale tra 80 e 100
     autonomies = []
@@ -95,7 +89,7 @@ if __name__ == '__main__':
     simulation = SimulationNewRecovery(tasks, agents, autonomies, charging_stations)
     tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                               a_star_max_iter=args.a_star_max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 400:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 1000:
         simulation.time_forward(tp)
 
     print(tp.get_completed_tasks())
