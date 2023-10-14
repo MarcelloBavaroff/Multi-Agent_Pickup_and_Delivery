@@ -54,10 +54,15 @@ class TokenPassingRecovery(object):
         self.token['agent_at_end_path_pos'] = []
         self.token['agents_in_recovery_trial'] = []
         self.token['dead_agents'] = []
+
         for a in self.agents:
             # dovrebbe essere prendi gli agenti del token e poi nello specifico quello col nome specifico
             self.token['agents'][a['name']] = [a['start']]
-            self.token['path_ends'].add(tuple(a['start']))
+
+            if tuple(a['start']) in self.non_task_endpoints:
+                self.token['occupied_non_task_endpoints'].add(tuple(a['start']))
+            else:
+                self.token['path_ends'].add(tuple(a['start']))
 
         for c in self.charging_stations:
             # ogni stazione contiene un dizionario con posizione e free_time()
@@ -119,7 +124,8 @@ class TokenPassingRecovery(object):
                         station = s
                         break
 
-                if station is not None and self.token['charging_stations'][station]['free_time'] - self.simulation.get_time() >= time_start:
+                if station is not None and self.token['charging_stations'][station][
+                    'free_time'] - self.simulation.get_time() >= time_start:
 
                     k = time_start
                     while k <= self.token['charging_stations'][station]['free_time'] - self.simulation.get_time():

@@ -111,6 +111,7 @@ class SimulationNewRecovery(object):
                         # aggiorno il path dell'agente
                         self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
 
+                        #prova
                         if self.actual_paths[agent['name']][self.time]['x'] == \
                                 self.actual_paths[agent['name']][self.time - 1]['x'] and \
                                 self.actual_paths[agent['name']][self.time]['y'] == \

@@ -98,8 +98,8 @@ if __name__ == '__main__':
     for path in simulation.actual_paths.values():
         cost = cost + len(path)
     output = {'schedule': simulation.actual_paths, 'cost': cost,
-              'completed_tasks_times': tp.get_completed_tasks_times(),
-              'n_replans': tp.get_n_replans()}
+              'completed_tasks_times': tp.get_completed_tasks_times()}
+              #'n_replans': tp.get_n_replans()}
     with open(args.output, 'w') as output_yaml:
         yaml.safe_dump(output, output_yaml)
 
