@@ -78,7 +78,7 @@ class TokenPassingRecovery(object):
     def admissible_heuristic(self, task_pos, agent_pos):
         return fabs(task_pos[0] - agent_pos[0]) + fabs(task_pos[1] - agent_pos[1])
 
-    # in teoria task più vicino al robot, in discarded tasks quelli già considerati e che
+    # In teoria task più vicino al robot, in discarded tasks quelli già considerati e che
     # non rispettano le condizioni. In teoria ritorna sempre qualcosa, se tutti scartati
     # non dovrei nemmeno chiamarlo
     def get_closest_task_name(self, available_tasks, agent_pos, discarded_tasks):
@@ -88,7 +88,7 @@ class TokenPassingRecovery(object):
             if a not in discarded_tasks:
                 admissible_tasks[a] = available_tasks[a]
 
-        #closest = random.choice(list(admissible_tasks.keys()))
+        # closest = random.choice(list(admissible_tasks.keys()))
         closest = list(admissible_tasks.keys())[0]
         dist = self.admissible_heuristic(admissible_tasks[closest][0], agent_pos)
         for task_name, task in admissible_tasks.items():
@@ -106,12 +106,38 @@ class TokenPassingRecovery(object):
                     obstacles[(path[i][0], path[i][1], k)] = name
                     if i == len(path) - 1:
                         obstacles[(path[i][0], path[i][1], -k)] = name
+
+            # se l'agente si sta caricando
+            # considerazione
+            elif len(path) == 1 and name in self.token['agents_to_tasks'].keys() and \
+                    self.token['agents_to_tasks'][name]['task_name'] == 'recharging':
+                station = None
+                for s in self.token['charging_stations']:
+                    t = self.token['charging_stations'][s]['pos']
+                    t = tuple(t)
+                    if t == tuple(path[0]):
+                        station = s
+                        break
+
+                if station is not None and self.token['charging_stations'][station]['free_time'] - self.simulation.get_time() >= time_start:
+
+                    k = time_start
+                    while k <= self.token['charging_stations'][station]['free_time'] - self.simulation.get_time():
+                        obstacles[(path[0][0], path[0][1], k)] = name
+                        k += 1
+
         return obstacles
 
     def get_idle_obstacles_agents(self, agents_paths, time_start):
         obstacles = set()
+        charging_stations_pos = set()
+
+        for c in self.charging_stations:
+            charging_stations_pos.add(tuple(c['pos']))
+
         for path in agents_paths:
-            if len(path) == 1:
+            # quelli nelle stazioni non li segno come ostacoli
+            if len(path) == 1 and tuple(path[0]) not in charging_stations_pos:
                 obstacles.add((path[0][0], path[0][1]))
             # presumo agenti che finiranno il loro percorso e si fermeranno? Quindi metto ultima
             # loro posizione
@@ -175,9 +201,6 @@ class TokenPassingRecovery(object):
 
     def get_completed_tasks_times(self):
         return self.token['completed_tasks_times']
-
-    def get_n_replans(self):
-        return self.token['n_replans']
 
     def get_token(self):
         return self.token
@@ -465,7 +488,6 @@ class TokenPassingRecovery(object):
             else:
                 return False, []
 
-
     def next_task_recharge(self):
         print("x")
 
@@ -488,7 +510,7 @@ class TokenPassingRecovery(object):
         idle_agents = self.get_idle_agents()
         assigned = False
         while len(idle_agents) > 0:
-            #agent_name = random.choice(list(idle_agents.keys()))
+            # agent_name = random.choice(list(idle_agents.keys()))
             agent_name = list(idle_agents.keys())[0]
 
             all_idle_agents = self.token['agents'].copy()
@@ -573,8 +595,8 @@ class TokenPassingRecovery(object):
 
             # righe 13-14 alg
             elif self.check_safe_idle(agent_pos):
-                #print('No available tasks for agent', agent_name)
-                #print('Current battery level', self.simulation.get_batteries_level()[agent_name])
+                # print('No available tasks for agent', agent_name)
+                # print('Current battery level', self.simulation.get_batteries_level()[agent_name])
 
                 nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                     agent_pos, agent_name, {})
@@ -588,7 +610,7 @@ class TokenPassingRecovery(object):
                         print(agent_name, ' is dead')
                         self.token['dead_agents'] = agent_name
 
-                #else:
+                # else:
                 #    print(agent_name, ' will wait in idle')
 
 
