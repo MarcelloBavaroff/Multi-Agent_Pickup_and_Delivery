@@ -49,7 +49,7 @@ class SimulationNewRecovery(object):
         self.agents_pos_now = set()
         self.agents_moved = set()
         agents_to_move = self.agents
-        random.shuffle(agents_to_move)
+        #random.shuffle(agents_to_move)
 
         # First "move" idle agents
         for agent in agents_to_move:
@@ -67,7 +67,7 @@ class SimulationNewRecovery(object):
                 # se in fase di ricarica aumento il livello della sua batteria (upper bound autonomia massima)
                 if agent['name'] in algorithm.get_token()['agents_to_tasks'] and \
                         algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name'] == 'recharging':
-                    #== 'recharging'
+
                     self.batteries_level[agent['name']] += 10
                     # se carica completa lo metto in idle?
                     if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:

@@ -70,11 +70,14 @@ if __name__ == '__main__':
         # Generate random tasks and delays
         tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'],
                                              param['n_tasks'], param['task_freq'])
+        for t in tasks:
+            print(t)
 
     #batteria casuale tra 80 e 100
     autonomies = []
     for i in range(len(agents)):
-        autonomies.append(round(random.uniform(80, 100), 2))
+        #autonomies.append(round(random.uniform(80, 100), 2))
+        autonomies.append(round(random.uniform(95, 100), 2))
 
     param['autonomies'] = autonomies
 
