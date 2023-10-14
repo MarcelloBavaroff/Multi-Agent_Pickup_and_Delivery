@@ -51,6 +51,7 @@ class SimulationNewRecovery(object):
         agents_to_move = self.agents
         #random.shuffle(agents_to_move)
 
+
         # First "move" idle agents
         for agent in agents_to_move:
 
@@ -96,7 +97,11 @@ class SimulationNewRecovery(object):
                     # accedo alla tupla della posizione
                     x_new = algorithm.get_token()['agents'][agent['name']][1][0]
                     y_new = algorithm.get_token()['agents'][agent['name']][1][1]
-                    # se non corrisponde alla posizione attuale di un altro agente
+
+
+                    # in pratica non sapendo l'ordine in cui devo muovere gli agenti se becco
+                    # che uno occupa la posizione dove dovrei andare vengo rimesso in coda per
+                    # muovermi
                     if tuple([x_new, y_new]) not in self.agents_pos_now or \
                             tuple([x_new, y_new]) == tuple(tuple([current_agent_pos['x'], current_agent_pos['y']])):
                         self.agents_moved.add(agent['name'])
@@ -110,8 +115,6 @@ class SimulationNewRecovery(object):
                                                                          1:]
                         # aggiorno il path dell'agente
                         self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
-
-                        #prova
                         if self.actual_paths[agent['name']][self.time]['x'] == \
                                 self.actual_paths[agent['name']][self.time - 1]['x'] and \
                                 self.actual_paths[agent['name']][self.time]['y'] == \
@@ -121,6 +124,8 @@ class SimulationNewRecovery(object):
                         else:
                             self.batteries_level[agent['name']] -= self.move_consumption
 
+                    else:
+                        print()
             agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]
 
     def get_time(self):
