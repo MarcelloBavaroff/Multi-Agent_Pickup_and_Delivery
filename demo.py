@@ -77,7 +77,11 @@ if __name__ == '__main__':
     autonomies = []
     for i in range(len(agents)):
         #autonomies.append(round(random.uniform(80, 100), 2))
-        autonomies.append(round(random.uniform(95, 100), 2))
+        autonomies.append(round(random.uniform(80, 100), 2))
+
+    print(autonomies)
+
+    autonomies = [92.4, 80.83, 84.5, 87.92, 91.96, 88.2, 83.67, 97.75, 90.36, 90.24, 81.68, 89.99, 98.27, 94.27, 85.7, 95.17, 86.32, 83.95, 91.68, 97.14, 92.28, 99.74, 84.81, 85.18, 81.88, 91.28, 99.61, 88.69, 97.28, 82.55, 86.34, 94.37, 97.01, 98.7, 93.79, 87.36, 81.84, 97.09, 94.53, 85.44, 80.12, 98.82, 95.21, 94.92, 83.58, 96.51, 81.61, 94.21, 92.71, 98.05, 81.88, 96.03]
 
     param['autonomies'] = autonomies
 
@@ -93,6 +97,8 @@ if __name__ == '__main__':
                               a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 400:
         simulation.time_forward(tp)
+
+    print(tp.get_completed_tasks())
 
     cost = 0
     for path in simulation.actual_paths.values():
