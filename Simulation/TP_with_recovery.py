@@ -17,6 +17,7 @@ States = ['safe_idle', 'recharging', 'charge_complete']
 class TokenPassingRecovery(object):
     def __init__(self, agents, dimesions, obstacles, non_task_endpoints, charging_stations, simulation,
                  a_star_max_iter=4000, new_recovery=False):
+        random.seed(3)
         self.agents = agents
         self.dimensions = dimesions
         self.obstacles = set(obstacles)
@@ -402,7 +403,8 @@ class TokenPassingRecovery(object):
             # Use cost - 1 because idle cost is 1
             moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], cost1 - 1)
             idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), cost1 - 1)
-
+            idle_obstacles_agents |= set(self.non_task_endpoints) - {tuple(agent_pos),
+                                                                     tuple(closest_task[1])}
 
 
             agent = {'name': agent_name, 'start': closest_task[0], 'goal': closest_task[1]}
@@ -526,16 +528,15 @@ class TokenPassingRecovery(object):
         modifiable_agents = []
 
         for agent in self.token['agents_to_tasks']:
-            k = self.simulation.get_time()
-
+            #k = self.simulation.get_time()
             # ottieni una lista di triple
-            path = self.simulation.get_actual_paths()[agent]
-            for i in range(len(my_path) - 1):
+            path = self.token['agents'][agent]
+            for i in range(1, min(len(my_path) - 1, len(path) - 1)):
 
                 # controllo su vertex conflict e transition conflict
-                if (my_path[i]['x'] == path[k + i]['x'] and my_path[i]['y'] == path[k + i]['y']) or \
-                        (my_path[i]['x'] == path[k + i + 1]['x'] and my_path[i]['y'] == path[k + i + 1]['y'] and
-                         my_path[i + 1]['x'] == path[k + i]['x'] and my_path[i + 1]['y'] == path[k + i]['y']):
+                if (my_path[i]['x'] == path[i][0] and my_path[i]['y'] == path[i][1]) or \
+                        (my_path[i]['x'] == path[i + 1][0] and my_path[i]['y'] == path[i + 1][1] and
+                         my_path[i + 1]['x'] == path[i][0] and my_path[i + 1]['y'] == path[i][1]):
 
                     if self.token['agents_to_tasks'][agent]['task_name'] in self.token['charging_stations']:
                         untouchable_agents.append(agent)
@@ -550,6 +551,8 @@ class TokenPassingRecovery(object):
                         else:
                             untouchable_agents.append(agent)
                     break
+
+        return untouchable_agents, modifiable_agents
 
     def time_forward(self):
 
@@ -637,7 +640,8 @@ class TokenPassingRecovery(object):
                                 agent_name, agent_pos, station)
 
                             if feasible_station:
-                                self.find_conflicting_agents(path_to_station_preemption)
+
+                                untouchable_agents, modifiable_agents = self.find_conflicting_agents(path_to_station_preemption)
                                 print()
                                 # usa il percorso per vedere con chi vai in conflitto tra i vari agenti
                                 # poi vedi se tra questi c'è qualcuno che ha un percorso che può essere eliminato (non in ricarica e non già preso il pickup)

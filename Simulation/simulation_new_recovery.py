@@ -11,6 +11,7 @@ from Simulation.tasks_and_delays_maker import *
 
 class SimulationNewRecovery(object):
     def __init__(self, tasks, agents, autonomies, charging_stations):
+        random.seed(1234)
         self.tasks = tasks
         self.agents = agents
         self.time = 0
@@ -159,6 +160,11 @@ class SimulationNewRecovery(object):
                             self.batteries_level[agent['name']] -= self.move_consumption
 
             agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]
+
+        agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]
+        if len(agents_to_move) != 0:
+            print('attenzione qualcosa non va')
+
 
     def get_time(self):
         return self.time
