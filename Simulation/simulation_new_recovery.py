@@ -73,6 +73,45 @@ class SimulationNewRecovery(object):
                 else:
                     self.batteries_level[agent['name']] -= self.move_consumption
 
+    def update_actual_paths(self, agent, algorithm, x_new, y_new, current_agent_pos):
+        self.agents_moved.add(agent['name'])
+        # dico che c'è un agente in questa posizione
+        self.agents_pos_now.remove(tuple([current_agent_pos['x'], current_agent_pos['y']]))
+        self.agents_pos_now.add(tuple([x_new, y_new]))
+
+        # cancello il primo
+        algorithm.get_token()['agents'][agent['name']] = algorithm.get_token()['agents'][agent['name']][
+                                                         1:]
+        # aggiorno il path dell'agente
+        self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
+        if self.actual_paths[agent['name']][self.time]['x'] == \
+                self.actual_paths[agent['name']][self.time - 1]['x'] and \
+                self.actual_paths[agent['name']][self.time]['y'] == \
+                self.actual_paths[agent['name']][self.time - 1]['y']:
+
+            self.batteries_level[agent['name']] -= self.wait_consumption
+        else:
+            self.batteries_level[agent['name']] -= self.move_consumption
+
+    def handle_loops(self, agents_to_move, algorithm):
+
+        actual_pos = []
+        for a in agents_to_move:
+            actual_pos.append(tuple(algorithm.get_token()['agents'][a['name']][0]))
+
+        correspondences = 0
+        for a in agents_to_move:
+            #next_pos è una lista, non una tupla
+            next_pos = algorithm.get_token()['agents'][a['name']][1]
+            if tuple(next_pos) in actual_pos:
+                correspondences += 1
+            else:
+                break
+        if correspondences == len(agents_to_move):
+            return True
+        else:
+            return False
+
     # questa viene chiamata per simulare un singolo timestep in avanti
     def time_forward(self, algorithm):
         self.time = self.time + 1
@@ -139,31 +178,28 @@ class SimulationNewRecovery(object):
                     # muovermi
                     if tuple([x_new, y_new]) not in self.agents_pos_now or \
                             tuple([x_new, y_new]) == tuple(tuple([current_agent_pos['x'], current_agent_pos['y']])):
-                        self.agents_moved.add(agent['name'])
-                        # dico che c'è un agente in questa posizione
-                        self.agents_pos_now.remove(tuple([current_agent_pos['x'], current_agent_pos['y']]))
-                        self.agents_pos_now.add(tuple([x_new, y_new]))
+
+                        self.update_actual_paths(agent, algorithm, x_new, y_new, current_agent_pos)
+
                         moved_this_step = moved_this_step + 1
-
-                        # cancello il primo
-                        algorithm.get_token()['agents'][agent['name']] = algorithm.get_token()['agents'][agent['name']][
-                                                                         1:]
-                        # aggiorno il path dell'agente
-                        self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
-                        if self.actual_paths[agent['name']][self.time]['x'] == \
-                                self.actual_paths[agent['name']][self.time - 1]['x'] and \
-                                self.actual_paths[agent['name']][self.time]['y'] == \
-                                self.actual_paths[agent['name']][self.time - 1]['y']:
-
-                            self.batteries_level[agent['name']] -= self.wait_consumption
-                        else:
-                            self.batteries_level[agent['name']] -= self.move_consumption
 
             agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]
 
         agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]
         if len(agents_to_move) != 0:
-            print('attenzione qualcosa non va')
+            if self.handle_loops(agents_to_move, algorithm):
+                for agent in agents_to_move:
+                    current_agent_pos = self.actual_paths[agent['name']][-1]
+                    if len(algorithm.get_token()['agents'][agent['name']]) > 1:
+                        # accedo alla tupla della posizione
+                        x_new = algorithm.get_token()['agents'][agent['name']][1][0]
+                        y_new = algorithm.get_token()['agents'][agent['name']][1][1]
+
+                        self.update_actual_paths(agent, algorithm, x_new, y_new, current_agent_pos)
+
+
+            else:
+                print('attenzione qualcosa non va')
 
 
     def get_time(self):
