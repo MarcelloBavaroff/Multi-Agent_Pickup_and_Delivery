@@ -10,7 +10,7 @@ from Simulation.CBS.cbs import CBS, Environment
 # from Simulation.markov_chains import MarkovChainsMaker
 # from collections import defaultdict
 
-
+# Praticamente aggiungo al set idle_obstacles_agents tutti i delivery che non sono il suo delivery o la sua posizione corrente
 States = ['safe_idle', 'recharging', 'charge_complete']
 
 
@@ -94,7 +94,7 @@ class TokenPassingRecovery(object):
                 admissible_tasks[a] = available_tasks[a]
 
         closest = random.choice(list(admissible_tasks.keys()))
-        #closest = list(admissible_tasks.keys())[0]
+        # closest = list(admissible_tasks.keys())[0]
         dist = self.admissible_heuristic(admissible_tasks[closest][0], agent_pos)
         for task_name, task in admissible_tasks.items():
             if self.admissible_heuristic(task[0], agent_pos) < dist:
@@ -220,6 +220,10 @@ class TokenPassingRecovery(object):
         closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos)
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
+
+        # Avoid delivery endpoints unless it's the goal or current position
+        idle_obstacles_agents |= set(self.non_task_endpoints) - {tuple(agent_pos),
+                                                                 closest_non_task_endpoint}
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_non_task_endpoint}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, moving_obstacles_agents,
                           a_star_max_iter=self.a_star_max_iter)
@@ -378,6 +382,8 @@ class TokenPassingRecovery(object):
                           available_tasks, consumption_to_station):
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
+        idle_obstacles_agents |= set(self.non_task_endpoints) - {tuple(agent_pos),
+                                                                 tuple(closest_task[1])}
 
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
         # penso sia l'unione di obstacles e idle_obastacles
@@ -396,6 +402,9 @@ class TokenPassingRecovery(object):
             # Use cost - 1 because idle cost is 1
             moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], cost1 - 1)
             idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), cost1 - 1)
+
+
+
             agent = {'name': agent_name, 'start': closest_task[0], 'goal': closest_task[1]}
             env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                               moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
@@ -439,7 +448,8 @@ class TokenPassingRecovery(object):
 
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
-
+        idle_obstacles_agents |= set(self.non_task_endpoints) - {tuple(agent_pos),
+                                                                 tuple(self.token['charging_stations'][station_name]['pos'])}
         # cambiare goal
         agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_stations'][station_name]['pos']}
 
@@ -508,6 +518,39 @@ class TokenPassingRecovery(object):
 
         return round(consumption, 2)
 
+    # restituisco 2 insiemi di agenti con cui ho conflitti: agenti intoccabili (caricano o già pickup)
+    # agenti eliminabili (non vanno a caricare)
+    def find_conflicting_agents(self, my_path):
+
+        untouchable_agents = []
+        modifiable_agents = []
+
+        for agent in self.token['agents_to_tasks']:
+            k = self.simulation.get_time()
+
+            # ottieni una lista di triple
+            path = self.simulation.get_actual_paths()[agent]
+            for i in range(len(my_path) - 1):
+
+                # controllo su vertex conflict e transition conflict
+                if (my_path[i]['x'] == path[k + i]['x'] and my_path[i]['y'] == path[k + i]['y']) or \
+                        (my_path[i]['x'] == path[k + i + 1]['x'] and my_path[i]['y'] == path[k + i + 1]['y'] and
+                         my_path[i + 1]['x'] == path[k + i]['x'] and my_path[i + 1]['y'] == path[k + i]['y']):
+
+                    if self.token['agents_to_tasks'][agent]['task_name'] in self.token['charging_stations']:
+                        untouchable_agents.append(agent)
+                    else:
+                        # il secondo controllo da fare è se hanno già raggiungo lo start_task
+                        task_start = self.token['agents_to_tasks'][agent]['start']
+                        task_start = tuple(task_start)
+
+                        # se task_start è nel path (lista di tuple) rimanente da percorrere allora non ho fatto pickup
+                        if task_start in self.token['agents'][agent]:
+                            modifiable_agents.append(agent)
+                        else:
+                            untouchable_agents.append(agent)
+                    break
+
     def time_forward(self):
 
         self.update_completed_tasks()
@@ -517,7 +560,7 @@ class TokenPassingRecovery(object):
         assigned = False
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
-            #agent_name = list(idle_agents.keys())[0]
+            # agent_name = list(idle_agents.keys())[0]
 
             all_idle_agents = self.token['agents'].copy()
             all_idle_agents.pop(agent_name)
@@ -586,18 +629,19 @@ class TokenPassingRecovery(object):
 
                     # se non ho trovato nessuna stazione al momento stampo un messaggio
                     # in teoria dovrei provare a fanculizzare gli altri agenti
-                    # if not find_feasible_station:
-                    #     print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
-                    #     while len(theoretically_ok_stations) > 0:
-                    #         station = theoretically_ok_stations[0]
-                    #         find_feasible_station, path_to_station_preemption = self.compute_real_path_station_preemption(agent_name, agent_pos, station)
-                    #
-                    #         if find_feasible_station:
-                    #             print()
-                    #             # usa il percorso per vedere con chi vai in conflitto tra i vari agenti
-                    #             # poi vedi se tra questi c'è qualcuno che ha un percorso che può essere eliminato (non in ricarica e non già preso il pickup)
-                    #             # per quelli che esistono cancello i loro path e provo a ricalcolare il percorso del mio agente
+                    if not find_feasible_station:
+                        print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
+                        while len(theoretically_ok_stations) > 0:
+                            station = theoretically_ok_stations[0]
+                            feasible_station, path_to_station_preemption = self.compute_real_path_station_preemption(
+                                agent_name, agent_pos, station)
 
+                            if feasible_station:
+                                self.find_conflicting_agents(path_to_station_preemption)
+                                print()
+                                # usa il percorso per vedere con chi vai in conflitto tra i vari agenti
+                                # poi vedi se tra questi c'è qualcuno che ha un percorso che può essere eliminato (non in ricarica e non già preso il pickup)
+                                # per quelli che esistono cancello i loro path e provo a ricalcolare il percorso del mio agente
 
             # righe 13-14 alg
             elif self.check_safe_idle(agent_pos):
