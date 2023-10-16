@@ -441,7 +441,7 @@ class TokenPassingRecovery(object):
                     for el in path_to_task_goal[agent_name]:
                         self.token['agents'][agent_name].append([el['x'], el['y']])
 
-                    # devo fare pop da quello vero? non dalla copia
+                    # devo fare pop di available_tasks da quello vero?
                     return True,
                 else:
                     return False
@@ -568,9 +568,48 @@ class TokenPassingRecovery(object):
         #riaggiungo il task
         self.token['tasks'][task['task_name']] = [[task['start']],[task['goal']]]
         #dovrei ridurlo al singolo primo elemento
-        self.token['agents'][agent_name][:1]
+        self.token['agents'][agent_name] = self.token['agents'][agent_name][:1]
 
+    # non rimetto il task tra quelli assegnabili
+    def reset_path(self, agent_name):
+        self.token['agents'][agent_name] = self.token['agents'][agent_name][:1]
 
+    def compute_new_path_to_goal(self, all_idle_agents, agent_name, agent_pos):
+
+        #forse usare x e y
+        task = self.token['agents_to_tasks'][agent_name]
+
+        moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
+        idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
+        idle_obstacles_agents |= set(self.non_task_endpoints) - {tuple(agent_pos),
+                                                                 tuple(task['goal'])}
+
+        agent = {'name': agent_name, 'start': agent_pos, 'goal': task['goal']}
+
+        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
+                          moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
+        cbs = CBS(env)
+        path_to_task_goal = self.search(cbs, agent_name, moving_obstacles_agents)
+
+        if not path_to_task_goal:
+            print('errore nel ricalcolo del percorso di ', agent_name)
+        else:
+            consumption = self.predicted_consumption(path_to_task_goal[agent_name])
+            if self.simulation.get_batteries_level()[agent_name] >= consumption:
+
+                #path_ends in teoria non lo cambio perché non è mai stato toccato
+                #last_step = path_to_task_goal[agent_name][-1]
+                #self.update_ends(agent_pos)
+                #self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
+                #self.token['agents_to_tasks'][agent_name] = {'task_name': closest_task_name, 'start': task[0],
+                #                                             'goal': task[1], 'predicted_cost': cost1 + cost2}
+                self.token['agents'][agent_name] = []
+                for el in path_to_task_goal[agent_name]:
+                    self.token['agents'][agent_name].append([el['x'], el['y']])
+
+                return True
+            else:
+                return False
 
 
 
@@ -593,9 +632,15 @@ class TokenPassingRecovery(object):
             agent_pos = idle_agents.pop(agent_name)[0]
             available_tasks = self.find_available_tasks(agent_pos)
 
-            # forse da togliere seconda condizione
-            # if len(available_tasks) > 0 or agent_name in self.token['agents_to_tasks']:
-            if len(available_tasks) > 0:
+            if agent_name in self.token['agents_to_tasks']:
+                if not self.compute_new_path_to_goal(all_idle_agents, agent_name, agent_pos):
+                    print("Errore nel calcolo del nuovo percorso verso il goal già assegnato")
+                else:
+                    print("Percorso dell'", agent_name, " verso il goal ricalcolato correttamente")
+
+                #in teoria end_paths già ok, available_tasks anche perché non lo reinserivo
+
+            elif len(available_tasks) > 0:
 
                 assigned = False
                 discarded_tasks = {}
@@ -654,7 +699,7 @@ class TokenPassingRecovery(object):
                     # in teoria dovrei provare a fanculizzare gli altri agenti
                     if not find_feasible_station:
                         print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
-                        while len(theoretically_ok_stations) > 0:
+                        while len(theoretically_ok_stations and not find_feasible_station) > 0:
                             station = theoretically_ok_stations[0]
                             theoretically_ok_stations.remove(station)
                             feasible_station, path_to_station_preemption = self.compute_real_path_station_preemption(
@@ -666,12 +711,20 @@ class TokenPassingRecovery(object):
 
                                     for a in modifiable_agents:
                                         self.reset_path_and_task(a)
-                                        idle_agents[a] = self.token['agents'][agent_name]
+                                        idle_agents[a] = self.token['agents'][a]
 
+                                    for b in going_to_goal_agents:
+                                        self.reset_path(b)
+                                        idle_agents[b] = self.token['agents'][b]
 
-                                    #find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
-                                                                                           #all_idle_agents,
-                                                                                           #nearest_station, )
+                                    #in teoria in moving obstacles ora non ci sono gli agenti problematici
+                                    find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
+                                                                                           all_idle_agents,
+                                                                                           station)
+                                    if not find_feasible_station:
+                                        print(agent_name, " is dead")
+                                        self.token['dead_agents'].append(agent_name)
+
 
 
 
