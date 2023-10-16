@@ -487,11 +487,15 @@ class TokenPassingRecovery(object):
                 return False
 
     # calcolo il percorso escludendo i percorsi degli altri agenti e se sono in idle in posizioni scomode
-    def compute_real_path_station_preemption(self, agent_name, agent_pos, station_name):
+    def compute_real_path_station_preemption(self, agent_name, agent_pos, station_name, all_idle_agents):
 
+        idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
+        idle_obstacles_agents |= set(self.non_task_endpoints) - {tuple(agent_pos),
+                                                                 tuple(self.token['charging_stations'][station_name][
+                                                                           'pos'])}
         # cambiare goal
         agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_stations'][station_name]['pos']}
-        env = Environment(self.dimensions, [agent], self.obstacles,
+        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           {}, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
         path_to_station = self.search(cbs, agent_name, {})
@@ -505,9 +509,6 @@ class TokenPassingRecovery(object):
                 return True, path_to_station[agent_name]
             else:
                 return False, []
-
-    def next_task_recharge(self):
-        print("x")
 
     def predicted_consumption(self, path):
 
@@ -526,6 +527,7 @@ class TokenPassingRecovery(object):
 
         untouchable_agents = []
         modifiable_agents = []
+        going_to_goal_agents = []
 
         for agent in self.token['agents_to_tasks']:
             #k = self.simulation.get_time()
@@ -540,6 +542,10 @@ class TokenPassingRecovery(object):
 
                     if self.token['agents_to_tasks'][agent]['task_name'] in self.token['charging_stations']:
                         untouchable_agents.append(agent)
+
+                    elif self.token['agents_to_tasks'][agent]['task_name'] == 'safe_idle':
+                        modifiable_agents.append(agent)
+
                     else:
                         # il secondo controllo da fare è se hanno già raggiungo lo start_task
                         task_start = self.token['agents_to_tasks'][agent]['start']
@@ -549,10 +555,26 @@ class TokenPassingRecovery(object):
                         if task_start in self.token['agents'][agent]:
                             modifiable_agents.append(agent)
                         else:
-                            untouchable_agents.append(agent)
+                            going_to_goal_agents.append(agent)
                     break
 
-        return untouchable_agents, modifiable_agents
+        return untouchable_agents, modifiable_agents, going_to_goal_agents
+
+    def reset_path_and_task(self, agent_name):
+
+        #task: 'task_name', 'start', 'goal'
+        task = self.token['agents_to_tasks'][agent_name]
+        self.token['agents_to_tasks'].pop(agent_name)
+        #riaggiungo il task
+        self.token['tasks'][task['task_name']] = [[task['start']],[task['goal']]]
+        #dovrei ridurlo al singolo primo elemento
+        self.token['agents'][agent_name][:1]
+
+
+
+
+
+
 
     def time_forward(self):
 
@@ -587,11 +609,9 @@ class TokenPassingRecovery(object):
                     task_total_consumption = task_total_cost * self.move_consumption
 
                     if task_total_consumption < self.simulation.get_batteries_level()[agent_name]:
-
                         # consumption to station si intende dal goal alla stazione più vicina
-                        nearest_station, consumption_to_station = self.search_nearest_available_station(task_total_cost,
-                                                                                                        closest_task[1],
-                                                                                                        agent_name)
+                        nearest_station, consumption_to_station = self.search_nearest_available_station(task_total_cost,closest_task[1],agent_name)
+
                         if nearest_station is not None:
                             assigned = self.compute_real_path(agent_name, agent_pos, closest_task, closest_task_name,
                                                               all_idle_agents,
@@ -636,21 +656,27 @@ class TokenPassingRecovery(object):
                         print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
                         while len(theoretically_ok_stations) > 0:
                             station = theoretically_ok_stations[0]
+                            theoretically_ok_stations.remove(station)
                             feasible_station, path_to_station_preemption = self.compute_real_path_station_preemption(
-                                agent_name, agent_pos, station)
+                                agent_name, agent_pos, station, all_idle_agents)
 
                             if feasible_station:
+                                untouchable_agents, modifiable_agents, going_to_goal_agents = self.find_conflicting_agents(path_to_station_preemption)
+                                if len(modifiable_agents) + len(going_to_goal_agents) > 0:
 
-                                untouchable_agents, modifiable_agents = self.find_conflicting_agents(path_to_station_preemption)
-                                print()
-                                # usa il percorso per vedere con chi vai in conflitto tra i vari agenti
-                                # poi vedi se tra questi c'è qualcuno che ha un percorso che può essere eliminato (non in ricarica e non già preso il pickup)
-                                # per quelli che esistono cancello i loro path e provo a ricalcolare il percorso del mio agente
+                                    for a in modifiable_agents:
+                                        self.reset_path_and_task(a)
+                                        idle_agents[a] = self.token['agents'][agent_name]
+
+
+                                    #find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
+                                                                                           #all_idle_agents,
+                                                                                           #nearest_station, )
+
+
 
             # righe 13-14 alg
             elif self.check_safe_idle(agent_pos):
-                # print('No available tasks for agent', agent_name)
-                # print('Current battery level', self.simulation.get_batteries_level()[agent_name])
 
                 nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                     agent_pos, agent_name, {})

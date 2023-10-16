@@ -38,7 +38,6 @@ class SimulationNewRecovery(object):
             # x e y del path sono presi da 'start' dell'agente (posizione 0 e 1)
             self.actual_paths[agent['name']] = [{'t': 0, 'x': agent['start'][0], 'y': agent['start'][1]}]
 
-
     def handle_agents_lenPath1(self, agents_to_move, algorithm):
 
         for agent in agents_to_move:
@@ -220,7 +219,6 @@ class SimulationNewRecovery(object):
 
     def get_max_autonomies(self):
         return self.max_autonomies
-
     def get_batteries_level(self):
         return self.batteries_level
 
