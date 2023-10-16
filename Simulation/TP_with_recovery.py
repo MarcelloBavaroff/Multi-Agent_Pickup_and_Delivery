@@ -17,7 +17,7 @@ States = ['safe_idle', 'recharging', 'charge_complete']
 class TokenPassingRecovery(object):
     def __init__(self, agents, dimesions, obstacles, non_task_endpoints, charging_stations, simulation,
                  a_star_max_iter=4000, new_recovery=False):
-        random.seed(3)
+        #random.seed(3)
         self.agents = agents
         self.dimensions = dimesions
         self.obstacles = set(obstacles)
@@ -237,8 +237,9 @@ class TokenPassingRecovery(object):
             print('No available task for agent', agent_name, ' moving to safe idling position...')
             self.update_ends(agent_pos)
             self.token['occupied_non_task_endpoints'].add(tuple(closest_non_task_endpoint))
+            cost = env.compute_solution_cost(path_to_non_task_endpoint)
             self.token['agents_to_tasks'][agent_name] = {'task_name': 'safe_idle', 'start': agent_pos,
-                                                         'goal': closest_non_task_endpoint, 'predicted_cost': 0}
+                                                         'goal': closest_non_task_endpoint, 'predicted_cost': cost}
             self.token['agents'][agent_name] = []
             for el in path_to_non_task_endpoint[agent_name]:
                 self.token['agents'][agent_name].append([el['x'], el['y']])
@@ -369,6 +370,10 @@ class TokenPassingRecovery(object):
                         if not find_feasible_station:
                             print(agent_name, " is dead")
                             self.token['dead_agents'].append(agent_name)
+
+                else:
+                    print(agent_name, " is dead")
+                    self.token['dead_agents'].append(agent_name)
 
     # restituisce il nome della stazione più vicina a cui è possibile andare a caricarsi una
     # volta completato il task
@@ -719,21 +724,43 @@ class TokenPassingRecovery(object):
                 if not assigned and len(available_tasks) > 0:
                     self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
-
             # righe 13-14 alg
             elif self.check_safe_idle(agent_pos):
-
                 nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                     agent_pos, agent_name, {})
 
-                if consumption_to_station == self.simulation.get_batteries_level()[agent_name]:
+                if nearest_station is not None and consumption_to_station == self.simulation.get_batteries_level()[agent_name]:
                     find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
                                                                            all_idle_agents, nearest_station)
                     if find_feasible_station:
                         print(agent_name, ' is moving to ', nearest_station, ' to recharge')
                     else:
-                        print(agent_name, ' is dead')
-                        self.token['dead_agents'] = agent_name
+                        #feasible_station è un bool
+                        feasible_station, path_to_station_preemption = self.compute_real_path_station_preemption(
+                            agent_name, agent_pos, nearest_station, all_idle_agents)
+
+                        if feasible_station:
+                            untouchable_agents, modifiable_agents, going_to_goal_agents = self.find_conflicting_agents(
+                                path_to_station_preemption)
+                            if len(modifiable_agents) + len(going_to_goal_agents) > 0:
+                                for a in modifiable_agents:
+                                    self.reset_path_and_task(a)
+                                    idle_agents[a] = self.token['agents'][a]
+
+                                for b in going_to_goal_agents:
+                                    self.reset_path(b)
+                                    idle_agents[b] = self.token['agents'][b]
+
+                                # in teoria in moving obstacles ora non ci sono gli agenti problematici
+                                find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
+                                                                                       all_idle_agents,
+                                                                                       nearest_station)
+                                if not find_feasible_station:
+                                    print(agent_name, " is dead")
+                                    self.token['dead_agents'].append(agent_name)
+                        else:
+                            print(agent_name, " is dead")
+                            self.token['dead_agents'].append(agent_name)
 
                 # else:
                 #    print(agent_name, ' will wait in idle')

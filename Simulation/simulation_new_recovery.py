@@ -11,7 +11,7 @@ from Simulation.tasks_and_delays_maker import *
 
 class SimulationNewRecovery(object):
     def __init__(self, tasks, agents, autonomies, charging_stations):
-        random.seed(1234)
+        #random.seed(1234)
         self.tasks = tasks
         self.agents = agents
         self.time = 0
@@ -253,9 +253,6 @@ if __name__ == '__main__':
     obstacles = param['map']['obstacles']
     non_task_endpoints = param['map']['non_task_endpoints']
     agents = param['agents']
-    # Old fixed tasks and delays
-    # tasks = param['tasks']
-    # delays = param['delays']
     # Generate random tasks and delays
     tasks, delays = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'], param['n_tasks'],
                               param['task_freq'])
