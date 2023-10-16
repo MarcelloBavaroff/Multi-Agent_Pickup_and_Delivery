@@ -317,6 +317,59 @@ class TokenPassingRecovery(object):
                 available_tasks[task_name] = task
         return available_tasks
 
+    def no_availableTasks_try_recharge(self, agent_name, agent_pos, all_idle_agents, idle_agents):
+        print("Nessun task assegnato anche se c'erano")
+        # in questo caso parto dalla mia posizione (agent_pos) quindi 0 come costo base
+        # quella restituita è sempre raggiungibile data la mia batteria oppure None
+        discarded_stations = {}
+        theoretically_ok_stations = []
+        find_feasible_station = False
+
+        nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
+            agent_pos, agent_name, discarded_stations)
+        while not find_feasible_station and nearest_station is not None:
+            # dico questa in teoria va bene
+            theoretically_ok_stations.append(nearest_station)
+            find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
+                                                                   all_idle_agents, nearest_station)
+            # se ho True vuol dire che ho assegnato la stazione e sono felice
+            # altrimenti devo vedere altre stazioni
+            if not find_feasible_station:
+                discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
+                nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
+                    agent_pos, agent_name, discarded_stations)
+
+        # se non ho trovato nessuna stazione al momento stampo un messaggio
+        # in teoria dovrei provare a fanculizzare gli altri agenti
+        if not find_feasible_station:
+            print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
+            while len(theoretically_ok_stations) > 0 and not find_feasible_station:
+                station = theoretically_ok_stations[0]
+                theoretically_ok_stations.remove(station)
+                feasible_station, path_to_station_preemption = self.compute_real_path_station_preemption(
+                    agent_name, agent_pos, station, all_idle_agents)
+
+                if feasible_station:
+                    untouchable_agents, modifiable_agents, going_to_goal_agents = self.find_conflicting_agents(
+                        path_to_station_preemption)
+                    if len(modifiable_agents) + len(going_to_goal_agents) > 0:
+
+                        for a in modifiable_agents:
+                            self.reset_path_and_task(a)
+                            idle_agents[a] = self.token['agents'][a]
+
+                        for b in going_to_goal_agents:
+                            self.reset_path(b)
+                            idle_agents[b] = self.token['agents'][b]
+
+                        # in teoria in moving obstacles ora non ci sono gli agenti problematici
+                        find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
+                                                                               all_idle_agents,
+                                                                               station)
+                        if not find_feasible_station:
+                            print(agent_name, " is dead")
+                            self.token['dead_agents'].append(agent_name)
+
     # restituisce il nome della stazione più vicina a cui è possibile andare a caricarsi una
     # volta completato il task
     def search_nearest_available_station(self, task_cost, task_final_pos, agent_name):
@@ -611,24 +664,18 @@ class TokenPassingRecovery(object):
             else:
                 return False
 
-
-
-
-
     def time_forward(self):
 
         self.update_completed_tasks()
         self.collect_new_tasks()
-
         idle_agents = self.get_idle_agents()
         assigned = False
+
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
             # agent_name = list(idle_agents.keys())[0]
-
             all_idle_agents = self.token['agents'].copy()
             all_idle_agents.pop(agent_name)
-
             agent_pos = idle_agents.pop(agent_name)[0]
             available_tasks = self.find_available_tasks(agent_pos)
 
@@ -637,11 +684,9 @@ class TokenPassingRecovery(object):
                     print("Errore nel calcolo del nuovo percorso verso il goal già assegnato")
                 else:
                     print("Percorso dell'", agent_name, " verso il goal ricalcolato correttamente")
-
                 #in teoria end_paths già ok, available_tasks anche perché non lo reinserivo
 
             elif len(available_tasks) > 0:
-
                 assigned = False
                 discarded_tasks = {}
                 while not assigned and len(discarded_tasks) < len(available_tasks):
@@ -672,60 +717,7 @@ class TokenPassingRecovery(object):
 
                 # non posso fare nulla quindi vado a caricarmi
                 if not assigned and len(available_tasks) > 0:
-                    print("Nessun task assegnato anche se c'erano")
-                    # in questo caso parto dalla mia posizione (agent_pos) quindi 0 come costo base
-                    # quella restituita è sempre raggiungibile data la mia batteria oppure None
-
-                    discarded_stations = {}
-                    theoretically_ok_stations = []
-                    find_feasible_station = False
-
-                    nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
-                        agent_pos, agent_name, discarded_stations)
-                    while not find_feasible_station and nearest_station is not None:
-                        # dico questa in teoria va bene
-                        theoretically_ok_stations.append(nearest_station)
-
-                        find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
-                                                                               all_idle_agents, nearest_station)
-                        # se ho True vuol dire che ho assegnato la stazione e sono felice
-                        # altrimenti devo vedere altre stazioni
-                        if not find_feasible_station:
-                            discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
-                            nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
-                                agent_pos, agent_name, discarded_stations)
-
-                    # se non ho trovato nessuna stazione al momento stampo un messaggio
-                    # in teoria dovrei provare a fanculizzare gli altri agenti
-                    if not find_feasible_station:
-                        print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
-                        while len(theoretically_ok_stations and not find_feasible_station) > 0:
-                            station = theoretically_ok_stations[0]
-                            theoretically_ok_stations.remove(station)
-                            feasible_station, path_to_station_preemption = self.compute_real_path_station_preemption(
-                                agent_name, agent_pos, station, all_idle_agents)
-
-                            if feasible_station:
-                                untouchable_agents, modifiable_agents, going_to_goal_agents = self.find_conflicting_agents(path_to_station_preemption)
-                                if len(modifiable_agents) + len(going_to_goal_agents) > 0:
-
-                                    for a in modifiable_agents:
-                                        self.reset_path_and_task(a)
-                                        idle_agents[a] = self.token['agents'][a]
-
-                                    for b in going_to_goal_agents:
-                                        self.reset_path(b)
-                                        idle_agents[b] = self.token['agents'][b]
-
-                                    #in teoria in moving obstacles ora non ci sono gli agenti problematici
-                                    find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
-                                                                                           all_idle_agents,
-                                                                                           station)
-                                    if not find_feasible_station:
-                                        print(agent_name, " is dead")
-                                        self.token['dead_agents'].append(agent_name)
-
-
+                    self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
 
             # righe 13-14 alg
@@ -745,7 +737,6 @@ class TokenPassingRecovery(object):
 
                 # else:
                 #    print(agent_name, ' will wait in idle')
-
 
             # righe 15-16 alg
             else:
