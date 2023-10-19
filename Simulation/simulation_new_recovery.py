@@ -46,23 +46,27 @@ class SimulationNewRecovery(object):
             # aggiorno posizione attuale agenti
             self.agents_pos_now.add(tuple([current_agent_pos['x'], current_agent_pos['y']]))
 
-            if len(algorithm.get_token()['agents'][agent['name']]) == 1:
+            # se in fase di ricarica aumento il livello della sua batteria (upper bound autonomia massima)
+            if agent['name'] in algorithm.get_token()['agents_to_tasks'] and \
+                    algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name'] == 'recharging':
+
                 self.agents_moved.add(agent['name'])
                 self.actual_paths[agent['name']].append(
                     {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
 
-                # se in fase di ricarica aumento il livello della sua batteria (upper bound autonomia massima)
-                if agent['name'] in algorithm.get_token()['agents_to_tasks'] and \
-                        algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name'] == 'recharging':
+                self.batteries_level[agent['name']] += 10
+                # se carica completa lo metto in idle?
+                if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
+                    self.batteries_level[agent['name']] = self.max_autonomies[agent['name']]
+                    algorithm.set_task_name(agent['name'], 'charge_complete')
 
-                    self.batteries_level[agent['name']] += 10
-                    # se carica completa lo metto in idle?
-                    if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
-                        self.batteries_level[agent['name']] = self.max_autonomies[agent['name']]
-                        algorithm.set_task_name(agent['name'], 'charge_complete')
+            elif len(algorithm.get_token()['agents'][agent['name']]) == 1:
+                self.agents_moved.add(agent['name'])
+                self.actual_paths[agent['name']].append(
+                    {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
 
                 # abbasso livello di batteria
-                elif self.actual_paths[agent['name']][self.time]['x'] == \
+                if self.actual_paths[agent['name']][self.time]['x'] == \
                         self.actual_paths[agent['name']][self.time - 1]['x'] and \
                         self.actual_paths[agent['name']][self.time]['y'] == \
                         self.actual_paths[agent['name']][self.time - 1]['y']:

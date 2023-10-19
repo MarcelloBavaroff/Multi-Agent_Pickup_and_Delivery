@@ -115,23 +115,23 @@ class TokenPassingRecovery(object):
 
             # se l'agente si sta caricando
             # considerazione
-            elif len(path) == 1 and name in self.token['agents_to_tasks'].keys() and \
-                    self.token['agents_to_tasks'][name]['task_name'] == 'recharging':
-                station = None
-                for s in self.token['charging_stations']:
-                    t = self.token['charging_stations'][s]['pos']
-                    t = tuple(t)
-                    if t == tuple(path[0]):
-                        station = s
-                        break
-
-                if station is not None and self.token['charging_stations'][station][
-                    'free_time'] - self.simulation.get_time() >= time_start:
-
-                    k = time_start
-                    while k <= self.token['charging_stations'][station]['free_time'] - self.simulation.get_time() + 1:
-                        obstacles[(path[0][0], path[0][1], k)] = name
-                        k += 1
+            # elif len(path) == 1 and name in self.token['agents_to_tasks'].keys() and \
+            #         self.token['agents_to_tasks'][name]['task_name'] == 'recharging':
+            #     station = None
+            #     for s in self.token['charging_stations']:
+            #         t = self.token['charging_stations'][s]['pos']
+            #         t = tuple(t)
+            #         if t == tuple(path[0]):
+            #             station = s
+            #             break
+            #
+            #     if station is not None and self.token['charging_stations'][station][
+            #         'free_time'] - self.simulation.get_time() >= time_start:
+            #
+            #         k = time_start
+            #         while k <= self.token['charging_stations'][station]['free_time'] - self.simulation.get_time() + 1:
+            #             obstacles[(path[0][0], path[0][1], k)] = name
+            #             k += 1
 
         return obstacles
 
@@ -283,8 +283,8 @@ class TokenPassingRecovery(object):
                     'free_time'] = self.simulation.get_time() + estimated_time_to_recharge
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
-                for i in range(estimated_time_to_recharge):
-                    self.token['agents'][agent_name].append([pos['x'], pos['x']])
+                for i in range(estimated_time_to_recharge-1):
+                    self.token['agents'][agent_name].append([pos['x'], pos['y']])
 
             # se agente assegnato ad un task E le sue coordinate attuali sono = al suo goal
             # E il suo path attuale lungo 1 ed il suo task non è safe idle, recharging, charge_complete
@@ -696,7 +696,7 @@ class TokenPassingRecovery(object):
             agent_pos = idle_agents.pop(agent_name)[0]
             available_tasks = self.find_available_tasks(agent_pos)
 
-            if agent_name in self.token['agents_to_tasks']:
+            if agent_name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][agent_name]['task_name'] != 'charge_complete':
                 if not self.compute_new_path_to_goal(all_idle_agents, agent_name, agent_pos):
                     print("Errore nel calcolo del nuovo percorso verso il goal già assegnato")
                 else:
