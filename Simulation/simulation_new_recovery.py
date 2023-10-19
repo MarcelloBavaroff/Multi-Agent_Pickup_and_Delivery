@@ -11,7 +11,7 @@ from Simulation.tasks_and_delays_maker import *
 
 class SimulationNewRecovery(object):
     def __init__(self, tasks, agents, autonomies, charging_stations):
-        #random.seed(1234)
+        random.seed(1234)
         self.tasks = tasks
         self.agents = agents
         self.time = 0
@@ -41,7 +41,6 @@ class SimulationNewRecovery(object):
     def handle_agents_lenPath1(self, agents_to_move, algorithm):
 
         for agent in agents_to_move:
-
             # ultimo elemento della lista dei path
             current_agent_pos = self.actual_paths[agent['name']][-1]
             # aggiorno posizione attuale agenti
@@ -127,37 +126,6 @@ class SimulationNewRecovery(object):
 
         # First "move" idle agents
         self.handle_agents_lenPath1(agents_to_move, algorithm)
-        # for agent in agents_to_move:
-        #
-        #     # ultimo elemento della lista dei path
-        #     current_agent_pos = self.actual_paths[agent['name']][-1]
-        #     # aggiorno posizione attuale agenti
-        #     self.agents_pos_now.add(tuple([current_agent_pos['x'], current_agent_pos['y']]))
-        #
-        #     if len(algorithm.get_token()['agents'][agent['name']]) == 1:
-        #         self.agents_moved.add(agent['name'])
-        #         self.actual_paths[agent['name']].append(
-        #             {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
-        #
-        #         # se in fase di ricarica aumento il livello della sua batteria (upper bound autonomia massima)
-        #         if agent['name'] in algorithm.get_token()['agents_to_tasks'] and \
-        #                 algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name'] == 'recharging':
-        #
-        #             self.batteries_level[agent['name']] += 10
-        #             # se carica completa lo metto in idle?
-        #             if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
-        #                 self.batteries_level[agent['name']] = self.max_autonomies[agent['name']]
-        #                 algorithm.set_task_name(agent['name'], 'charge_complete')
-        #
-        #         # abbasso livello di batteria
-        #         elif self.actual_paths[agent['name']][self.time]['x'] == \
-        #                 self.actual_paths[agent['name']][self.time - 1]['x'] and \
-        #                 self.actual_paths[agent['name']][self.time]['y'] == \
-        #                 self.actual_paths[agent['name']][self.time - 1]['y']:
-        #
-        #             self.batteries_level[agent['name']] -= self.wait_consumption
-        #         else:
-        #             self.batteries_level[agent['name']] -= self.move_consumption
 
         # Check moving agents doesn't collide with others
         agents_to_move = [x for x in agents_to_move if x['name'] not in self.agents_moved]

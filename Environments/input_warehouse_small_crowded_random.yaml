@@ -124,6 +124,14 @@ map:
     -   [14, 8]
     -   [14, 9]
     -   [14, 10]
+    charging_stations:
+        - pos: [ 12, 0 ]
+          name: station0
+        - pos: [ 12, 12 ]
+          name: station1
+        - pos: [ 0, 0 ]
+          name: station2
+        - pos: [ 0, 12 ]
+          name: station3
 n_tasks: 50
 task_freq: 1
-n_delays_per_agent: 10
