@@ -283,8 +283,12 @@ class TokenPassingRecovery(object):
                     'free_time'] = self.simulation.get_time() + estimated_time_to_recharge
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
-                for i in range(estimated_time_to_recharge-1):
+                for i in range(estimated_time_to_recharge):
                     self.token['agents'][agent_name].append([pos['x'], pos['y']])
+
+
+                #qui devo già pianificare dove andare dopo che ho finito
+
 
             # se agente assegnato ad un task E le sue coordinate attuali sono = al suo goal
             # E il suo path attuale lungo 1 ed il suo task non è safe idle, recharging, charge_complete

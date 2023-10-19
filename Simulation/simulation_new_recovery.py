@@ -53,8 +53,11 @@ class SimulationNewRecovery(object):
                 self.agents_moved.add(agent['name'])
                 self.actual_paths[agent['name']].append(
                     {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
+                algorithm.get_token()['agents'][agent['name']] = algorithm.get_token()['agents'][agent['name']][
+                                                                 1:]
 
                 self.batteries_level[agent['name']] += 10
+
                 # se carica completa lo metto in idle?
                 if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
                     self.batteries_level[agent['name']] = self.max_autonomies[agent['name']]
@@ -147,6 +150,7 @@ class SimulationNewRecovery(object):
                     # in pratica non sapendo l'ordine in cui devo muovere gli agenti se becco
                     # che uno occupa la posizione dove dovrei andare vengo rimesso in coda per
                     # muovermi
+                    # PS secondo me potrei muoverli tutti assieme
                     if tuple([x_new, y_new]) not in self.agents_pos_now or \
                             tuple([x_new, y_new]) == tuple(tuple([current_agent_pos['x'], current_agent_pos['y']])):
 

@@ -87,7 +87,7 @@ class Constraints(object):
         self.edge_constraints |= other.edge_constraints
 
     def __str__(self):
-        return "VC: " + str([str(vc) for vc in self.vertex_constraints])  + \
+        return "VC: " + str([str(vc) for vc in self.vertex_constraints]) + \
             "EC: " + str([str(ec) for ec in self.edge_constraints])
 
 class Environment(object):
