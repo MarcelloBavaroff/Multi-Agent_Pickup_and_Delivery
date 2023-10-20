@@ -98,6 +98,7 @@ class SimulationNewRecovery(object):
         else:
             self.batteries_level[agent['name']] -= self.move_consumption
 
+
     def handle_loops(self, agents_to_move, algorithm):
 
         actual_pos = []
@@ -116,6 +117,7 @@ class SimulationNewRecovery(object):
             return True
         else:
             return False
+
 
     # questa viene chiamata per simulare un singolo timestep in avanti
     def time_forward(self, algorithm):

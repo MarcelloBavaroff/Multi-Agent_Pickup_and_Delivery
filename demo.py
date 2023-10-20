@@ -92,7 +92,9 @@ if __name__ == '__main__':
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 1000:
         simulation.time_forward(tp)
 
-    print(tp.get_completed_tasks())
+    print("Number of completed tasks: ", tp.get_completed_tasks(), "/", len(tasks))
+    print("Number of dead agents: ", len(tp.get_token()['dead_agents']))
+
 
     cost = 0
     for path in simulation.actual_paths.values():
