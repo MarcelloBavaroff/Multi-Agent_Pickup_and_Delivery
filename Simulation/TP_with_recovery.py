@@ -113,25 +113,6 @@ class TokenPassingRecovery(object):
                     if i == len(path) - 1:
                         obstacles[(path[i][0], path[i][1], -k)] = name
 
-            # se l'agente si sta caricando
-            # considerazione
-            # elif len(path) == 1 and name in self.token['agents_to_tasks'].keys() and \
-            #         self.token['agents_to_tasks'][name]['task_name'] == 'recharging':
-            #     station = None
-            #     for s in self.token['charging_stations']:
-            #         t = self.token['charging_stations'][s]['pos']
-            #         t = tuple(t)
-            #         if t == tuple(path[0]):
-            #             station = s
-            #             break
-            #
-            #     if station is not None and self.token['charging_stations'][station][
-            #         'free_time'] - self.simulation.get_time() >= time_start:
-            #
-            #         k = time_start
-            #         while k <= self.token['charging_stations'][station]['free_time'] - self.simulation.get_time() + 1:
-            #             obstacles[(path[0][0], path[0][1], k)] = name
-            #             k += 1
 
         return obstacles
 
@@ -166,11 +147,11 @@ class TokenPassingRecovery(object):
 
         return True
 
-    def get_closest_non_task_endpoint(self, agent_pos):
+    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints):
         dist = -1
         res = -1
         for endpoint in self.non_task_endpoints:
-            if endpoint not in self.token['occupied_non_task_endpoints']:
+            if endpoint not in self.token['occupied_non_task_endpoints'] and endpoint not in discarded_endpoints:
                 if dist == -1:
                     dist = self.admissible_heuristic(endpoint, agent_pos)
                     res = endpoint
@@ -181,7 +162,7 @@ class TokenPassingRecovery(object):
                         res = endpoint
         if res == -1:
             print('Error in finding non-task endpoint, is instance well-formed?')
-            exit(1)
+            # exit(1)
         return res
 
     def update_ends(self, agent_pos):
@@ -218,7 +199,7 @@ class TokenPassingRecovery(object):
         return path
 
     def go_to_closest_non_task_endpoint(self, agent_name, agent_pos, all_idle_agents, time_start):
-        closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos)
+        closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos, set())
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], time_start)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), time_start)
 
@@ -240,10 +221,45 @@ class TokenPassingRecovery(object):
             cost = env.compute_solution_cost(path_to_non_task_endpoint)
             self.token['agents_to_tasks'][agent_name] = {'task_name': 'safe_idle', 'start': agent_pos,
                                                          'goal': closest_non_task_endpoint, 'predicted_cost': cost}
-            #self.token['agents'][agent_name] = []
+            # self.token['agents'][agent_name] = []
             self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
             for el in path_to_non_task_endpoint[agent_name]:
                 self.token['agents'][agent_name].append([el['x'], el['y']])
+
+    def go_to_closest_non_task_endpoint_or_charge(self, agent_name, agent_pos, all_idle_agents, idle_agents,
+                                                  time_start):
+
+        discarded_endpoints = set()
+        assigned = False
+        closest_non_task_endpoint = 0
+
+        # quando non ci sono endpoint disponibili restituisce -1 la funzione e quindi esco dal ciclo
+        while not assigned and closest_non_task_endpoint != -1:
+            closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos, discarded_endpoints)
+            if closest_non_task_endpoint != -1:
+
+                endpoint_cost = self.admissible_heuristic(closest_non_task_endpoint, agent_pos)
+                endpoint_consume = endpoint_cost * self.move_consumption
+                if endpoint_consume < self.simulation.get_batteries_level()[agent_name]:
+                    nearest_station, consumption_to_station = self.search_nearest_available_station(endpoint_cost,
+                                                                                                    closest_non_task_endpoint,
+                                                                                                    agent_name)
+
+                    if nearest_station is not None:
+                        assigned = self.compute_real_path_to_endpoint(agent_name, agent_pos, closest_non_task_endpoint,
+                                                                      all_idle_agents, consumption_to_station)
+
+                        if not assigned:
+                            discarded_endpoints.add(closest_non_task_endpoint)
+                    else:
+                        discarded_endpoints.add(closest_non_task_endpoint)
+
+                else:
+                    discarded_endpoints.add(closest_non_task_endpoint)
+
+        if not assigned and closest_non_task_endpoint == -1:
+            print("Nessun endpoint assegnato")
+            self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
     # def get_random_close_cell(self, agent_pos, r):
     #     while True:
@@ -289,9 +305,10 @@ class TokenPassingRecovery(object):
 
                 all_idle_agents = self.token['agents'].copy()
                 all_idle_agents.pop(agent_name)
-                self.go_to_closest_non_task_endpoint(agent_name, tuple((pos['x'], pos['y'])), all_idle_agents, estimated_time_to_recharge)
+                self.go_to_closest_non_task_endpoint(agent_name, tuple((pos['x'], pos['y'])), all_idle_agents,
+                                                     estimated_time_to_recharge)
 
-                #qui devo già pianificare dove andare dopo che ho finito
+                # qui devo già pianificare dove andare dopo che ho finito
 
 
 
@@ -354,8 +371,9 @@ class TokenPassingRecovery(object):
                 print(agent_name, " is dead")
                 self.token['dead_agents'].append(agent_name)
 
+    # devo andarmi a caricare
     def no_availableTasks_try_recharge(self, agent_name, agent_pos, all_idle_agents, idle_agents):
-        print("Nessun task assegnato anche se c'erano")
+
         # in questo caso parto dalla mia posizione (agent_pos) quindi 0 come costo base
         # quella restituita è sempre raggiungibile data la mia batteria oppure None
         discarded_stations = {}
@@ -365,7 +383,7 @@ class TokenPassingRecovery(object):
         nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
             agent_pos, agent_name, discarded_stations)
         while not find_feasible_station and nearest_station is not None:
-            # dico questa in teoria va bene
+
             theoretically_ok_stations.append(nearest_station)
             find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
                                                                    all_idle_agents, nearest_station)
@@ -373,13 +391,14 @@ class TokenPassingRecovery(object):
             # altrimenti devo vedere altre stazioni
             if not find_feasible_station:
                 discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
+
                 nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                     agent_pos, agent_name, discarded_stations)
 
-        # se non ho trovato nessuna stazione al momento stampo un messaggio
-        # in teoria dovrei provare a fanculizzare gli altri agenti
+        # se non ho trovato stazioni raggiungibili provo a cancellare i percorsi degli altri agenti che
+        # non stanno andando a caricarsi. (Non tocco quelli in idle)
         if not find_feasible_station:
-            print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
+
             while len(theoretically_ok_stations) > 0 and not find_feasible_station:
                 station = theoretically_ok_stations[0]
                 theoretically_ok_stations.remove(station)
@@ -388,10 +407,10 @@ class TokenPassingRecovery(object):
 
                 if feasible_station:
                     self.change_other_paths(path_to_station_preemption, idle_agents, agent_name, agent_pos,
-                                            all_idle_agents,
-                                            station)
+                                            all_idle_agents, station)
 
                 else:
+                    print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
                     print(agent_name, " is dead")
                     self.token['dead_agents'].append(agent_name)
 
@@ -411,7 +430,7 @@ class TokenPassingRecovery(object):
                 estimated_arrival_time = estimated_arrival_cost + self.simulation.get_time()
 
                 # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
-                #self.token['charging_stations'][s['name']]['free_time'] < estimated_arrival_time
+                # self.token['charging_stations'][s['name']]['free_time'] < estimated_arrival_time
                 if estimated_arrival_cost * self.move_consumption < self.simulation.get_batteries_level()[
                     agent_name]:
                     if dist_min == -1:
@@ -589,6 +608,74 @@ class TokenPassingRecovery(object):
             else:
                 return False, []
 
+    def compute_new_path_to_goal(self, all_idle_agents, agent_name, agent_pos):
+
+        # forse usare x e y
+        task = self.token['agents_to_tasks'][agent_name]
+        moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
+        idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
+        idle_obstacles_agents |= set(self.non_task_endpoints) - {tuple(agent_pos), tuple(task['goal'])}
+
+        agent = {'name': agent_name, 'start': agent_pos, 'goal': task['goal']}
+        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
+                          moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
+        cbs = CBS(env)
+        path_to_task_goal = self.search(cbs, agent_name, moving_obstacles_agents)
+
+        if not path_to_task_goal:
+            print('errore nel ricalcolo del percorso di ', agent_name)
+        else:
+            consumption = self.predicted_consumption(path_to_task_goal[agent_name])
+            if self.simulation.get_batteries_level()[agent_name] >= consumption:
+
+                # path_ends in teoria non lo cambio perché non è mai stato toccato
+                # last_step = path_to_task_goal[agent_name][-1]
+                # self.update_ends(agent_pos)
+                # self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
+                # self.token['agents_to_tasks'][agent_name] = {'task_name': closest_task_name, 'start': task[0],
+                #                                             'goal': task[1], 'predicted_cost': cost1 + cost2}
+                self.token['agents'][agent_name] = []
+                for el in path_to_task_goal[agent_name]:
+                    self.token['agents'][agent_name].append([el['x'], el['y']])
+                return True
+            else:
+                return False
+
+    def compute_real_path_to_endpoint(self, all_idle_agents, agent_name, agent_pos, closest_endpoint,
+                                      consumption_to_station):
+
+        moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
+        idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
+
+        # Avoid delivery endpoints unless it's the goal or current position
+        idle_obstacles_agents |= set(self.non_task_endpoints) - {tuple(agent_pos), closest_endpoint}
+
+        agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_endpoint}
+        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, moving_obstacles_agents,
+                          a_star_max_iter=self.a_star_max_iter)
+        cbs = CBS(env)
+        path_to_non_task_endpoint = self.search(cbs, agent_name, moving_obstacles_agents)
+        if not path_to_non_task_endpoint:
+            print("Solution to non-task endpoint not found for agent", agent_name, " instance is not well-formed.")
+
+        else:
+            consumption = self.predicted_consumption(path_to_non_task_endpoint[agent_name]) + consumption_to_station
+            if self.simulation.get_batteries_level()[agent_name] >= consumption:
+
+                print('No available task for agent', agent_name, 'moving to safe idling position...')
+                self.update_ends(agent_pos)
+                self.token['occupied_non_task_endpoints'].add(tuple(closest_endpoint))
+                cost = env.compute_solution_cost(path_to_non_task_endpoint)
+                self.token['agents_to_tasks'][agent_name] = {'task_name': 'safe_idle', 'start': agent_pos,
+                                                             'goal': closest_endpoint, 'predicted_cost': cost}
+                # self.token['agents'][agent_name] = []
+                self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
+                for el in path_to_non_task_endpoint[agent_name]:
+                    self.token['agents'][agent_name].append([el['x'], el['y']])
+                return True
+            else:
+                return False
+
     def predicted_consumption(self, path):
 
         consumption = 0
@@ -653,43 +740,6 @@ class TokenPassingRecovery(object):
     def reset_path(self, agent_name):
         self.token['agents'][agent_name] = self.token['agents'][agent_name][:1]
 
-    def compute_new_path_to_goal(self, all_idle_agents, agent_name, agent_pos):
-
-        # forse usare x e y
-        task = self.token['agents_to_tasks'][agent_name]
-
-        moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
-        idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
-        idle_obstacles_agents |= set(self.non_task_endpoints) - {tuple(agent_pos),
-                                                                 tuple(task['goal'])}
-
-        agent = {'name': agent_name, 'start': agent_pos, 'goal': task['goal']}
-
-        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
-                          moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
-        cbs = CBS(env)
-        path_to_task_goal = self.search(cbs, agent_name, moving_obstacles_agents)
-
-        if not path_to_task_goal:
-            print('errore nel ricalcolo del percorso di ', agent_name)
-        else:
-            consumption = self.predicted_consumption(path_to_task_goal[agent_name])
-            if self.simulation.get_batteries_level()[agent_name] >= consumption:
-
-                # path_ends in teoria non lo cambio perché non è mai stato toccato
-                # last_step = path_to_task_goal[agent_name][-1]
-                # self.update_ends(agent_pos)
-                # self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
-                # self.token['agents_to_tasks'][agent_name] = {'task_name': closest_task_name, 'start': task[0],
-                #                                             'goal': task[1], 'predicted_cost': cost1 + cost2}
-                self.token['agents'][agent_name] = []
-                for el in path_to_task_goal[agent_name]:
-                    self.token['agents'][agent_name].append([el['x'], el['y']])
-
-                return True
-            else:
-                return False
-
     def time_forward(self):
 
         self.update_completed_tasks()
@@ -705,19 +755,21 @@ class TokenPassingRecovery(object):
             agent_pos = idle_agents.pop(agent_name)[0]
             available_tasks = self.find_available_tasks(agent_pos)
 
-            #se ho cancellato il path di un agente che ha già fatto pickup
-            if agent_name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][agent_name]['task_name'] != 'charge_complete':
+            # se ho cancellato il path di un agente che ha già fatto pickup
+            if agent_name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][agent_name][
+                'task_name'] != 'charge_complete':
                 if not self.compute_new_path_to_goal(all_idle_agents, agent_name, agent_pos):
                     print("Errore nel calcolo del nuovo percorso verso il goal già assegnato")
                 else:
                     print("Percorso dell'", agent_name, " verso il goal ricalcolato correttamente")
                 # in teoria end_paths già ok, available_tasks anche perché non lo reinserivo
-
+            # se ci sono task disponibili provo ad assegnarli all'agente a patto che almeno a livello euristico poi possa andare
+            # a caricarsi. Dopo il check con due euristiche per il task calcolo il percorso reale
             elif len(available_tasks) > 0:
                 assigned = False
                 discarded_tasks = {}
                 while not assigned and len(discarded_tasks) < len(available_tasks):
-                    # prima c'era un if - else dovuto probabilmente a qualcosa dei delay
+
                     closest_task_name = self.get_closest_task_name(available_tasks, agent_pos, discarded_tasks)
                     closest_task = available_tasks[closest_task_name]
 
@@ -736,7 +788,6 @@ class TokenPassingRecovery(object):
                                                               all_idle_agents,
                                                               available_tasks, consumption_to_station)
                             # mi turba il fatto che la pop di available_tasks funzioni fuori dalla funzione, ma ok
-
                             if not assigned:
                                 discarded_tasks[closest_task_name] = closest_task
                         else:
@@ -744,17 +795,20 @@ class TokenPassingRecovery(object):
                     else:
                         discarded_tasks[closest_task_name] = closest_task
 
-                # non posso fare nulla quindi vado a caricarmi
+                # se c'erano effettivamente task disponibili ma non vengono assegnati allora ho poca batteria e devo caricarmi
                 if not assigned and len(available_tasks) > 0:
+                    print("Nessun task assegnato anche se c'erano")
                     self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
             # righe 13-14 alg
+            # se sono in safe_idle nel momento in cui ho la batteria minima per caricarmi secondo l'euristica vado a caricarmi
+            # anche qui se serve cambio il path degli altri agenti
             elif self.check_safe_idle(agent_pos):
                 nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                     agent_pos, agent_name, {})
 
-                if nearest_station is not None and consumption_to_station == self.simulation.get_batteries_level()[
-                    agent_name]:
+                if nearest_station is not None and consumption_to_station == self.simulation.get_batteries_level()[agent_name]:
+
                     find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
                                                                            all_idle_agents, nearest_station)
                     if find_feasible_station:
@@ -768,7 +822,6 @@ class TokenPassingRecovery(object):
                             self.change_other_paths(path_to_station_preemption, idle_agents, agent_name, agent_pos,
                                                     all_idle_agents,
                                                     nearest_station)
-
                         else:
                             print(agent_name, " is dead")
                             self.token['dead_agents'].append(agent_name)
@@ -778,4 +831,5 @@ class TokenPassingRecovery(object):
 
             # righe 15-16 alg
             else:
-                self.go_to_closest_non_task_endpoint(agent_name, agent_pos, all_idle_agents, 0)
+                self.go_to_closest_non_task_endpoint_or_charge(agent_name, agent_pos, all_idle_agents, idle_agents, 0)
+                # self.go_to_closest_non_task_endpoint(agent_name, agent_pos, all_idle_agents, 0)
