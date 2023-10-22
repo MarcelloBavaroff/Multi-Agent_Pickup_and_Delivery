@@ -24,8 +24,8 @@ class SimulationNewRecovery(object):
         self.max_autonomies = {}
         self.batteries_level = {}
         self.charging_stations = charging_stations
-        self.move_consumption = 0.5
-        self.wait_consumption = 0.05
+        self.move_consumption = 0.1
+        self.wait_consumption = 0.01
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]
@@ -173,7 +173,6 @@ class SimulationNewRecovery(object):
                         y_new = algorithm.get_token()['agents'][agent['name']][1][1]
 
                         self.update_actual_paths(agent, algorithm, x_new, y_new, current_agent_pos)
-
 
             else:
                 print('attenzione qualcosa non va')
