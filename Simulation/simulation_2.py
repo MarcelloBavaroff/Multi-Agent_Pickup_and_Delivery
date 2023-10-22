@@ -4,12 +4,12 @@ import json
 import os
 import time
 from collections import defaultdict
-from Simulation.TP_with_recovery import TokenPassingRecovery
+from Simulation.TP_battery_2 import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
 
 
-class SimulationNewRecovery(object):
+class Simulation(object):
     def __init__(self, tasks, agents, autonomies, charging_stations):
         random.seed(1234)
         self.tasks = tasks
@@ -239,9 +239,9 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = SimulationNewRecovery(tasks, agents)
-    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000,
-                              new_recovery=True)
+    simulation = Simulation(tasks, agents)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000,
+                      new_recovery=True)
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 

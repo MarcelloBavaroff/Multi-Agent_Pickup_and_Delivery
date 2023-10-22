@@ -14,7 +14,7 @@ from Simulation.CBS.cbs import CBS, Environment
 States = ['safe_idle', 'recharging', 'charge_complete']
 
 
-class TokenPassingRecovery(object):
+class TokenPassing(object):
     def __init__(self, agents, dimesions, obstacles, non_task_endpoints, charging_stations, simulation, goal_endpoints,
                  a_star_max_iter=4000, new_recovery=False):
         random.seed(3)
@@ -481,6 +481,24 @@ class TokenPassingRecovery(object):
         else:
             return closest_station_name, estimated_station_cost * self.move_consumption
 
+    # se ho solo un percorso utilizzo il due
+    def apply_path(self, agent_name, agent_pos, path1, path2, task_name, start, goal, predicted_cost):
+        last_step = path2[agent_name][-1]
+        self.update_ends(agent_pos)
+        self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
+        self.token['agents_to_tasks'][agent_name] = {'task_name': task_name, 'start': start,
+                                                     'goal': goal, 'predicted_cost': predicted_cost}
+        self.token['agents'][agent_name] = []
+
+        if path1 is not None:
+            for el in path1[agent_name]:
+                self.token['agents'][agent_name].append([el['x'], el['y']])
+            # Don't repeat twice same step, elimino ultimo elemento
+            self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
+
+        for el in path2[agent_name]:
+            self.token['agents'][agent_name].append([el['x'], el['y']])
+
     def compute_real_path(self, agent_name, agent_pos, closest_task, closest_task_name, all_idle_agents,
                           available_tasks, consumption_to_station):
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
@@ -529,20 +547,23 @@ class TokenPassingRecovery(object):
                     else:
                         task = closest_task
 
-                    last_step = path_to_task_goal[agent_name][-1]
-                    self.update_ends(agent_pos)
-                    self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
-                    self.token['agents_to_tasks'][agent_name] = {'task_name': closest_task_name, 'start': task[0],
-                                                                 'goal': task[1], 'predicted_cost': cost1 + cost2}
-                    self.token['agents'][agent_name] = []
-                    for el in path_to_task_start[agent_name]:
-                        self.token['agents'][agent_name].append([el['x'], el['y']])
-                    # Don't repeat twice same step, elimino ultimo elemento
-                    self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
-                    for el in path_to_task_goal[agent_name]:
-                        self.token['agents'][agent_name].append([el['x'], el['y']])
+                    #devo unire i percorsi to start and to goal
 
-                    # devo fare pop di available_tasks da quello vero?
+                    self.apply_path(agent_name, agent_pos, path_to_task_start, path_to_task_goal, closest_task_name, task[0], task[1], cost1 + cost2)
+
+                    # last_step = path_to_task_goal[agent_name][-1]
+                    # self.update_ends(agent_pos)
+                    # self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
+                    # self.token['agents_to_tasks'][agent_name] = {'task_name': closest_task_name, 'start': task[0],
+                    #                                              'goal': task[1], 'predicted_cost': cost1 + cost2}
+                    # self.token['agents'][agent_name] = []
+                    # for el in path_to_task_start[agent_name]:
+                    #     self.token['agents'][agent_name].append([el['x'], el['y']])
+                    # # Don't repeat twice same step, elimino ultimo elemento
+                    # self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
+                    # for el in path_to_task_goal[agent_name]:
+                    #     self.token['agents'][agent_name].append([el['x'], el['y']])
+
                     return True,
                 else:
                     return False
@@ -551,12 +572,13 @@ class TokenPassingRecovery(object):
 
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
-        idle_obstacles_agents |= set(self.non_task_endpoints)  # - {tuple(agent_pos), tuple(self.token['charging_stations'][station_name]['pos'])}
-        idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos), tuple(self.token['charging_stations'][station_name]['pos'])}
+        idle_obstacles_agents |= set(
+            self.non_task_endpoints)  # - {tuple(agent_pos), tuple(self.token['charging_stations'][station_name]['pos'])}
+        idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos),
+                                                         tuple(self.token['charging_stations'][station_name]['pos'])}
 
         # cambiare goal
         agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_stations'][station_name]['pos']}
-
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
@@ -572,18 +594,18 @@ class TokenPassingRecovery(object):
             # Use cost - 1 because idle cost is 1
 
             if self.simulation.get_batteries_level()[agent_name] >= consumption:
-
                 last_step = path_to_station[agent_name][-1]
-                self.update_ends(agent_pos)
-                self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
-                self.token['agents_to_tasks'][agent_name] = {'task_name': station_name,
-                                                             'start': tuple([last_step['x'], last_step['y']]),
-                                                             'goal': tuple([last_step['x'], last_step['y']]),
-                                                             'predicted_cost': cost1}
-                self.token['agents'][agent_name] = []
-                for el in path_to_station[agent_name]:
-                    self.token['agents'][agent_name].append([el['x'], el['y']])
-
+                self.apply_path(agent_name, agent_pos, None, path_to_station, station_name,
+                                tuple([last_step['x'], last_step['y']]), tuple([last_step['x'], last_step['y']]), cost1)
+                # self.update_ends(agent_pos)
+                # self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
+                # self.token['agents_to_tasks'][agent_name] = {'task_name': station_name,
+                #                                              'start': tuple([last_step['x'], last_step['y']]),
+                #                                              'goal': tuple([last_step['x'], last_step['y']]),
+                #                                              'predicted_cost': cost1}
+                # self.token['agents'][agent_name] = []
+                # for el in path_to_station[agent_name]:
+                #     self.token['agents'][agent_name].append([el['x'], el['y']])
                 return True
             else:
                 return False
@@ -592,8 +614,10 @@ class TokenPassingRecovery(object):
     def compute_real_path_station_preemption(self, agent_name, agent_pos, station_name, all_idle_agents):
 
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
-        idle_obstacles_agents |= set(self.non_task_endpoints)  # - {tuple(agent_pos), tuple(self.token['charging_stations'][station_name]['pos'])}
-        idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos), tuple(self.token['charging_stations'][station_name]['pos'])}
+        idle_obstacles_agents |= set(
+            self.non_task_endpoints)  # - {tuple(agent_pos), tuple(self.token['charging_stations'][station_name]['pos'])}
+        idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos),
+                                                         tuple(self.token['charging_stations'][station_name]['pos'])}
 
         # cambiare goal
         agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_stations'][station_name]['pos']}
@@ -614,7 +638,6 @@ class TokenPassingRecovery(object):
 
     def compute_new_path_to_goal(self, all_idle_agents, agent_name, agent_pos):
 
-        # forse usare x e y
         task = self.token['agents_to_tasks'][agent_name]
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)

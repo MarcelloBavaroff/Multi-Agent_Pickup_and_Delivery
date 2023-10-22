@@ -3,10 +3,10 @@ from collections import defaultdict
 import yaml
 import json
 import os
-from Simulation.TP_with_recovery import TokenPassingRecovery
+from Simulation.TP_battery_2 import TokenPassing
 import RoothPath
 from Simulation.simulation_old import Simulation
-from Simulation.simulation_new_recovery import SimulationNewRecovery
+from Simulation.simulation_2 import Simulation
 from Simulation.tasks_and_delays_maker import *
 import time
 
@@ -52,8 +52,8 @@ if __name__ == '__main__':
                 yaml.safe_dump(param, param_file)
             #simulation = Simulation(tasks, agents, delays=delays)
             #tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=1000, k=k)
-            simulation = SimulationNewRecovery(tasks, agents, delays=delays)
-            tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=1000, k=k, new_recovery=True)
+            simulation = Simulation(tasks, agents, delays=delays)
+            tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=1000, k=k, new_recovery=True)
             while tp.get_completed_tasks() != len(tasks):
                 simulation.time_forward(tp)
             for path in simulation.actual_paths.values():

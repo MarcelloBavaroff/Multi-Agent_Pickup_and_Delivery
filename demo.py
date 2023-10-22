@@ -3,10 +3,10 @@ import yaml
 import json
 import os
 import random
-from Simulation.TP_with_recovery import TokenPassingRecovery
+from Simulation.TP_battery_2 import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_new_recovery import SimulationNewRecovery
+from Simulation.simulation_2 import Simulation
 import subprocess
 import sys
 import ast
@@ -85,9 +85,9 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = SimulationNewRecovery(tasks, agents, autonomies, charging_stations)
-    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation, param['map']['goal_locations'],
-                              a_star_max_iter=args.a_star_max_iter, new_recovery=True)
+    simulation = Simulation(tasks, agents, autonomies, charging_stations)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation, param['map']['goal_locations'],
+                      a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 1000:
         simulation.time_forward(tp)
 

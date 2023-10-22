@@ -4,7 +4,7 @@ import json
 import os
 import time
 from collections import defaultdict
-from Simulation.TP_with_recovery import TokenPassingRecovery
+from Simulation.TP_battery_2 import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
 
@@ -190,8 +190,8 @@ if __name__ == '__main__':
 
     # Simulate
     simulation = SimulationNewRecovery(tasks, agents, delays=delays)
-    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000, k=1,
-                              replan_every_k_delays=False, pd=0.2, p_max=1, p_iter=1, new_recovery=True)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000, k=1,
+                      replan_every_k_delays=False, pd=0.2, p_max=1, p_iter=1, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 
