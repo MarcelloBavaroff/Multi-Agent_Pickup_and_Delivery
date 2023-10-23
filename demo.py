@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=1, type=int)  # default=1
-    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
+    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=True)
 
     args = parser.parse_args()
 
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    #autonomies = [95.48, 97.74, 80.78, 99.57, 89.47, 80.46, 81.08, 93.46, 80.72, 96.74, 85.13, 97.42, 90.6, 82.92, 97.85, 83.82, 96.32, 88.13, 97.4, 91.64]
+    autonomies = [93.28, 99.8, 95.38, 96.46, 82.45, 89.65, 84.02, 91.9, 90.77, 98.11, 94.75, 97.37, 86.34, 83.44, 95.27, 95.19, 89.67, 93.15, 97.68, 95.86]
 
 
     param['autonomies'] = autonomies
@@ -94,6 +94,9 @@ if __name__ == '__main__':
 
     print("Number of completed tasks: ", tp.get_completed_tasks(), "/", len(tasks))
     print("Number of dead agents: ", len(tp.get_token()['dead_agents']))
+
+    for a in tp.get_token()['dead_agents']:
+        print("Agent ", a, " died")
 
     service_time = 0
     for a in tp.get_token()['completed_tasks_times']:

@@ -80,26 +80,26 @@ agents:
   - 14
   - 0
 autonomies:
-- 84.94
-- 87.36
-- 84.5
-- 85.81
-- 92.41
-- 88.88
-- 91.89
-- 87.28
-- 92.73
-- 87.3
-- 95.07
-- 89.78
-- 81.77
-- 81.27
-- 89.32
-- 99.43
-- 89.95
-- 80.69
-- 84.07
-- 89.34
+- 99.59
+- 93.18
+- 94.81
+- 82.42
+- 91.92
+- 91.49
+- 84.95
+- 99.16
+- 83.86
+- 88.14
+- 98.71
+- 83.58
+- 98.94
+- 86.14
+- 95.75
+- 82.99
+- 87.08
+- 89.51
+- 94.58
+- 87.05
 map:
   charging_stations:
   - name: station0
@@ -186,34 +186,34 @@ map:
   - 15
   - 15
   goal_locations:
-  - &id013
+  - &id025
     - 0
     - 9
-  - &id019
+  - &id024
     - 0
     - 8
-  - &id011
+  - &id008
     - 0
     - 7
-  - &id009
+  - &id001
     - 0
     - 6
-  - &id017
+  - &id003
     - 0
     - 5
-  - &id023
+  - &id018
     - 14
     - 9
-  - &id003
-    - 14
-    - 8
-  - &id001
-    - 14
-    - 7
   - &id005
     - 14
+    - 8
+  - &id012
+    - 14
+    - 7
+  - &id027
+    - 14
     - 6
-  - &id007
+  - &id013
     - 14
     - 5
   non_task_endpoints:
@@ -373,76 +373,76 @@ map:
   - - 11
     - 12
   start_locations:
-  - &id002
+  - &id007
     - 4
-    - 2
-  - &id018
-    - 6
-    - 2
-  - &id020
-    - 8
     - 2
   - &id030
+    - 6
+    - 2
+  - &id014
+    - 8
+    - 2
+  - &id034
     - 10
     - 2
-  - &id015
+  - &id029
     - 4
     - 4
-  - &id031
+  - &id019
     - 6
     - 4
-  - &id024
+  - &id002
     - 8
     - 4
-  - &id008
+  - &id011
     - 10
     - 4
-  - &id016
-    - 4
-    - 6
-  - &id004
-    - 6
-    - 6
   - &id006
+    - 4
+    - 6
+  - &id009
+    - 6
+    - 6
+  - &id022
     - 8
     - 6
-  - &id028
+  - &id033
     - 10
     - 6
-  - &id021
+  - &id031
     - 4
     - 8
   - &id026
     - 6
     - 8
-  - &id014
+  - &id004
     - 8
     - 8
-  - &id029
-    - 10
-    - 8
-  - &id010
-    - 4
-    - 10
-  - &id022
-    - 6
-    - 10
-  - &id033
-    - 8
-    - 10
   - &id032
     - 10
+    - 8
+  - &id017
+    - 4
     - 10
-  - &id025
+  - &id010
+    - 6
+    - 10
+  - &id015
+    - 8
+    - 10
+  - &id016
+    - 10
+    - 10
+  - &id028
     - 4
     - 12
-  - &id034
+  - &id023
     - 6
     - 12
-  - &id027
+  - &id021
     - 8
     - 12
-  - &id012
+  - &id020
     - 10
     - 12
 n_tasks: 200
@@ -453,798 +453,798 @@ tasks:
   start_time: 0
   task_name: task0
 - goal: *id003
-  start: *id002
+  start: *id004
   start_time: 0
   task_name: task1
-- goal: *id001
-  start: *id004
+- goal: *id005
+  start: *id006
   start_time: 0
   task_name: task2
 - goal: *id005
-  start: *id006
-  start_time: 1
+  start: *id007
+  start_time: 0
   task_name: task3
-- goal: *id007
-  start: *id008
-  start_time: 1
+- goal: *id008
+  start: *id009
+  start_time: 0
   task_name: task4
-- goal: *id009
+- goal: *id005
   start: *id010
   start_time: 1
   task_name: task5
-- goal: *id011
-  start: *id012
+- goal: *id001
+  start: *id011
   start_time: 1
   task_name: task6
+- goal: *id012
+  start: *id009
+  start_time: 1
+  task_name: task7
 - goal: *id013
   start: *id014
-  start_time: 2
-  task_name: task7
-- goal: *id003
-  start: *id015
-  start_time: 2
+  start_time: 1
   task_name: task8
-- goal: *id007
-  start: *id016
+- goal: *id001
+  start: *id015
   start_time: 2
   task_name: task9
-- goal: *id017
-  start: *id018
+- goal: *id005
+  start: *id009
   start_time: 2
   task_name: task10
-- goal: *id019
-  start: *id020
+- goal: *id001
+  start: *id016
   start_time: 2
   task_name: task11
-- goal: *id009
-  start: *id021
+- goal: *id012
+  start: *id017
   start_time: 2
   task_name: task12
-- goal: *id011
-  start: *id022
-  start_time: 3
+- goal: *id018
+  start: *id019
+  start_time: 2
   task_name: task13
-- goal: *id011
-  start: *id006
+- goal: *id003
+  start: *id020
   start_time: 3
   task_name: task14
-- goal: *id011
-  start: *id015
+- goal: *id003
+  start: *id021
   start_time: 3
   task_name: task15
-- goal: *id007
-  start: *id018
+- goal: *id003
+  start: *id022
   start_time: 3
   task_name: task16
-- goal: *id003
-  start: *id016
-  start_time: 4
-  task_name: task17
-- goal: *id023
+- goal: *id005
   start: *id006
   start_time: 4
-  task_name: task18
+  task_name: task17
 - goal: *id003
-  start: *id024
+  start: *id023
+  start_time: 4
+  task_name: task18
+- goal: *id024
+  start: *id006
   start_time: 4
   task_name: task19
-- goal: *id003
+- goal: *id001
   start: *id006
   start_time: 4
   task_name: task20
-- goal: *id013
-  start: *id020
-  start_time: 5
+- goal: *id008
+  start: *id022
+  start_time: 4
   task_name: task21
-- goal: *id017
-  start: *id025
-  start_time: 6
+- goal: *id025
+  start: *id010
+  start_time: 4
   task_name: task22
-- goal: *id007
-  start: *id025
-  start_time: 6
+- goal: *id018
+  start: *id019
+  start_time: 5
   task_name: task23
-- goal: *id007
-  start: *id004
-  start_time: 6
-  task_name: task24
 - goal: *id001
   start: *id026
   start_time: 6
+  task_name: task24
+- goal: *id027
+  start: *id004
+  start_time: 6
   task_name: task25
-- goal: *id011
-  start: *id027
+- goal: *id018
+  start: *id028
   start_time: 6
   task_name: task26
-- goal: *id003
-  start: *id027
+- goal: *id027
+  start: *id021
   start_time: 7
   task_name: task27
-- goal: *id011
-  start: *id025
+- goal: *id003
+  start: *id006
   start_time: 7
   task_name: task28
-- goal: *id007
-  start: *id004
-  start_time: 7
+- goal: *id012
+  start: *id014
+  start_time: 8
   task_name: task29
-- goal: *id013
-  start: *id021
+- goal: *id001
+  start: *id016
   start_time: 8
   task_name: task30
 - goal: *id013
-  start: *id018
-  start_time: 8
-  task_name: task31
-- goal: *id003
-  start: *id028
-  start_time: 8
-  task_name: task32
-- goal: *id009
   start: *id029
-  start_time: 8
-  task_name: task33
-- goal: *id005
-  start: *id027
-  start_time: 8
-  task_name: task34
-- goal: *id023
-  start: *id030
-  start_time: 8
-  task_name: task35
-- goal: *id003
-  start: *id008
   start_time: 9
+  task_name: task31
+- goal: *id008
+  start: *id010
+  start_time: 10
+  task_name: task32
+- goal: *id001
+  start: *id028
+  start_time: 10
+  task_name: task33
+- goal: *id001
+  start: *id004
+  start_time: 10
+  task_name: task34
+- goal: *id001
+  start: *id016
+  start_time: 10
+  task_name: task35
+- goal: *id012
+  start: *id023
+  start_time: 11
   task_name: task36
 - goal: *id013
-  start: *id010
-  start_time: 9
+  start: *id009
+  start_time: 11
   task_name: task37
-- goal: *id005
-  start: *id024
-  start_time: 9
+- goal: *id008
+  start: *id014
+  start_time: 11
   task_name: task38
 - goal: *id005
-  start: *id010
-  start_time: 9
+  start: *id014
+  start_time: 11
   task_name: task39
-- goal: *id003
-  start: *id002
-  start_time: 9
+- goal: *id025
+  start: *id004
+  start_time: 11
   task_name: task40
-- goal: *id007
-  start: *id020
-  start_time: 9
+- goal: *id013
+  start: *id011
+  start_time: 12
   task_name: task41
-- goal: *id009
-  start: *id008
-  start_time: 9
+- goal: *id018
+  start: *id009
+  start_time: 12
   task_name: task42
-- goal: *id003
-  start: *id021
-  start_time: 10
+- goal: *id005
+  start: *id011
+  start_time: 12
   task_name: task43
-- goal: *id007
-  start: *id006
-  start_time: 10
+- goal: *id025
+  start: *id030
+  start_time: 12
   task_name: task44
-- goal: *id007
-  start: *id027
-  start_time: 10
+- goal: *id008
+  start: *id009
+  start_time: 12
   task_name: task45
-- goal: *id017
-  start: *id018
-  start_time: 11
+- goal: *id024
+  start: *id011
+  start_time: 12
   task_name: task46
-- goal: *id009
-  start: *id026
-  start_time: 11
+- goal: *id001
+  start: *id021
+  start_time: 13
   task_name: task47
-- goal: *id007
-  start: *id002
-  start_time: 11
+- goal: *id001
+  start: *id028
+  start_time: 13
   task_name: task48
-- goal: *id017
-  start: *id010
+- goal: *id012
+  start: *id028
   start_time: 13
   task_name: task49
-- goal: *id003
-  start: *id030
+- goal: *id013
+  start: *id007
   start_time: 13
   task_name: task50
-- goal: *id005
-  start: *id031
-  start_time: 13
+- goal: *id008
+  start: *id009
+  start_time: 14
   task_name: task51
-- goal: *id013
-  start: *id032
-  start_time: 13
+- goal: *id012
+  start: *id029
+  start_time: 14
   task_name: task52
-- goal: *id003
-  start: *id032
-  start_time: 13
+- goal: *id027
+  start: *id028
+  start_time: 14
   task_name: task53
-- goal: *id005
-  start: *id026
+- goal: *id027
+  start: *id021
   start_time: 14
   task_name: task54
-- goal: *id001
-  start: *id020
+- goal: *id027
+  start: *id022
   start_time: 14
   task_name: task55
-- goal: *id009
-  start: *id002
+- goal: *id018
+  start: *id031
   start_time: 14
   task_name: task56
-- goal: *id017
-  start: *id015
+- goal: *id005
+  start: *id009
   start_time: 14
   task_name: task57
-- goal: *id001
-  start: *id016
+- goal: *id012
+  start: *id032
   start_time: 15
   task_name: task58
-- goal: *id009
-  start: *id010
+- goal: *id018
+  start: *id017
   start_time: 15
   task_name: task59
-- goal: *id019
-  start: *id012
+- goal: *id024
+  start: *id004
   start_time: 15
   task_name: task60
-- goal: *id017
-  start: *id004
-  start_time: 15
-  task_name: task61
-- goal: *id009
-  start: *id027
-  start_time: 15
-  task_name: task62
-- goal: *id017
-  start: *id014
-  start_time: 15
-  task_name: task63
-- goal: *id005
-  start: *id024
-  start_time: 15
-  task_name: task64
-- goal: *id017
-  start: *id015
-  start_time: 15
-  task_name: task65
-- goal: *id011
-  start: *id031
-  start_time: 15
-  task_name: task66
-- goal: *id011
+- goal: *id025
   start: *id033
   start_time: 16
+  task_name: task61
+- goal: *id013
+  start: *id014
+  start_time: 16
+  task_name: task62
+- goal: *id003
+  start: *id017
+  start_time: 16
+  task_name: task63
+- goal: *id018
+  start: *id015
+  start_time: 16
+  task_name: task64
+- goal: *id001
+  start: *id020
+  start_time: 17
+  task_name: task65
+- goal: *id012
+  start: *id014
+  start_time: 17
+  task_name: task66
+- goal: *id013
+  start: *id026
+  start_time: 17
   task_name: task67
 - goal: *id013
-  start: *id033
-  start_time: 16
+  start: *id017
+  start_time: 17
   task_name: task68
-- goal: *id003
-  start: *id020
-  start_time: 16
-  task_name: task69
-- goal: *id023
-  start: *id031
-  start_time: 16
-  task_name: task70
 - goal: *id005
+  start: *id016
+  start_time: 17
+  task_name: task69
+- goal: *id024
   start: *id029
-  start_time: 16
+  start_time: 17
+  task_name: task70
+- goal: *id013
+  start: *id010
+  start_time: 17
   task_name: task71
-- goal: *id007
-  start: *id020
-  start_time: 17
+- goal: *id013
+  start: *id014
+  start_time: 18
   task_name: task72
-- goal: *id009
-  start: *id002
-  start_time: 17
+- goal: *id018
+  start: *id030
+  start_time: 18
   task_name: task73
-- goal: *id019
-  start: *id008
-  start_time: 17
+- goal: *id025
+  start: *id009
+  start_time: 18
   task_name: task74
-- goal: *id009
-  start: *id012
+- goal: *id027
+  start: *id022
   start_time: 18
   task_name: task75
-- goal: *id023
-  start: *id015
-  start_time: 18
+- goal: *id018
+  start: *id023
+  start_time: 19
   task_name: task76
-- goal: *id019
-  start: *id015
+- goal: *id024
+  start: *id017
   start_time: 19
   task_name: task77
-- goal: *id003
-  start: *id025
+- goal: *id005
+  start: *id034
   start_time: 19
   task_name: task78
-- goal: *id009
-  start: *id012
-  start_time: 19
+- goal: *id024
+  start: *id023
+  start_time: 20
   task_name: task79
-- goal: *id019
-  start: *id015
-  start_time: 19
+- goal: *id001
+  start: *id032
+  start_time: 20
   task_name: task80
-- goal: *id005
-  start: *id025
-  start_time: 19
+- goal: *id013
+  start: *id023
+  start_time: 20
   task_name: task81
-- goal: *id005
-  start: *id026
-  start_time: 19
+- goal: *id008
+  start: *id006
+  start_time: 20
   task_name: task82
-- goal: *id007
-  start: *id002
-  start_time: 19
+- goal: *id001
+  start: *id031
+  start_time: 20
   task_name: task83
 - goal: *id003
-  start: *id033
+  start: *id017
   start_time: 20
   task_name: task84
-- goal: *id023
-  start: *id012
+- goal: *id008
+  start: *id007
   start_time: 20
   task_name: task85
-- goal: *id005
-  start: *id015
+- goal: *id012
+  start: *id014
   start_time: 20
   task_name: task86
-- goal: *id019
-  start: *id029
+- goal: *id008
+  start: *id032
   start_time: 20
   task_name: task87
-- goal: *id013
-  start: *id031
-  start_time: 20
-  task_name: task88
-- goal: *id013
-  start: *id004
-  start_time: 20
-  task_name: task89
-- goal: *id023
-  start: *id002
-  start_time: 20
-  task_name: task90
-- goal: *id003
-  start: *id006
-  start_time: 21
-  task_name: task91
-- goal: *id017
+- goal: *id005
   start: *id020
   start_time: 21
-  task_name: task92
-- goal: *id001
-  start: *id016
-  start_time: 21
-  task_name: task93
+  task_name: task88
 - goal: *id003
-  start: *id027
-  start_time: 21
-  task_name: task94
-- goal: *id013
   start: *id028
   start_time: 21
-  task_name: task95
-- goal: *id009
-  start: *id012
+  task_name: task89
+- goal: *id005
+  start: *id020
   start_time: 21
+  task_name: task90
+- goal: *id024
+  start: *id020
+  start_time: 22
+  task_name: task91
+- goal: *id013
+  start: *id034
+  start_time: 22
+  task_name: task92
+- goal: *id003
+  start: *id029
+  start_time: 23
+  task_name: task93
+- goal: *id025
+  start: *id002
+  start_time: 23
+  task_name: task94
+- goal: *id025
+  start: *id016
+  start_time: 23
+  task_name: task95
+- goal: *id008
+  start: *id023
+  start_time: 23
   task_name: task96
 - goal: *id001
-  start: *id034
-  start_time: 21
-  task_name: task97
-- goal: *id019
-  start: *id027
-  start_time: 21
-  task_name: task98
-- goal: *id005
   start: *id002
-  start_time: 21
+  start_time: 23
+  task_name: task97
+- goal: *id018
+  start: *id006
+  start_time: 24
+  task_name: task98
+- goal: *id024
+  start: *id028
+  start_time: 24
   task_name: task99
-- goal: *id011
-  start: *id004
-  start_time: 22
+- goal: *id025
+  start: *id009
+  start_time: 24
   task_name: task100
-- goal: *id001
-  start: *id029
-  start_time: 23
+- goal: *id008
+  start: *id030
+  start_time: 24
   task_name: task101
-- goal: *id017
-  start: *id027
-  start_time: 23
+- goal: *id018
+  start: *id030
+  start_time: 24
   task_name: task102
-- goal: *id011
-  start: *id029
+- goal: *id027
+  start: *id004
   start_time: 24
   task_name: task103
-- goal: *id009
-  start: *id034
+- goal: *id027
+  start: *id007
   start_time: 24
   task_name: task104
-- goal: *id017
-  start: *id018
-  start_time: 24
+- goal: *id012
+  start: *id011
+  start_time: 25
   task_name: task105
 - goal: *id005
-  start: *id014
-  start_time: 24
+  start: *id002
+  start_time: 26
   task_name: task106
-- goal: *id023
-  start: *id027
-  start_time: 24
+- goal: *id001
+  start: *id002
+  start_time: 26
   task_name: task107
 - goal: *id005
-  start: *id021
-  start_time: 24
+  start: *id022
+  start_time: 26
   task_name: task108
-- goal: *id007
-  start: *id028
-  start_time: 25
+- goal: *id013
+  start: *id023
+  start_time: 26
   task_name: task109
-- goal: *id001
+- goal: *id003
   start: *id015
-  start_time: 25
+  start_time: 26
   task_name: task110
-- goal: *id009
-  start: *id034
+- goal: *id013
+  start: *id033
   start_time: 26
   task_name: task111
-- goal: *id013
-  start: *id012
-  start_time: 26
+- goal: *id012
+  start: *id011
+  start_time: 27
   task_name: task112
-- goal: *id011
-  start: *id032
-  start_time: 26
+- goal: *id003
+  start: *id019
+  start_time: 27
   task_name: task113
-- goal: *id019
-  start: *id016
-  start_time: 26
+- goal: *id018
+  start: *id023
+  start_time: 27
   task_name: task114
-- goal: *id003
-  start: *id020
-  start_time: 26
-  task_name: task115
-- goal: *id017
-  start: *id034
-  start_time: 26
-  task_name: task116
-- goal: *id009
+- goal: *id018
   start: *id022
-  start_time: 26
+  start_time: 28
+  task_name: task115
+- goal: *id018
+  start: *id030
+  start_time: 28
+  task_name: task116
+- goal: *id027
+  start: *id007
+  start_time: 28
   task_name: task117
-- goal: *id013
-  start: *id028
-  start_time: 27
+- goal: *id024
+  start: *id023
+  start_time: 29
   task_name: task118
-- goal: *id009
-  start: *id033
-  start_time: 27
+- goal: *id001
+  start: *id034
+  start_time: 29
   task_name: task119
-- goal: *id007
-  start: *id006
-  start_time: 27
+- goal: *id012
+  start: *id016
+  start_time: 29
   task_name: task120
-- goal: *id013
-  start: *id025
-  start_time: 27
+- goal: *id018
+  start: *id029
+  start_time: 29
   task_name: task121
-- goal: *id011
-  start: *id015
-  start_time: 27
+- goal: *id027
+  start: *id016
+  start_time: 29
   task_name: task122
-- goal: *id003
-  start: *id006
-  start_time: 28
+- goal: *id008
+  start: *id014
+  start_time: 29
   task_name: task123
-- goal: *id003
-  start: *id025
-  start_time: 28
+- goal: *id024
+  start: *id026
+  start_time: 29
   task_name: task124
-- goal: *id007
-  start: *id008
-  start_time: 28
+- goal: *id001
+  start: *id034
+  start_time: 29
   task_name: task125
-- goal: *id007
-  start: *id028
-  start_time: 28
+- goal: *id018
+  start: *id022
+  start_time: 29
   task_name: task126
 - goal: *id001
-  start: *id002
+  start: *id017
   start_time: 29
   task_name: task127
-- goal: *id019
-  start: *id028
-  start_time: 29
+- goal: *id024
+  start: *id022
+  start_time: 30
   task_name: task128
-- goal: *id009
-  start: *id033
-  start_time: 29
+- goal: *id008
+  start: *id034
+  start_time: 30
   task_name: task129
-- goal: *id013
-  start: *id021
-  start_time: 29
-  task_name: task130
-- goal: *id013
-  start: *id021
-  start_time: 29
-  task_name: task131
-- goal: *id023
-  start: *id002
-  start_time: 29
-  task_name: task132
-- goal: *id007
-  start: *id028
-  start_time: 29
-  task_name: task133
-- goal: *id011
-  start: *id032
-  start_time: 30
-  task_name: task134
-- goal: *id001
-  start: *id027
-  start_time: 30
-  task_name: task135
-- goal: *id011
+- goal: *id012
   start: *id016
   start_time: 30
-  task_name: task136
-- goal: *id003
-  start: *id010
+  task_name: task130
+- goal: *id024
+  start: *id016
   start_time: 30
-  task_name: task137
-- goal: *id001
-  start: *id004
+  task_name: task131
+- goal: *id013
+  start: *id017
   start_time: 30
-  task_name: task138
-- goal: *id011
-  start: *id020
-  start_time: 30
-  task_name: task139
-- goal: *id019
-  start: *id027
-  start_time: 30
-  task_name: task140
-- goal: *id017
-  start: *id022
+  task_name: task132
+- goal: *id018
+  start: *id029
   start_time: 31
+  task_name: task133
+- goal: *id018
+  start: *id010
+  start_time: 31
+  task_name: task134
+- goal: *id025
+  start: *id020
+  start_time: 31
+  task_name: task135
+- goal: *id012
+  start: *id028
+  start_time: 31
+  task_name: task136
+- goal: *id013
+  start: *id030
+  start_time: 32
+  task_name: task137
+- goal: *id008
+  start: *id020
+  start_time: 32
+  task_name: task138
+- goal: *id025
+  start: *id002
+  start_time: 33
+  task_name: task139
+- goal: *id003
+  start: *id019
+  start_time: 33
+  task_name: task140
+- goal: *id005
+  start: *id004
+  start_time: 33
   task_name: task141
 - goal: *id013
-  start: *id018
-  start_time: 31
+  start: *id029
+  start_time: 33
   task_name: task142
-- goal: *id013
-  start: *id010
-  start_time: 31
+- goal: *id005
+  start: *id019
+  start_time: 34
   task_name: task143
-- goal: *id023
-  start: *id031
-  start_time: 32
+- goal: *id027
+  start: *id015
+  start_time: 34
   task_name: task144
-- goal: *id001
-  start: *id030
-  start_time: 32
+- goal: *id003
+  start: *id004
+  start_time: 34
   task_name: task145
-- goal: *id001
-  start: *id034
-  start_time: 32
+- goal: *id012
+  start: *id004
+  start_time: 35
   task_name: task146
-- goal: *id017
-  start: *id024
-  start_time: 32
+- goal: *id003
+  start: *id015
+  start_time: 35
   task_name: task147
 - goal: *id001
-  start: *id006
-  start_time: 32
+  start: *id016
+  start_time: 35
   task_name: task148
-- goal: *id001
-  start: *id014
-  start_time: 32
+- goal: *id008
+  start: *id002
+  start_time: 35
   task_name: task149
-- goal: *id003
-  start: *id020
-  start_time: 32
-  task_name: task150
 - goal: *id013
-  start: *id014
-  start_time: 33
+  start: *id023
+  start_time: 35
+  task_name: task150
+- goal: *id027
+  start: *id006
+  start_time: 35
   task_name: task151
 - goal: *id005
-  start: *id026
-  start_time: 33
+  start: *id019
+  start_time: 35
   task_name: task152
-- goal: *id007
-  start: *id032
-  start_time: 33
+- goal: *id005
+  start: *id030
+  start_time: 36
   task_name: task153
-- goal: *id023
-  start: *id029
-  start_time: 34
-  task_name: task154
-- goal: *id023
-  start: *id031
-  start_time: 34
-  task_name: task155
-- goal: *id011
-  start: *id032
-  start_time: 34
-  task_name: task156
 - goal: *id001
-  start: *id027
-  start_time: 34
-  task_name: task157
-- goal: *id007
-  start: *id025
-  start_time: 35
-  task_name: task158
-- goal: *id013
-  start: *id020
-  start_time: 35
-  task_name: task159
-- goal: *id001
-  start: *id028
-  start_time: 35
-  task_name: task160
-- goal: *id001
-  start: *id002
-  start_time: 36
-  task_name: task161
-- goal: *id009
-  start: *id027
-  start_time: 36
-  task_name: task162
-- goal: *id011
-  start: *id004
-  start_time: 36
-  task_name: task163
-- goal: *id001
-  start: *id008
-  start_time: 36
-  task_name: task164
-- goal: *id023
-  start: *id012
-  start_time: 36
-  task_name: task165
-- goal: *id023
-  start: *id020
-  start_time: 37
-  task_name: task166
-- goal: *id023
-  start: *id028
-  start_time: 37
-  task_name: task167
-- goal: *id011
-  start: *id025
-  start_time: 37
-  task_name: task168
-- goal: *id001
-  start: *id028
-  start_time: 37
-  task_name: task169
-- goal: *id007
-  start: *id032
-  start_time: 37
-  task_name: task170
-- goal: *id003
-  start: *id014
-  start_time: 37
-  task_name: task171
-- goal: *id003
   start: *id016
+  start_time: 36
+  task_name: task154
+- goal: *id005
+  start: *id028
   start_time: 37
-  task_name: task172
-- goal: *id017
-  start: *id031
+  task_name: task155
+- goal: *id003
+  start: *id022
   start_time: 37
-  task_name: task173
-- goal: *id017
-  start: *id008
-  start_time: 37
-  task_name: task174
-- goal: *id023
+  task_name: task156
+- goal: *id005
+  start: *id023
+  start_time: 38
+  task_name: task157
+- goal: *id018
+  start: *id010
+  start_time: 38
+  task_name: task158
+- goal: *id027
   start: *id021
-  start_time: 37
-  task_name: task175
-- goal: *id011
+  start_time: 38
+  task_name: task159
+- goal: *id024
+  start: *id034
+  start_time: 38
+  task_name: task160
+- goal: *id013
+  start: *id017
+  start_time: 39
+  task_name: task161
+- goal: *id027
+  start: *id007
+  start_time: 39
+  task_name: task162
+- goal: *id012
+  start: *id007
+  start_time: 39
+  task_name: task163
+- goal: *id025
   start: *id004
-  start_time: 38
-  task_name: task176
-- goal: *id011
-  start: *id025
-  start_time: 38
-  task_name: task177
+  start_time: 39
+  task_name: task164
+- goal: *id013
+  start: *id023
+  start_time: 40
+  task_name: task165
+- goal: *id025
+  start: *id015
+  start_time: 40
+  task_name: task166
+- goal: *id013
+  start: *id026
+  start_time: 40
+  task_name: task167
+- goal: *id005
+  start: *id014
+  start_time: 41
+  task_name: task168
+- goal: *id005
+  start: *id004
+  start_time: 41
+  task_name: task169
+- goal: *id003
+  start: *id032
+  start_time: 41
+  task_name: task170
+- goal: *id018
+  start: *id020
+  start_time: 41
+  task_name: task171
 - goal: *id001
   start: *id015
-  start_time: 38
+  start_time: 41
+  task_name: task172
+- goal: *id001
+  start: *id031
+  start_time: 41
+  task_name: task173
+- goal: *id012
+  start: *id034
+  start_time: 41
+  task_name: task174
+- goal: *id018
+  start: *id020
+  start_time: 41
+  task_name: task175
+- goal: *id018
+  start: *id006
+  start_time: 41
+  task_name: task176
+- goal: *id025
+  start: *id014
+  start_time: 42
+  task_name: task177
+- goal: *id025
+  start: *id031
+  start_time: 42
   task_name: task178
-- goal: *id019
-  start: *id025
-  start_time: 38
-  task_name: task179
-- goal: *id003
-  start: *id022
-  start_time: 39
-  task_name: task180
-- goal: *id023
-  start: *id022
-  start_time: 39
-  task_name: task181
 - goal: *id005
-  start: *id016
-  start_time: 39
+  start: *id007
+  start_time: 43
+  task_name: task179
+- goal: *id005
+  start: *id004
+  start_time: 43
+  task_name: task180
+- goal: *id008
+  start: *id031
+  start_time: 43
+  task_name: task181
+- goal: *id018
+  start: *id028
+  start_time: 43
   task_name: task182
-- goal: *id009
-  start: *id026
-  start_time: 39
+- goal: *id018
+  start: *id034
+  start_time: 44
   task_name: task183
-- goal: *id007
-  start: *id030
-  start_time: 39
+- goal: *id003
+  start: *id007
+  start_time: 44
   task_name: task184
-- goal: *id007
-  start: *id002
-  start_time: 40
+- goal: *id025
+  start: *id006
+  start_time: 44
   task_name: task185
-- goal: *id019
-  start: *id033
-  start_time: 40
+- goal: *id001
+  start: *id007
+  start_time: 44
   task_name: task186
 - goal: *id013
-  start: *id016
-  start_time: 40
-  task_name: task187
-- goal: *id013
-  start: *id026
-  start_time: 40
-  task_name: task188
-- goal: *id009
   start: *id004
-  start_time: 40
-  task_name: task189
-- goal: *id013
-  start: *id020
-  start_time: 40
-  task_name: task190
-- goal: *id017
-  start: *id031
-  start_time: 40
-  task_name: task191
-- goal: *id003
-  start: *id012
-  start_time: 41
-  task_name: task192
-- goal: *id001
-  start: *id020
-  start_time: 41
-  task_name: task193
-- goal: *id017
-  start: *id015
-  start_time: 42
-  task_name: task194
-- goal: *id019
-  start: *id030
-  start_time: 42
-  task_name: task195
-- goal: *id003
+  start_time: 44
+  task_name: task187
+- goal: *id027
   start: *id014
-  start_time: 42
+  start_time: 44
+  task_name: task188
+- goal: *id018
+  start: *id032
+  start_time: 45
+  task_name: task189
+- goal: *id025
+  start: *id032
+  start_time: 45
+  task_name: task190
+- goal: *id005
+  start: *id007
+  start_time: 45
+  task_name: task191
+- goal: *id005
+  start: *id009
+  start_time: 46
+  task_name: task192
+- goal: *id027
+  start: *id031
+  start_time: 46
+  task_name: task193
+- goal: *id012
+  start: *id032
+  start_time: 46
+  task_name: task194
+- goal: *id012
+  start: *id026
+  start_time: 46
+  task_name: task195
+- goal: *id024
+  start: *id015
+  start_time: 46
   task_name: task196
-- goal: *id003
-  start: *id033
-  start_time: 43
+- goal: *id005
+  start: *id014
+  start_time: 46
   task_name: task197
-- goal: *id001
-  start: *id021
-  start_time: 43
+- goal: *id012
+  start: *id019
+  start_time: 46
   task_name: task198
-- goal: *id007
-  start: *id022
-  start_time: 43
+- goal: *id025
+  start: *id029
+  start_time: 47
   task_name: task199

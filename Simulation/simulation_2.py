@@ -25,7 +25,7 @@ class Simulation(object):
         self.batteries_level = {}
         self.charging_stations = charging_stations
         self.move_consumption = 1
-        self.wait_consumption = 0.1
+        self.wait_consumption = 0.05
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]
@@ -79,6 +79,11 @@ class Simulation(object):
                     self.batteries_level[agent['name']] -= self.wait_consumption
                 else:
                     self.batteries_level[agent['name']] -= self.move_consumption
+
+                if self.batteries_level[agent['name']] <= 0:
+                    print("Batteria negativa")
+                    #algorithm.get_token()['dead_agents'].add(agent['name'])
+
 
     def update_actual_paths(self, agent, algorithm, x_new, y_new, current_agent_pos):
         self.agents_moved.add(agent['name'])
