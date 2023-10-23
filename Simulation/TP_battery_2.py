@@ -120,15 +120,17 @@ class TokenPassing(object):
         obstacles = set()
         charging_stations_pos = set()
 
-        for c in self.charging_stations:
-            charging_stations_pos.add(tuple(c['pos']))
+        #for c in self.charging_stations:
+        #    charging_stations_pos.add(tuple(c['pos']))
 
         for g in self.goal_endpoints:
             obstacles.add(tuple(g))
+        for c in self.charging_stations:
+            obstacles.add(tuple(c['pos']))
 
         for path in agents_paths:
-            # quelli nelle stazioni non li segno come ostacoli
-            if len(path) == 1 and tuple(path[0]) not in charging_stations_pos:
+            # quelli nelle stazioni non li segno come ostacoli and tuple(path[0]) not in charging_stations_pos
+            if len(path) == 1:
                 obstacles.add((path[0][0], path[0][1]))
             # presumo agenti che finiranno il loro percorso e si fermeranno? Quindi metto ultima
             # loro posizione
@@ -294,7 +296,7 @@ class TokenPassing(object):
                 'task_name'] in self.token['charging_stations']:
 
                 station_name = self.token['agents_to_tasks'][agent_name]['task_name']
-                self.token['agents_to_tasks'][agent_name]['task_name'] = 'recharging'
+                #self.token['agents_to_tasks'][agent_name]['task_name'] = 'recharging'
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name]) / 10
@@ -311,6 +313,7 @@ class TokenPassing(object):
                 all_idle_agents.pop(agent_name)
                 self.go_to_closest_non_task_endpoint(agent_name, tuple((pos['x'], pos['y'])), all_idle_agents,
                                                      estimated_time_to_recharge)
+                self.token['agents_to_tasks'][agent_name]['task_name'] = 'recharging'
 
                 # qui devo già pianificare dove andare dopo che ho finito
 
@@ -412,6 +415,7 @@ class TokenPassing(object):
                 if feasible_station:
                     self.change_other_paths(path_to_station_preemption, idle_agents, agent_name, agent_pos,
                                             all_idle_agents, station)
+                    print("Ricarica possibile dopo aver cambiato i percorsi degli altri agenti")
 
                 else:
                     print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
@@ -826,7 +830,7 @@ class TokenPassing(object):
 
                 # se c'erano effettivamente task disponibili ma non vengono assegnati allora ho poca batteria e devo caricarmi
                 if not assigned and len(available_tasks) > 0:
-                    print("Nessun task assegnato anche se c'erano")
+                    #print("Nessun task assegnato anche se c'erano")
                     self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
             # righe 13-14 alg

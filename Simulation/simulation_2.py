@@ -24,8 +24,8 @@ class Simulation(object):
         self.max_autonomies = {}
         self.batteries_level = {}
         self.charging_stations = charging_stations
-        self.move_consumption = 0.1
-        self.wait_consumption = 0.01
+        self.move_consumption = 1
+        self.wait_consumption = 0.1
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]
@@ -61,7 +61,9 @@ class Simulation(object):
                 # se carica completa lo metto in idle?
                 if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
                     self.batteries_level[agent['name']] = self.max_autonomies[agent['name']]
-                    algorithm.set_task_name(agent['name'], 'charge_complete')
+                    #algorithm.set_task_name(agent['name'], 'charge_complete')
+                    algorithm.set_task_name(agent['name'], 'safe_idle')
+
 
             elif len(algorithm.get_token()['agents'][agent['name']]) == 1:
                 self.agents_moved.add(agent['name'])
@@ -98,6 +100,8 @@ class Simulation(object):
         else:
             self.batteries_level[agent['name']] -= self.move_consumption
 
+        if self.batteries_level[agent['name']] <= 0:
+            print("errore")
 
     def handle_loops(self, agents_to_move, algorithm):
 
@@ -107,7 +111,7 @@ class Simulation(object):
 
         correspondences = 0
         for a in agents_to_move:
-            #next_pos è una lista, non una tupla
+            # next_pos è una lista, non una tupla
             next_pos = algorithm.get_token()['agents'][a['name']][1]
             if tuple(next_pos) in actual_pos:
                 correspondences += 1
@@ -117,7 +121,6 @@ class Simulation(object):
             return True
         else:
             return False
-
 
     # questa viene chiamata per simulare un singolo timestep in avanti
     def time_forward(self, algorithm):
@@ -155,7 +158,6 @@ class Simulation(object):
                     # PS secondo me potrei muoverli tutti assieme
                     if tuple([x_new, y_new]) not in self.agents_pos_now or \
                             tuple([x_new, y_new]) == tuple(tuple([current_agent_pos['x'], current_agent_pos['y']])):
-
                         self.update_actual_paths(agent, algorithm, x_new, y_new, current_agent_pos)
 
                         moved_this_step = moved_this_step + 1
@@ -177,7 +179,6 @@ class Simulation(object):
             else:
                 print('attenzione qualcosa non va')
 
-
     def get_time(self):
         return self.time
 
@@ -196,6 +197,7 @@ class Simulation(object):
 
     def get_max_autonomies(self):
         return self.max_autonomies
+
     def get_batteries_level(self):
         return self.batteries_level
 
