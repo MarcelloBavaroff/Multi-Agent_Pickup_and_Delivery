@@ -1,0 +1,201 @@
+agents:
+-   start: [0, 14]
+    name: agent0
+-   start: [0, 13]
+    name: agent1
+-   start: [0, 12]
+    name: agent2
+-   start: [0, 11]
+    name: agent3
+-   start: [0, 10]
+    name: agent4
+-   start: [0, 4]
+    name: agent5
+-   start: [0, 3]
+    name: agent6
+-   start: [0, 2]
+    name: agent7
+-   start: [0, 1]
+    name: agent8
+-   start: [0, 0]
+    name: agent9
+-   start: [14, 14]
+    name: agent10
+-   start: [14, 13]
+    name: agent11
+-   start: [14, 12]
+    name: agent12
+-   start: [14, 11]
+    name: agent13
+-   start: [14, 10]
+    name: agent14
+-   start: [14, 4]
+    name: agent15
+-   start: [14, 3]
+    name: agent16
+-   start: [14, 2]
+    name: agent17
+-   start: [14, 1]
+    name: agent18
+-   start: [14, 0]
+    name: agent19
+map:
+    dimensions: [15, 15]
+    obstacles:
+    - !!python/tuple [3, 2]
+    - !!python/tuple [5, 2]
+    - !!python/tuple [7, 2]
+    - !!python/tuple [9, 2]
+    - !!python/tuple [11, 2]
+    - !!python/tuple [3, 3]
+    - !!python/tuple [4, 3]
+    - !!python/tuple [5, 3]
+    - !!python/tuple [6, 3]
+    - !!python/tuple [7, 3]
+    - !!python/tuple [8, 3]
+    - !!python/tuple [9, 3]
+    - !!python/tuple [10, 3]
+    - !!python/tuple [11, 3]
+    - !!python/tuple [3, 4]
+    - !!python/tuple [5, 4]
+    - !!python/tuple [7, 4]
+    - !!python/tuple [9, 4]
+    - !!python/tuple [11, 4]
+    - !!python/tuple [3, 6]
+    - !!python/tuple [5, 6]
+    - !!python/tuple [7, 6]
+    - !!python/tuple [9, 6]
+    - !!python/tuple [11, 6]
+    - !!python/tuple [3, 7]
+    - !!python/tuple [4, 7]
+    - !!python/tuple [5, 7]
+    - !!python/tuple [6, 7]
+    - !!python/tuple [7, 7]
+    - !!python/tuple [8, 7]
+    - !!python/tuple [9, 7]
+    - !!python/tuple [10, 7]
+    - !!python/tuple [11, 7]
+    - !!python/tuple [3, 8]
+    - !!python/tuple [5, 8]
+    - !!python/tuple [7, 8]
+    - !!python/tuple [9, 8]
+    - !!python/tuple [11, 8]
+    - !!python/tuple [3, 10]
+    - !!python/tuple [5, 10]
+    - !!python/tuple [7, 10]
+    - !!python/tuple [9, 10]
+    - !!python/tuple [11, 10]
+    - !!python/tuple [3, 11]
+    - !!python/tuple [4, 11]
+    - !!python/tuple [5, 11]
+    - !!python/tuple [6, 11]
+    - !!python/tuple [7, 11]
+    - !!python/tuple [8, 11]
+    - !!python/tuple [9, 11]
+    - !!python/tuple [10, 11]
+    - !!python/tuple [11, 11]
+    - !!python/tuple [3, 12]
+    - !!python/tuple [5, 12]
+    - !!python/tuple [7, 12]
+    - !!python/tuple [9, 12]
+    - !!python/tuple [11, 12]
+    non_task_endpoints:
+    - !!python/tuple [0, 14]
+    - !!python/tuple [0, 13]
+    - !!python/tuple [0, 12]
+    - !!python/tuple [0, 11]
+    - !!python/tuple [0, 10]
+    - !!python/tuple [0, 4]
+    - !!python/tuple [0, 3]
+    - !!python/tuple [0, 2]
+    - !!python/tuple [0, 1]
+    - !!python/tuple [0, 0]
+    - !!python/tuple [14, 14]
+    - !!python/tuple [14, 13]
+    - !!python/tuple [14, 12]
+    - !!python/tuple [14, 11]
+    - !!python/tuple [14, 10]
+    - !!python/tuple [14, 4]
+    - !!python/tuple [14, 3]
+    - !!python/tuple [14, 2]
+    - !!python/tuple [14, 1]
+    - !!python/tuple [14, 0]
+    start_locations:
+    -   [4, 2]
+    -   [6, 2]
+    -   [8, 2]
+    -   [10, 2]
+    -   [4, 4]
+    -   [6, 4]
+    -   [8, 4]
+    -   [10, 4]
+    -   [4, 6]
+    -   [6, 6]
+    -   [8, 6]
+    -   [10, 6]
+    -   [4, 8]
+    -   [6, 8]
+    -   [8, 8]
+    -   [10, 8]
+    -   [4, 10]
+    -   [6, 10]
+    -   [8, 10]
+    -   [10, 10]
+    -   [4, 12]
+    -   [6, 12]
+    -   [8, 12]
+    -   [10, 12]
+    goal_locations:
+    -   [0, 9]
+    -   [0, 8]
+    -   [0, 7]
+    -   [0, 6]
+    -   [0, 5]
+    -   [14, 9]
+    -   [14, 8]
+    -   [14, 7]
+    -   [14, 6]
+    -   [14, 5]
+    charging_stations:
+        - pos: [ 2, 14 ]
+          name: station0
+        - pos: [ 3, 14 ]
+          name: station1
+        - pos: [ 4, 14 ]
+          name: station2
+        - pos: [ 5, 14 ]
+          name: station3
+        - pos: [ 6, 14 ]
+          name: station4
+        - pos: [ 7, 14 ]
+          name: station5
+        - pos: [ 8, 14 ]
+          name: station6
+        - pos: [ 9, 14 ]
+          name: station7
+        - pos: [ 10, 14 ]
+          name: station8
+        - pos: [ 11, 14 ]
+          name: station9
+        - pos: [ 3, 0 ]
+          name: station10
+        - pos: [ 4, 0 ]
+          name: station11
+        - pos: [ 5, 0 ]
+          name: station12
+        - pos: [ 6, 0 ]
+          name: station13
+        - pos: [ 7, 0 ]
+          name: station14
+        - pos: [ 8, 0 ]
+          name: station15
+        - pos: [ 9, 0 ]
+          name: station16
+        - pos: [ 10, 0 ]
+          name: station17
+        - pos: [ 11, 0 ]
+          name: station18
+        - pos: [ 12, 0 ]
+          name: station19
+n_tasks: 50
+task_freq: 1
