@@ -62,10 +62,7 @@ if __name__ == '__main__':
 
     # Simulate
     simulation = Simulation(tasks, agents, delays=delays)
-    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,
-                      a_star_max_iter=args.a_star_max_iter, k=args.k,
-                      replan_every_k_delays=False, pd=args.pd, p_max=args.p, p_iter=args.p_iter,
-                      new_recovery=True)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,,
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 

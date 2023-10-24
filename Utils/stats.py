@@ -59,9 +59,7 @@ def run_sim(param, n_sim, args, k_or_p_max):
         simulation = Simulation(tasks, agents, delays=delays)
         # tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=1000,
         #                          k=k, new_recovery=True)
-        tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,
-                          a_star_max_iter=a_star_max_iter, k=k, replan_every_k_delays=replan_every_k_delays,
-                          pd=pd, p_max=p_max, p_iter=p_iter, new_recovery=new_recovery)
+        tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,,
         start = time.time()
         while tp.get_completed_tasks() != len(tasks):
             simulation.time_forward(tp)
@@ -129,9 +127,7 @@ def run_sim_parall(param, args, k_or_p_max, n_single_sim):
     simulation = Simulation(tasks, agents, delays=delays)
     # tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=1000,
     #                          k=k, new_recovery=True)
-    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,
-                      a_star_max_iter=a_star_max_iter, k=k, replan_every_k_delays=replan_every_k_delays,
-                      pd=pd, p_max=p_max, p_iter=p_iter, new_recovery=new_recovery)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,,
     start = time.time()
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)

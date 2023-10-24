@@ -53,7 +53,7 @@ if __name__ == '__main__':
             #simulation = Simulation(tasks, agents, delays=delays)
             #tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=1000, k=k)
             simulation = Simulation(tasks, agents, delays=delays)
-            tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=1000, k=k, new_recovery=True)
+            tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,,
             while tp.get_completed_tasks() != len(tasks):
                 simulation.time_forward(tp)
             for path in simulation.actual_paths.values():

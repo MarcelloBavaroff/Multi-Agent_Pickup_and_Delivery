@@ -15,11 +15,11 @@ States = ['safe_idle', 'recharging', 'charge_complete']
 
 
 class TokenPassing(object):
-    def __init__(self, agents, dimesions, obstacles, non_task_endpoints, charging_stations, simulation, goal_endpoints,
+    def __init__(self, agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation, goal_endpoints,
                  a_star_max_iter=4000, new_recovery=False):
         random.seed(3)
         self.agents = agents
-        self.dimensions = dimesions
+        self.dimensions = dimensions
         self.obstacles = set(obstacles)
         self.non_task_endpoints = non_task_endpoints
         if len(agents) > len(non_task_endpoints):
@@ -248,16 +248,19 @@ class TokenPassing(object):
                 endpoint_consume = endpoint_cost * self.move_consumption
                 if endpoint_consume < self.simulation.get_batteries_level()[agent_name]:
                     nearest_station, consumption_to_station = self.search_nearest_available_station(endpoint_cost,
-                                                                                                    closest_non_task_endpoint,agent_name)
+                                                                                                    closest_non_task_endpoint,
+                                                                                                    agent_name)
                     if nearest_station is not None:
-                        #real cost è in timestep ed esclude il costo per andare alla stazione
-                        path_endpoint, real_cost = self.compute_real_path_to_endpoint(all_idle_agents, agent_name, agent_pos, closest_non_task_endpoint,
-                                                                       consumption_to_station)
+                        # real cost è in timestep ed esclude il costo per andare alla stazione
+                        path_endpoint, real_cost = self.compute_real_path_to_endpoint(all_idle_agents, agent_name,
+                                                                                      agent_pos,
+                                                                                      closest_non_task_endpoint,
+                                                                                      consumption_to_station)
 
                         if path_endpoint is not False:
                             # ora controllo pure il percorso reale della stazione
                             path_station = self.compute_real_path_station(agent_name, agent_pos, all_idle_agents,
-                                                                           nearest_station, real_cost)
+                                                                          nearest_station, real_cost)
 
                             if path_station is not False:
                                 assigned = True
@@ -277,15 +280,12 @@ class TokenPassing(object):
         if not assigned and closest_non_task_endpoint == -1:
             print("Nessun endpoint assegnato")
 
-            # questo implica che in passato qualcuno ha già calcolato il mio path per andare a caricarmi
             if len(self.token['agents'][agent_name]) != len(self.token['agents_preemption'][agent_name]):
-                self.use_preempted_path_to_station(agent_name)
+                if self.predicted_consumption(self.token['agents_preemption'][agent_name]) == \
+                        self.simulation.get_batteries_level()[agent_name]:
+                    self.use_preempted_path_to_station(agent_name)
             else:
-                print('dovrò mettere qui una roba se non c''è nessun percorso di ricarica')
-
-            self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
-
-
+                self.try_preemption_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
     def set_task_name(self, agent_name, task_name):
         self.token['agents_to_tasks'][agent_name]['task_name'] = task_name
@@ -368,7 +368,7 @@ class TokenPassing(object):
         return available_tasks
 
     def change_other_paths(self, path_to_station_preemption, idle_agents, agent_name, agent_pos,
-                           all_idle_agents,nearest_station):
+                           all_idle_agents, nearest_station):
 
         untouchable_agents, modifiable_agents, going_to_goal_agents = self.find_conflicting_agents(
             path_to_station_preemption)
@@ -393,46 +393,38 @@ class TokenPassing(object):
         return find_feasible_station
 
     # devo andarmi a caricare
-    def no_availableTasks_try_recharge(self, agent_name, agent_pos, all_idle_agents, idle_agents):
+    def try_preemption_recharge(self, agent_name, agent_pos, all_idle_agents, idle_agents):
 
         # in questo caso parto dalla mia posizione (agent_pos) quindi 0 come costo base
         # quella restituita è sempre raggiungibile data la mia batteria oppure None
         discarded_stations = {}
         theoretically_ok_stations = []
-        find_feasible_station = False
+        path_station = False
 
         nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
             agent_pos, agent_name, discarded_stations)
-        while not find_feasible_station and nearest_station is not None:
+        while not path_station and nearest_station is not None:
 
-            theoretically_ok_stations.append(nearest_station)
-            find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
-                                                                   all_idle_agents, nearest_station)
+            # theoretically_ok_stations.append(nearest_station)
+            path_station = self.compute_real_path_station(agent_name, agent_pos,
+                                                          all_idle_agents, nearest_station, 0)
             # se ho True vuol dire che ho assegnato la stazione e sono felice
             # altrimenti devo vedere altre stazioni
-            if not find_feasible_station:
+            if not path_station:
                 discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
 
                 nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                     agent_pos, agent_name, discarded_stations)
 
-        # se non ho trovato stazioni raggiungibili provo a cancellare i percorsi degli altri agenti che
-        # non stanno andando a caricarsi. (Non tocco quelli in idle)
-        if not find_feasible_station:
-
-            while len(theoretically_ok_stations) > 0 and not find_feasible_station:
-                station = theoretically_ok_stations[0]
-                theoretically_ok_stations.remove(station)
-                feasible_station, path_to_station_preemption = self.compute_real_path_station_preemption(
-                    agent_name, agent_pos, station, all_idle_agents)
-
-                if feasible_station:
-                    find_feasible_station = self.change_other_paths(path_to_station_preemption, idle_agents, agent_name,
-                                                                    agent_pos, all_idle_agents, station)
-                    print("Ricarica possibile dopo aver cambiato i percorsi degli altri agenti")
-
-            if not find_feasible_station:
-                self.check_if_dead(agent_pos, agent_name)
+        # path station contiene il percorso reale per andare alla stazione oppure falso
+        if not path_station:
+            # qui ci andava la parte sul cambio di path agli altri agenti
+            self.check_if_dead(agent_pos, agent_name)
+        else:
+            # gli metto -1,-1 tanto viene cancellato
+            self.apply_path_preemption(agent_name, None, [(-1, -1)], path_station)
+            if self.predicted_consumption(path_station) == self.simulation.get_batteries_level()[agent_name]:
+                self.use_preempted_path_to_station(agent_name)
 
     # restituisce il nome della stazione più vicina a cui è possibile andare a caricarsi una
     # volta completato il task
@@ -512,6 +504,7 @@ class TokenPassing(object):
         if estimated_station_cost * self.move_consumption > self.simulation.get_batteries_level()[
             agent_name]:
             self.token['dead_agents'].add(agent_name)
+            print(agent_name, 'is dead in position ', agent_pos, 'al timestep', self.simulation.get_time())
             return True
         else:
             return False
@@ -562,8 +555,11 @@ class TokenPassing(object):
             if s['pos'] == tuple(last_step):
                 station_name = s['name']
 
-        self.token['agents_to_tasks'][agent_name] = {'task_name': station_name, 'start': tuple([last_step['x'], last_step['y']]),
-                                                     'goal': tuple([last_step['x'], last_step['y']]), 'predicted_cost': len(self.token['agents_to_tasks'][agent_name]) - 1}
+        self.token['agents_to_tasks'][agent_name] = {'task_name': station_name,
+                                                     'start': tuple([last_step['x'], last_step['y']]),
+                                                     'goal': tuple([last_step['x'], last_step['y']]),
+                                                     'predicted_cost': len(
+                                                         self.token['agents_to_tasks'][agent_name]) - 1}
 
     def compute_real_path(self, agent_name, agent_pos, closest_task, closest_task_name, all_idle_agents,
                           available_tasks, predicted_consumption_to_station):
@@ -864,15 +860,21 @@ class TokenPassing(object):
                     if task_total_consumption < self.simulation.get_batteries_level()[agent_name]:
                         # consumption to station si intende dal goal alla stazione più vicina
                         nearest_station, consumption_to_station = self.search_nearest_available_station(task_total_cost,
-                                                                                                        closest_task[1],agent_name)
+                                                                                                        closest_task[1],
+                                                                                                        agent_name)
                         if nearest_station is not None:
                             # cost non è il consumo, ma il numero di timestep
-                            path_start, path_goal, total_real_cost = self.compute_real_path(agent_name, agent_pos, closest_task,
-                                                                                            closest_task_name, all_idle_agents, available_tasks, consumption_to_station)
+                            path_start, path_goal, total_real_cost = self.compute_real_path(agent_name, agent_pos,
+                                                                                            closest_task,
+                                                                                            closest_task_name,
+                                                                                            all_idle_agents,
+                                                                                            available_tasks,
+                                                                                            consumption_to_station)
                             if path_start is not False:
                                 # ora controllo pure il percorso reale della stazione
                                 path_station = self.compute_real_path_station(agent_name, closest_task[1],
-                                                                              all_idle_agents, nearest_station, total_real_cost)
+                                                                              all_idle_agents, nearest_station,
+                                                                              total_real_cost)
                                 if path_station is not False:
                                     assigned = True
                                     # ufficializzo il path fino al goal
@@ -894,47 +896,31 @@ class TokenPassing(object):
                 # se c'erano effettivamente task disponibili ma non vengono assegnati allora ho poca batteria e devo caricarmi
                 if not assigned and len(available_tasks) > 0:
                     # print("Nessun task assegnato anche se c'erano")
-                    #self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
+                    # self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
                     # questo implica che in passato qualcuno ha già calcolato il mio path per andare a caricarmi
                     if len(self.token['agents'][agent_name]) != len(self.token['agents_preemption'][agent_name]):
-                        self.use_preempted_path_to_station(agent_name)
+
+                        if self.predicted_consumption(self.token['agents_preemption'][agent_name]) == \
+                                self.simulation.get_batteries_level()[agent_name]:
+                            self.use_preempted_path_to_station(agent_name)
+
                     else:
-                        print('dovrò mettere qui una roba tipo il check_safe_idle')
+                        self.try_preemption_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
             # righe 13-14 alg
             # se sono in safe_idle nel momento in cui ho la batteria minima per caricarmi secondo l'euristica vado a caricarmi
             # anche qui se serve cambio il path degli altri agenti
             elif self.check_safe_idle(agent_pos):
-                #quindi ho la stazione prenotata
+                # quindi ho la stazione prenotata
                 if len(self.token['agents'][agent_name]) != len(self.token['agents_preemption'][agent_name]):
-                    if self.predicted_consumption(self.token['agents_preemption'][agent_name]) == self.simulation.get_batteries_level()[agent_name]:
+                    if self.predicted_consumption(self.token['agents_preemption'][agent_name]) == \
+                            self.simulation.get_batteries_level()[agent_name]:
+
                         self.use_preempted_path_to_station(agent_name)
-
-
-                nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
-                    agent_pos, agent_name, {})
-
-                if nearest_station is not None and consumption_to_station == self.simulation.get_batteries_level()[
-                    agent_name]:
-
-                    find_feasible_station = self.compute_real_path_station(agent_name, agent_pos,
-                                                                           all_idle_agents, nearest_station)
-                    if find_feasible_station:
-                        print(agent_name, ' is moving to ', nearest_station, ' to recharge')
-                    else:
-                        # feasible_station è un bool
-                        feasible_station, path_to_station_preemption = self.compute_real_path_station_preemption(
-                            agent_name, agent_pos, nearest_station, all_idle_agents)
-
-                        if feasible_station:
-                            if not self.change_other_paths(path_to_station_preemption, idle_agents, agent_name,
-                                                           agent_pos, all_idle_agents, nearest_station):
-                                self.check_if_dead(agent_pos, agent_name)
-                        else:
-                            self.check_if_dead(agent_pos, agent_name)
                 else:
-                    self.check_if_dead(agent_pos, agent_name)
+                    self.try_preemption_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
+
 
             # righe 15-16 alg
             else:

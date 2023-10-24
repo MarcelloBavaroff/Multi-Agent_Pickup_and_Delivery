@@ -246,8 +246,7 @@ if __name__ == '__main__':
 
     # Simulate
     simulation = Simulation(tasks, agents)
-    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000,
-                      new_recovery=True)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,,
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 

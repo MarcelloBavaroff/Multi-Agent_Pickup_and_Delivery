@@ -86,8 +86,8 @@ if __name__ == '__main__':
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations)
-    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation, param['map']['goal_locations'],
-                      a_star_max_iter=args.a_star_max_iter, new_recovery=True)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
+                      param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 1000:
         simulation.time_forward(tp)
 

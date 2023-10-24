@@ -190,8 +190,7 @@ if __name__ == '__main__':
 
     # Simulate
     simulation = SimulationNewRecovery(tasks, agents, delays=delays)
-    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000, k=1,
-                      replan_every_k_delays=False, pd=0.2, p_max=1, p_iter=1, new_recovery=True)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,,
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 
