@@ -14,7 +14,7 @@ import ast
 
 def read_tasks():
     data_list = []
-    with open('Modified/bugAgentLoop', 'r') as file:
+    with open('Modified/versione2', 'r') as file:
         for line in file:
             try:
                 # Valuta la stringa come un dizionario Python
@@ -74,8 +74,7 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    autonomies = [89.09, 96.18, 94.99, 86.41, 88.19, 86.61, 92.29, 91.93, 95.79, 84.55, 83.32, 83.57, 85.72, 95.36, 89.43, 90.13, 83.22, 84.42, 95.44, 83.03]
-
+    autonomies = [81.18, 91.16, 80.81, 83.38]
     param['autonomies'] = autonomies
 
     # assegno i tasks generati così poi li vado a scrivere
