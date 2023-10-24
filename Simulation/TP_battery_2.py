@@ -878,12 +878,24 @@ class TokenPassing(object):
                 if not assigned and len(available_tasks) > 0:
                     # print("Nessun task assegnato anche se c'erano")
                     self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
-                    self.use_preempted_path_to_station(agent_name)
+
+                    # questo implica che in passato qualcuno ha già calcolato il mio path per andare a caricarmi
+                    if len(self.token['agents'][agent_name]) != len(self.token['agents_preemption'][agent_name]):
+                        self.use_preempted_path_to_station(agent_name)
+                    else:
+                        print('dovrò mettere qui una roba tipo il check_safe_idle')
+
 
             # righe 13-14 alg
             # se sono in safe_idle nel momento in cui ho la batteria minima per caricarmi secondo l'euristica vado a caricarmi
             # anche qui se serve cambio il path degli altri agenti
             elif self.check_safe_idle(agent_pos):
+                #quindi ho la stazione prenotata
+                if len(self.token['agents'][agent_name]) != len(self.token['agents_preemption'][agent_name]):
+                    if self.predicted_consumption(self.token['agents_preemption'][agent_name]) == self.simulation.get_batteries_level()[agent_name]:
+                        self.use_preempted_path_to_station(agent_name)
+
+
                 nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                     agent_pos, agent_name, {})
 
