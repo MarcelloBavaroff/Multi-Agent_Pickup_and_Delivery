@@ -14,7 +14,7 @@ import ast
 
 def read_tasks():
     data_list = []
-    with open('Modified/200x5_selftime', 'r') as file:
+    with open('Modified/bugAgentLoop', 'r') as file:
         for line in file:
             try:
                 # Valuta la stringa come un dizionario Python
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    autonomies = [93.28, 99.8, 95.38, 96.46, 82.45, 89.65, 84.02, 91.9, 90.77, 98.11, 94.75, 97.37, 86.34, 83.44, 95.27, 95.19, 89.67, 93.15, 97.68, 95.86]
+    autonomies = [89.09, 96.18, 94.99, 86.41, 88.19, 86.61, 92.29, 91.93, 95.79, 84.55, 83.32, 83.57, 85.72, 95.36, 89.43, 90.13, 83.22, 84.42, 95.44, 83.03]
 
 
     param['autonomies'] = autonomies
