@@ -61,7 +61,7 @@ class Simulation(object):
                 # se carica completa lo metto in idle?
                 if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
                     self.batteries_level[agent['name']] = self.max_autonomies[agent['name']]
-                    #algorithm.set_task_name(agent['name'], 'charge_complete')
+                    # algorithm.set_task_name(agent['name'], 'charge_complete')
                     algorithm.set_task_name(agent['name'], 'safe_idle')
 
 
@@ -82,8 +82,7 @@ class Simulation(object):
 
                 if self.batteries_level[agent['name']] <= 0:
                     print("Batteria negativa")
-                    #algorithm.get_token()['dead_agents'].add(agent['name'])
-
+                    # algorithm.get_token()['dead_agents'].add(agent['name'])
 
     def update_actual_paths(self, agent, algorithm, x_new, y_new, current_agent_pos):
         self.agents_moved.add(agent['name'])

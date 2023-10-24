@@ -77,7 +77,7 @@ class TokenPassing(object):
         agents = {}
         for name, path in self.token['agents'].items():
             if len(path) == 1 and not (name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][name][
-                'task_name'] == 'recharging'):
+                'task_name'] == 'recharging'):  # and name not in self.token['dead_agents']:
                 agents[name] = path
         return agents
 
@@ -377,8 +377,7 @@ class TokenPassing(object):
                                                                    all_idle_agents,
                                                                    nearest_station)
         if not find_feasible_station:
-            print(agent_name, " is dead")
-            self.token['dead_agents'].add(agent_name)
+            self.check_if_dead(agent_pos, agent_name)
 
         return find_feasible_station
 
@@ -422,9 +421,7 @@ class TokenPassing(object):
                     print("Ricarica possibile dopo aver cambiato i percorsi degli altri agenti")
 
             if not find_feasible_station:
-                print("Nessuna stazione di ricarica raggiungibile con la batteria attuale")
-                print(agent_name, " is dead")
-                self.token['dead_agents'].add(agent_name)
+                self.check_if_dead(agent_pos, agent_name)
 
     # restituisce il nome della stazione più vicina a cui è possibile andare a caricarsi una
     # volta completato il task
@@ -488,6 +485,25 @@ class TokenPassing(object):
             return None, None
         else:
             return closest_station_name, estimated_station_cost * self.move_consumption
+
+    def check_if_dead(self, agent_pos, agent_name):
+        dist_min = -1
+        estimated_station_cost = None
+
+        for s in self.charging_stations:
+            estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
+            if dist_min == -1:
+                dist_min = estimated_station_cost
+
+            elif estimated_station_cost < dist_min:
+                dist_min = estimated_station_cost
+
+        if estimated_station_cost * self.move_consumption > self.simulation.get_batteries_level()[
+            agent_name]:
+            self.token['dead_agents'].add(agent_name)
+            return True
+        else:
+            return False
 
     # se ho solo un percorso utilizzo il due
     def apply_path(self, agent_name, agent_pos, path1, path2, task_name, start, goal, predicted_cost):
@@ -784,8 +800,11 @@ class TokenPassing(object):
         self.collect_new_tasks()
         idle_agents = self.get_idle_agents()
 
-        # for a in self.token['dead_agents']:
-        #     del idle_agents[a]
+        for a in idle_agents:
+            self.check_if_dead(idle_agents[a][0], a)
+
+        for a in self.token['dead_agents']:
+            del idle_agents[a]
 
         assigned = False
 
@@ -824,7 +843,6 @@ class TokenPassing(object):
                         nearest_station, consumption_to_station = self.search_nearest_available_station(task_total_cost,
                                                                                                         closest_task[1],
                                                                                                         agent_name)
-
                         if nearest_station is not None:
                             assigned = self.compute_real_path(agent_name, agent_pos, closest_task, closest_task_name,
                                                               all_idle_agents,
@@ -864,16 +882,11 @@ class TokenPassing(object):
                         if feasible_station:
                             if not self.change_other_paths(path_to_station_preemption, idle_agents, agent_name,
                                                            agent_pos, all_idle_agents, nearest_station):
-
-                                print(agent_name, " is dead")
-                                self.token['dead_agents'].add(agent_name)
-
+                                self.check_if_dead(agent_pos, agent_name)
                         else:
-                            print(agent_name, " is dead")
-                            self.token['dead_agents'].add(agent_name)
-
-                # else:
-                #    print(agent_name, ' will wait in idle')
+                            self.check_if_dead(agent_pos, agent_name)
+                else:
+                    self.check_if_dead(agent_pos, agent_name)
 
             # righe 15-16 alg
             else:

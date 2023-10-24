@@ -104,8 +104,8 @@ class Simulation(object):
         else:
             self.batteries_level[agent['name']] -= self.move_consumption
 
-        if self.batteries_level[agent['name']] <= 0:
-            print("errore")
+        #if self.batteries_level[agent['name']] <= 0:
+        #    print("errore")
 
     def handle_loops(self, agents_to_move, algorithm):
 
