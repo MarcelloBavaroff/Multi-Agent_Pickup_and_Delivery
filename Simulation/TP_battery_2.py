@@ -225,7 +225,7 @@ class TokenPassing(object):
             print("Solution to non-task endpoint not found for agent", agent_name, " instance is not well-formed.")
 
         else:
-            print('No available task for agent', agent_name, ' moving to safe idling position...')
+            #print('No available task for agent', agent_name, ' moving to safe idling position...')
             self.update_ends(agent_pos)
             self.token['occupied_non_task_endpoints'].add(tuple(closest_non_task_endpoint))
             cost = env.compute_solution_cost(path_to_non_task_endpoint)
@@ -548,9 +548,8 @@ class TokenPassing(object):
         self.token['agents'][agent_name] = (self.token['agents_preemption'][agent_name]).copy()
 
         last_step = self.token['agents'][agent_name][-1]
-        self.update_ends(self.token['agents'][agent_name][1])
+        self.update_ends(self.token['agents'][agent_name][0])
         self.token['path_ends'].add(tuple([last_step[0], last_step[1]]))
-        # self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
 
         station_name = 'Error'
         for s in self.charging_stations:
@@ -703,12 +702,6 @@ class TokenPassing(object):
             consumption = self.predicted_consumption(path_to_task_goal[agent_name])
             if self.simulation.get_batteries_level()[agent_name] >= consumption:
 
-                # path_ends in teoria non lo cambio perché non è mai stato toccato
-                # last_step = path_to_task_goal[agent_name][-1]
-                # self.update_ends(agent_pos)
-                # self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
-                # self.token['agents_to_tasks'][agent_name] = {'task_name': closest_task_name, 'start': task[0],
-                #                                             'goal': task[1], 'predicted_cost': cost1 + cost2}
                 self.token['agents'][agent_name] = []
                 for el in path_to_task_goal[agent_name]:
                     self.token['agents'][agent_name].append([el['x'], el['y']])
