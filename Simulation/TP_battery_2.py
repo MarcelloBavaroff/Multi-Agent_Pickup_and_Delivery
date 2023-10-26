@@ -233,6 +233,8 @@ class TokenPassing(object):
             for el in path_to_non_task_endpoint[agent_name]:
                 self.token['agents'][agent_name].append([el['x'], el['y']])
 
+            self.token['agents_preemption'][agent_name] = self.token['agents'][agent_name].copy()
+
     def go_to_closest_non_task_endpoint_or_charge(self, agent_name, agent_pos, all_idle_agents, idle_agents,
                                                   time_start):
 
