@@ -17,7 +17,7 @@ States = ['safe_idle', 'recharging', 'charge_complete']
 class TokenPassing(object):
     def __init__(self, agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation, goal_endpoints,
                  a_star_max_iter=4000, new_recovery=False):
-        random.seed(3)
+        random.seed(5)
         self.agents = agents
         self.dimensions = dimensions
         self.obstacles = set(obstacles)

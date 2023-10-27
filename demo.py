@@ -14,7 +14,7 @@ import ast
 
 def read_tasks():
     data_list = []
-    with open('Modified/versione2', 'r') as file:
+    with open('Modified/20_20_v2', 'r') as file:
         for line in file:
             try:
                 # Valuta la stringa come un dizionario Python
@@ -69,12 +69,12 @@ if __name__ == '__main__':
     # batteria casuale tra 80 e 100
     autonomies = []
     for i in range(len(agents)):
-        # autonomies.append(round(random.uniform(80, 100), 2))
         autonomies.append(round(random.uniform(80, 100), 2))
 
     print(autonomies)
 
-    autonomies = [81.18, 91.16, 80.81, 83.38]
+    autonomies = [96.94, 83.32, 98.02, 99.51, 81.94, 83.85, 87.43, 88.86, 87.78, 94.38, 89.05, 99.79, 94.06, 91.03, 94.33, 92.55, 84.28, 80.93, 97.17, 93.46]
+
     param['autonomies'] = autonomies
 
     # assegno i tasks generati così poi li vado a scrivere
