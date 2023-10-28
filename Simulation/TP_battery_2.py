@@ -812,12 +812,17 @@ class TokenPassing(object):
         self.token['agents'][agent_name] = self.token['agents'][agent_name][:1]
 
     def decide_if_charge(self, agent_name, agent_pos, all_idle_agents, idle_agents):
-
+        # controllo se ho un path per andarmi a caricare
         if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
                 self.token['agents_preemption'][agent_name]):
-            if self.predicted_consumption(self.token['agents_preemption'][agent_name]) == \
+            # se con la mia batteria arrivo giusto a caricarmi ci vado
+            if self.compute_consumption_to_station(agent_name) == \
                     self.simulation.get_batteries_level()[agent_name]:
                 self.use_preempted_path_to_station(agent_name)
+
+            # altrimenti calcolo il percorso per andare a caricarmi a turno dopo
+            else:
+
         else:
             self.try_preemption_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
@@ -910,6 +915,26 @@ class TokenPassing(object):
                 discarded_tasks[closest_task_name] = closest_task
 
         return assigned
+
+    def compute_consumption_to_station(self, agent_name):
+
+        path = self.token['agents_preemption'][agent_name]
+        consumption = 0
+        stations = set()
+        for s in self.charging_stations:
+            stations.add(tuple(s['pos']))
+
+        # appena arrivo alla stazione smetto di contare il consumo
+        for i in range(len(path)-1):
+            if tuple(path[i]) == tuple(path[i+1]):
+                consumption += self.wait_consumption
+            else:
+                consumption += self.move_consumption
+            if tuple(path[i+1]) in stations:
+                break
+
+        return consumption
+
 
     def time_forward(self):
 
