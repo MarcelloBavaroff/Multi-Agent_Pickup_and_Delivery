@@ -559,16 +559,26 @@ class TokenPassing(object):
         self.token['charging_stations'][station_name]['booked'] = agent_name
 
     def use_preempted_path_to_station(self, agent_name):
-        self.token['agents'][agent_name] = (self.token['agents_preemption'][agent_name]).copy()
+
+        station_name = 'Error'
+        station_pos = None
+        for s in self.charging_stations:
+            if s['pos'] in self.token['agents_preemption'][agent_name]:
+                station_name = s['name']
+                station_pos = s['pos']
+                break
+
+        # copio solo la parte relativa alla stazione, non quella del NON task endpoint
+        self.token['agents'][agent_name] = []
+        i = 0
+        while self.token['agents_preemption'][agent_name][i] != station_pos:
+            self.token['agents'][agent_name].append(self.token['agents_preemption'][agent_name][i])
+            i += 1
+        self.token['agents'][agent_name].append(self.token['agents_preemption'][agent_name][i])
 
         last_step = self.token['agents'][agent_name][-1]
         self.update_ends(self.token['agents'][agent_name][0])
         self.token['path_ends'].add(tuple([last_step[0], last_step[1]]))
-
-        station_name = 'Error'
-        for s in self.charging_stations:
-            if tuple(s['pos']) == tuple(last_step):
-                station_name = s['name']
 
         self.token['agents_to_tasks'][agent_name] = {'task_name': station_name,
                                                      'start': tuple([last_step[0], last_step[1]]),
@@ -663,7 +673,7 @@ class TokenPassing(object):
             # Use cost - 1 because idle cost is 1
 
             if self.simulation.get_batteries_level()[
-                agent_name] - self.simulation.get_wait_consumption() >= consumption:
+                agent_name] >= consumption:
                 return path_to_station, consumption, cost1
             else:
                 return False, False, False
@@ -832,18 +842,18 @@ class TokenPassing(object):
             agent_pos, agent_name, discarded_stations)
 
         while not path_station and nearest_station is not None and not assigned:
-
             # time start = 1 perché devo considerare dal turno dopo
             if first_time:
                 time_start = 0
+                previous_consumption = 0
             else:
                 time_start = 1
+                previous_consumption = self.simulation.get_wait_consumption()
+            #gli passo il consumo di un turno di wait se non è il primo turno
+            path_station, to_station_consumption, to_station_duration = self.compute_real_path_station(agent_name, agent_pos,
+                                                                                                       all_idle_agents,nearest_station,
+                                                                                                       time_start, previous_consumption)
 
-            path_station, to_station_consumption, to_station_duration = self.compute_real_path_station(agent_name,
-                                                                                                       agent_pos,
-                                                                                                       all_idle_agents,
-                                                                                                       nearest_station,
-                                                                                                       time_start, 0)
             # se ho True vuol dire che ho assegnato la stazione e sono felice
             # altrimenti devo vedere altre stazioni
             if not path_station:
@@ -861,8 +871,8 @@ class TokenPassing(object):
                                                   agent_name] - total_real_consumption) / 10
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
-                # tra quanti timestep dovrei caricarmi, -1 perché concatenati
-                total_real_duration = to_station_duration + estimated_time_to_recharge - 1
+                # tra quanti timestep dovrei caricarmi
+                total_real_duration = to_station_duration + estimated_time_to_recharge
                 closest_non_task_endpoint = 0
 
                 while not assigned and closest_non_task_endpoint != -1:
@@ -968,7 +978,8 @@ class TokenPassing(object):
                             # ora controllo pure il percorso reale della stazione
                             path_station = self.compute_real_path_station(agent_name, closest_task[1],
                                                                           all_idle_agents, nearest_station,
-                                                                          total_real_duration-1, task_total_consumption)
+                                                                          total_real_duration - 1,
+                                                                          task_total_consumption)
 
                             # se effettivamente ho un percorso per la stazione calcolato col consumo reale, allora
                             # posso controllare gli endpoint
@@ -1000,7 +1011,7 @@ class TokenPassing(object):
                                             # previous consumption è 0 perché mi sono appena caricato
                                             path_endpoint, real_cost = self.compute_real_path_to_endpoint(
                                                 all_idle_agents, agent_name, agent_pos,
-                                                closest_non_task_endpoint, 0, total_real_duration-1)
+                                                closest_non_task_endpoint, 0, total_real_duration - 1)
 
                                             if path_endpoint is not False:
                                                 assigned = True
