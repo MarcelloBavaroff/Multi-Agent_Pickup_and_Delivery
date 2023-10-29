@@ -14,7 +14,7 @@ import ast
 
 def read_tasks():
     data_list = []
-    with open('Modified/20_20_v2', 'r') as file:
+    with open('Modified/hardcoded_tasks', 'r') as file:
         for line in file:
             try:
                 # Valuta la stringa come un dizionario Python
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=1, type=int)  # default=1
-    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=True)
+    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
 
     args = parser.parse_args()
 
@@ -73,8 +73,7 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    autonomies = [96.94, 83.32, 98.02, 99.51, 81.94, 83.85, 87.43, 88.86, 87.78, 94.38, 89.05, 99.79, 94.06, 91.03, 94.33, 92.55, 84.28, 80.93, 97.17, 93.46]
-
+    #autonomies = [92.2, 80.56, 94.6, 96.67]
     param['autonomies'] = autonomies
 
     # assegno i tasks generati così poi li vado a scrivere
