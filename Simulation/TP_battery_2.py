@@ -156,12 +156,14 @@ class TokenPassing(object):
 
         return True
 
-    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints, old_non_task_endpoint):
+    # agent_pos è da che posizione calcolare l'endpoint più vicino, old_non_task_endpoint è l'endpoint che (forse) occupi ora
+    # preem_non_task_endpoint è l'endpoint che hai prenotato al momento
+    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints, old_non_task_endpoint, preem_non_task_endpoint):
         dist = -1
         res = -1
         for endpoint in self.non_task_endpoints:
             if ((endpoint not in self.token['occupied_non_task_endpoints'] and endpoint not in discarded_endpoints and endpoint not in self.token['preemption_ends'])
-                    or endpoint == tuple(agent_pos) or endpoint == tuple(old_non_task_endpoint)):
+                    or endpoint == tuple(agent_pos) or endpoint == tuple(old_non_task_endpoint) or endpoint == tuple(preem_non_task_endpoint)):
                 if dist == -1:
                     dist = self.admissible_heuristic(endpoint, agent_pos)
                     res = endpoint
@@ -798,8 +800,9 @@ class TokenPassing(object):
                 station_pos = tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y']))
 
                 while not assigned and closest_non_task_endpoint != -1:
+
                     closest_non_task_endpoint = self.get_closest_non_task_endpoint(station_pos,
-                                                                                   discarded_endpoints, agent_pos)
+                                                                                   discarded_endpoints, agent_pos, self.token['agents_preemption'][agent_name][-1])
                     if closest_non_task_endpoint != -1:
                         endpoint_duration = self.admissible_heuristic(closest_non_task_endpoint,
                                                                       station_pos)
@@ -860,6 +863,7 @@ class TokenPassing(object):
             if not changed:
                 print("Errore ", agent_name, " non aveva un percorso per andare a caricarsi e non lo trova ora")
 
+    # qui io non sono già in un NONTE
     def choose_NON_task_endpoint_and_station(self, agent_name, agent_pos, all_idle_agents):
 
         assigned = False
@@ -873,7 +877,7 @@ class TokenPassing(object):
         # fino a quando non assegno un task oppure li ho esclusi tutti
         while not assigned and closest_non_task_endpoint != -1:
 
-            closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos, discarded_endpoints1, agent_pos)
+            closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos, discarded_endpoints1, agent_pos, self.token['agents_preemption'][agent_name][-1])
 
             if closest_non_task_endpoint != -1:
                 endpoint_duration = self.admissible_heuristic(closest_non_task_endpoint, agent_pos)
@@ -925,7 +929,7 @@ class TokenPassing(object):
 
                                     while not assigned and closest_non_task_endpoint2 != -1:
                                         closest_non_task_endpoint2 = self.get_closest_non_task_endpoint(tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y'])),
-                                            discarded_endpoints2, tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y'])))
+                                            discarded_endpoints2, tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y'])), self.token['agents_preemption'][agent_name][-1])
                                         if closest_non_task_endpoint2 != -1:
                                             endpoint_duration2 = self.admissible_heuristic(closest_non_task_endpoint2,
                                                                                            tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y'])))
@@ -1056,7 +1060,7 @@ class TokenPassing(object):
                                 station_pos = tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y']))
                                 while not assigned and closest_non_task_endpoint != -1:
                                     closest_non_task_endpoint = self.get_closest_non_task_endpoint(station_pos,
-                                                                                                   discarded_endpoints, agent_pos)
+                                                                                                   discarded_endpoints, agent_pos, self.token['agents_preemption'][agent_name][-1])
                                     if closest_non_task_endpoint != -1:
                                         endpoint_duration = self.admissible_heuristic(closest_non_task_endpoint, station_pos)
 

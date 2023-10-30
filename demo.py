@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=1, type=int)  # default=1
-    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
+    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=True)
 
     args = parser.parse_args()
 
@@ -73,7 +73,8 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    #autonomies = [92.2, 80.56, 94.6, 96.67]
+    autonomies = [92.94, 97.4, 99.85, 96.37, 92.46, 82.89, 83.66, 92.94, 92.97, 99.77, 96.14, 89.86, 95.8, 95.39, 94.71, 96.57, 92.93, 99.24, 81.97, 83.4]
+
     param['autonomies'] = autonomies
 
     # assegno i tasks generati così poi li vado a scrivere
