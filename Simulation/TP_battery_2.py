@@ -210,8 +210,6 @@ class TokenPassing(object):
         path = cbs.search()
         return path
 
-
-
     def set_task_name(self, agent_name, task_name):
         self.token['agents_to_tasks'][agent_name]['task_name'] = task_name
 
@@ -421,7 +419,7 @@ class TokenPassing(object):
             elif estimated_station_cost < dist_min:
                 dist_min = estimated_station_cost
 
-        if estimated_station_cost * self.move_consumption > self.simulation.get_batteries_level()[
+        if dist_min * self.move_consumption > self.simulation.get_batteries_level()[
             agent_name]:
             self.token['dead_agents'].add(agent_name)
             print(agent_name, 'is dead in position ', agent_pos, 'al timestep', self.simulation.get_time())
@@ -560,7 +558,6 @@ class TokenPassing(object):
                     return path_to_task_start, path_to_task_goal, cost1 + cost2 - 1, consumption
                 else:
                     return False, False, False, False
-
     # agent_pos spesso è la posizione del goal appena terminato dall'agente
     # time_start è il tempo in cui l'agente termina il goal e poi va a caricarsi nel caso
     def compute_real_path_station(self, agent_name, agent_pos, all_idle_agents, station_name, time_start,
@@ -584,7 +581,7 @@ class TokenPassing(object):
             return False, False, False
 
         else:
-            print("Solution found to charging station for agent", agent_name)
+            #print("Solution found to charging station for agent", agent_name)
             cost1 = env.compute_solution_cost(path_to_station)
             consumption = self.predicted_consumption(path_to_station[agent_name]) + task_total_consumption
             # Use cost - 1 because idle cost is 1
@@ -691,7 +688,6 @@ class TokenPassing(object):
                     consumption += self.move_consumption
 
         return round(consumption, 2)
-
     # restituisco 2 insiemi di agenti con cui ho conflitti: agenti intoccabili (caricano o già pickup)
     # agenti eliminabili (non vanno a caricare)
     # def find_conflicting_agents(self, my_path):
@@ -730,7 +726,6 @@ class TokenPassing(object):
     #                 break
     #
     #     return untouchable_agents, modifiable_agents, going_to_goal_agents
-
     def reset_path_and_task(self, agent_name):
 
         # task: 'task_name', 'start', 'goal'
@@ -815,7 +810,7 @@ class TokenPassing(object):
                             # total_real_duration è il tempo totale che ci metto a fare tutto (c'è un meno 1 per la concatenazione)
                             path_endpoint, real_duration = self.compute_real_path_to_endpoint(
                                 all_idle_agents, agent_name, station_pos,
-                                closest_non_task_endpoint, 0, total_real_duration - 1,
+                                closest_non_task_endpoint, 0, total_real_duration - 1 + time_start,
                                 self.simulation.get_max_autonomies()[
                                     agent_name])
 
@@ -847,7 +842,8 @@ class TokenPassing(object):
         if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
                 self.token['agents_preemption'][agent_name]):
             # se con la mia batteria arrivo giusto a caricarmi ci vado
-            if math.ceil(self.compute_consumption_to_station(agent_name)) == self.simulation.get_batteries_level()[agent_name]:
+            #if self.compute_consumption_to_station(agent_name) == self.simulation.get_batteries_level()[agent_name]:
+            if self.last_time_to_charge(agent_name):
                 self.use_preempted_path_to_station(agent_name)
 
             # altrimenti calcolo il percorso per andare a caricarmi a turno dopo e se esiste assegno quello al preem
@@ -1145,6 +1141,15 @@ class TokenPassing(object):
                 break
 
         return consumption
+
+    def last_time_to_charge(self, agent_name):
+
+        if self.simulation.get_batteries_level()[agent_name] >= self.compute_consumption_to_station(agent_name) >= \
+                self.simulation.get_batteries_level()[agent_name] - self.simulation.get_wait_consumption():
+            return True
+        else:
+            return False
+
 
     def time_forward(self):
 

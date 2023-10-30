@@ -127,6 +127,7 @@ class Animation:
             self.ax.add_artist(a)
         return self.patches + self.artists
 
+    # combined schedule
     def animate_func(self, i):
         for agent_name, agent in self.combined_schedule.items():
             pos = self.getState(i / self.slow_factor, agent)
@@ -159,6 +160,8 @@ class Animation:
                     d1.set_facecolor('red')
                     d2.set_facecolor('red')
                     print("COLLISION! (agent-agent) ({}, {})".format(i, j))
+                    #print("Time: {}".format(i / self.slow_factor))
+                    print("Positions: {}, {}".format(pos1, pos2))
 
         return self.patches + self.artists
 
