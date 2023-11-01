@@ -53,6 +53,7 @@ class TokenPassing(object):
         self.token['occupied_non_task_endpoints'] = set()
         # 0,1 = coordinates, 2 = t when the agent will finish its recharging process
         self.token['charging_stations'] = {}
+        self.token['occupied_charging_stations'] = {}
         self.token['agent_at_end_path'] = []
         self.token['agent_at_end_path_pos'] = []
         self.token['agents_in_recovery_trial'] = []
@@ -71,7 +72,7 @@ class TokenPassing(object):
             # ogni stazione contiene un dizionario con posizione e free_time()
             self.token['charging_stations'][c['name']] = {}
             self.token['charging_stations'][c['name']]['pos'] = c['pos']
-            self.token['charging_stations'][c['name']]['free_time'] = 0
+            self.token['charging_stations'][c['name']]['free'] = False
 
     # in teoria agenti in idle hanno il path verso la loro posizione attuale (se sta caricando no)
     def get_idle_agents(self):
@@ -85,6 +86,14 @@ class TokenPassing(object):
     def get_chiamateCBS(self):
         return self.chiamateCBS
 
+    def get_occupied_stations(self):
+        return self.token['occupied_charging_stations']
+
+    def remove_occupied_station(self, agent_name):
+        self.token['occupied_charging_stations'].remove(agent_name)
+
+    def set_free_station(self, station_name):
+        self.token['charging_stations'][station_name]['free'] = True
     # distanza in celle verticali ed orizzontali
     def admissible_heuristic(self, task_pos, agent_pos):
         return fabs(task_pos[0] - agent_pos[0]) + fabs(task_pos[1] - agent_pos[1])
@@ -307,22 +316,13 @@ class TokenPassing(object):
                                                   agent_name]) / 10
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
-                self.token['charging_stations'][station_name][
-                    'free_time'] = self.simulation.get_time() + estimated_time_to_recharge
-
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
                 for i in range(estimated_time_to_recharge):
                     self.token['agents'][agent_name].append([pos['x'], pos['y']])
 
                 all_idle_agents = self.token['agents'].copy()
                 all_idle_agents.pop(agent_name)
-                self.go_to_closest_non_task_endpoint(agent_name, tuple((pos['x'], pos['y'])), all_idle_agents,
-                                                     estimated_time_to_recharge)
                 self.token['agents_to_tasks'][agent_name]['task_name'] = 'recharging'
-
-                # qui devo già pianificare dove andare dopo che ho finito
-
-
 
             # se agente assegnato ad un task E le sue coordinate attuali sono = al suo goal
             # E il suo path attuale lungo 1 ed il suo task non è safe idle, recharging, charge_complete
@@ -438,13 +438,12 @@ class TokenPassing(object):
 
         for s in self.charging_stations:
             # stazione non assegnata a un altro agente
-            if s['name'] not in self.token['agents_to_tasks']:
+            if s['name'] not in self.token['agents_to_tasks'] and self.token['charging_stations'][s['name']]['free']:
                 estimated_station_cost = self.admissible_heuristic(task_final_pos, s['pos'])
                 estimated_arrival_cost = task_cost + estimated_station_cost
                 estimated_arrival_time = estimated_arrival_cost + self.simulation.get_time()
 
                 # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
-                # self.token['charging_stations'][s['name']]['free_time'] < estimated_arrival_time
                 if estimated_arrival_cost * self.move_consumption < self.simulation.get_batteries_level()[
                     agent_name]:
                     if dist_min == -1:
@@ -469,12 +468,13 @@ class TokenPassing(object):
 
         for s in self.charging_stations:
             # stazione non assegnata a un altro agente
-            if s['name'] not in ongoing_tasks and s['name'] not in discarded_stations:
+            if (s['name'] not in ongoing_tasks and s['name'] not in discarded_stations
+                    and self.token['charging_stations'][s['name']]['free']):
+
                 estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
                 estimated_arrival_time = estimated_station_cost + self.simulation.get_time()
 
                 # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
-                # self.token['charging_stations'][s['name']]['free_time'] < estimated_arrival_time
                 if estimated_station_cost * self.move_consumption < self.simulation.get_batteries_level()[
                     agent_name]:
 
@@ -603,7 +603,7 @@ class TokenPassing(object):
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
         idle_obstacles_agents |= set(
-            self.non_task_endpoints)  # - {tuple(agent_pos), tuple(self.token['charging_stations'][station_name]['pos'])}
+            self.non_task_endpoints)
         idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos),
                                                          tuple(self.token['charging_stations'][station_name]['pos'])}
 
@@ -627,6 +627,7 @@ class TokenPassing(object):
                 last_step = path_to_station[agent_name][-1]
                 self.apply_path(agent_name, agent_pos, None, path_to_station, station_name,
                                 tuple([last_step['x'], last_step['y']]), tuple([last_step['x'], last_step['y']]), cost1)
+                self.token['occupied_charging_stations'][agent_name] = station_name
                 # self.update_ends(agent_pos)
                 # self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
                 # self.token['agents_to_tasks'][agent_name] = {'task_name': station_name,
@@ -641,30 +642,30 @@ class TokenPassing(object):
                 return False
 
     # calcolo il percorso escludendo i percorsi degli altri agenti e se sono in idle in posizioni scomode
-    def compute_real_path_station_preemption(self, agent_name, agent_pos, station_name, all_idle_agents):
-
-        idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
-        idle_obstacles_agents |= set(
-            self.non_task_endpoints)  # - {tuple(agent_pos), tuple(self.token['charging_stations'][station_name]['pos'])}
-        idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos),
-                                                         tuple(self.token['charging_stations'][station_name]['pos'])}
-
-        # cambiare goal
-        agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_stations'][station_name]['pos']}
-        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
-                          {}, a_star_max_iter=self.a_star_max_iter)
-        cbs = CBS(env)
-        path_to_station = self.search(cbs, agent_name, {})
-
-        if not path_to_station:
-            return False, []
-
-        else:
-            consumption = self.predicted_consumption(path_to_station[agent_name])
-            if self.simulation.get_batteries_level()[agent_name] >= consumption:
-                return True, path_to_station[agent_name]
-            else:
-                return False, []
+    # def compute_real_path_station_preemption(self, agent_name, agent_pos, station_name, all_idle_agents):
+    #
+    #     idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
+    #     idle_obstacles_agents |= set(
+    #         self.non_task_endpoints)
+    #     idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos),
+    #                                                      tuple(self.token['charging_stations'][station_name]['pos'])}
+    #
+    #     # cambiare goal
+    #     agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_stations'][station_name]['pos']}
+    #     env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
+    #                       {}, a_star_max_iter=self.a_star_max_iter)
+    #     cbs = CBS(env)
+    #     path_to_station = self.search(cbs, agent_name, {})
+    #
+    #     if not path_to_station:
+    #         return False, []
+    #
+    #     else:
+    #         consumption = self.predicted_consumption(path_to_station[agent_name])
+    #         if self.simulation.get_batteries_level()[agent_name] >= consumption:
+    #             return True, path_to_station[agent_name]
+    #         else:
+    #             return False, []
 
     def compute_new_path_to_goal(self, all_idle_agents, agent_name, agent_pos):
 
