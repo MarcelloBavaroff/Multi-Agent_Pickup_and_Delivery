@@ -34,6 +34,7 @@ class TokenPassing(object):
         self.charging_stations = charging_stations
         self.move_consumption = self.simulation.get_move_consumption()
         self.wait_consumption = self.simulation.get_wait_consumption()
+        self.chiamateCBS = 0
         self.init_token()
         # vedi sotto
 
@@ -83,6 +84,9 @@ class TokenPassing(object):
                 agents[name] = path
         return agents
 
+    def get_chiamateCBS(self):
+        return self.chiamateCBS
+
     # distanza in celle verticali ed orizzontali
     def admissible_heuristic(self, task_pos, agent_pos):
         return fabs(task_pos[0] - agent_pos[0]) + fabs(task_pos[1] - agent_pos[1])
@@ -114,6 +118,10 @@ class TokenPassing(object):
                 if len(path) > time_start and len(path) > 1:
                     for i in range(int(time_start), len(path)):
                         k = i - time_start
+
+                        if (path[i][0], path[i][1], k) in obstacles:
+                            print('problema già inserito')
+
                         obstacles[(path[i][0], path[i][1], k)] = name
                         if i == len(path) - 1:
                             obstacles[(path[i][0], path[i][1], -k)] = name
@@ -207,6 +215,7 @@ class TokenPassing(object):
     def search(self, cbs, agent_name, moving_obstacles_agents):
 
         path = cbs.search()
+        self.chiamateCBS += 1
         return path
 
     def set_task_name(self, agent_name, task_name):

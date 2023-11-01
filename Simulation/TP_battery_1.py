@@ -799,23 +799,52 @@ class TokenPassing(object):
     def reset_path(self, agent_name):
         self.token['agents'][agent_name] = self.token['agents'][agent_name][:1]
 
+    def choose_task(self, agent_name, agent_pos, available_tasks, all_idle_agents):
+
+        assigned = False
+        discarded_tasks = {}
+        while not assigned and len(discarded_tasks) < len(available_tasks):
+
+            closest_task_name = self.get_closest_task_name(available_tasks, agent_pos, discarded_tasks)
+            closest_task = available_tasks[closest_task_name]
+
+            task_total_cost = self.admissible_heuristic(closest_task[0], agent_pos)
+            task_total_cost += self.admissible_heuristic(closest_task[1], closest_task[0])
+            task_total_consumption = task_total_cost * self.move_consumption
+
+            if task_total_consumption < self.simulation.get_batteries_level()[agent_name]:
+                # consumption to station si intende dal goal alla stazione più vicina
+                nearest_station, consumption_to_station = self.search_nearest_available_station(task_total_cost,
+                                                                                                closest_task[1],
+                                                                                                agent_name)
+                if nearest_station is not None:
+                    assigned = self.compute_real_path(agent_name, agent_pos, closest_task, closest_task_name,
+                                                      all_idle_agents,
+                                                      available_tasks, consumption_to_station)
+                    # mi turba il fatto che la pop di available_tasks funzioni fuori dalla funzione, ma ok
+                    if not assigned:
+                        discarded_tasks[closest_task_name] = closest_task
+                else:
+                    discarded_tasks[closest_task_name] = closest_task
+            else:
+                discarded_tasks[closest_task_name] = closest_task
+
+        return assigned
+
+
     def time_forward(self):
 
         self.update_completed_tasks()
         self.collect_new_tasks()
         idle_agents = self.get_idle_agents()
-
         for a in idle_agents:
             self.check_if_dead(idle_agents[a][0], a)
-
         for a in self.token['dead_agents']:
             del idle_agents[a]
-
         assigned = False
 
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
-            # agent_name = list(idle_agents.keys())[0]
             all_idle_agents = self.token['agents'].copy()
             all_idle_agents.pop(agent_name)
             agent_pos = idle_agents.pop(agent_name)[0]
@@ -832,33 +861,7 @@ class TokenPassing(object):
             # se ci sono task disponibili provo ad assegnarli all'agente a patto che almeno a livello euristico poi possa andare
             # a caricarsi. Dopo il check con due euristiche per il task calcolo il percorso reale
             elif len(available_tasks) > 0:
-                assigned = False
-                discarded_tasks = {}
-                while not assigned and len(discarded_tasks) < len(available_tasks):
-
-                    closest_task_name = self.get_closest_task_name(available_tasks, agent_pos, discarded_tasks)
-                    closest_task = available_tasks[closest_task_name]
-
-                    task_total_cost = self.admissible_heuristic(closest_task[0], agent_pos)
-                    task_total_cost += self.admissible_heuristic(closest_task[1], closest_task[0])
-                    task_total_consumption = task_total_cost * self.move_consumption
-
-                    if task_total_consumption < self.simulation.get_batteries_level()[agent_name]:
-                        # consumption to station si intende dal goal alla stazione più vicina
-                        nearest_station, consumption_to_station = self.search_nearest_available_station(task_total_cost,
-                                                                                                        closest_task[1],
-                                                                                                        agent_name)
-                        if nearest_station is not None:
-                            assigned = self.compute_real_path(agent_name, agent_pos, closest_task, closest_task_name,
-                                                              all_idle_agents,
-                                                              available_tasks, consumption_to_station)
-                            # mi turba il fatto che la pop di available_tasks funzioni fuori dalla funzione, ma ok
-                            if not assigned:
-                                discarded_tasks[closest_task_name] = closest_task
-                        else:
-                            discarded_tasks[closest_task_name] = closest_task
-                    else:
-                        discarded_tasks[closest_task_name] = closest_task
+                assigned = self.choose_task(agent_name, agent_pos, available_tasks, all_idle_agents)
 
                 # se c'erano effettivamente task disponibili ma non vengono assegnati allora ho poca batteria e devo caricarmi
                 if not assigned and len(available_tasks) > 0:

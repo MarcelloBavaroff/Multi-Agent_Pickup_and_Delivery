@@ -3,10 +3,10 @@ import yaml
 import json
 import os
 import random
-from Simulation.TP_battery_2 import TokenPassing
+from Simulation.TP_battery_1 import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_2 import Simulation
+from Simulation.simulation_1 import Simulation
 import subprocess
 import sys
 import ast
@@ -100,6 +100,7 @@ if __name__ == '__main__':
     for a in tp.get_token()['completed_tasks_times']:
         service_time += tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a]
     print("Average service time: ", service_time / len(tp.get_token()['completed_tasks_times']))
+    print("Chiamate a CBS: ", tp.get_chiamateCBS())
 
     cost = 0
     for path in simulation.actual_paths.values():
