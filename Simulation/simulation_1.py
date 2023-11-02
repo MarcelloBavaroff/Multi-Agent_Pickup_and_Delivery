@@ -98,9 +98,16 @@ class Simulation(object):
         else:
             self.batteries_level[agent['name']] -= self.move_consumption
 
+            # controllo che vado via dalla stazione di ricarica
             if agent['name'] in algorithm.get_occupied_stations():
-                algorithm.set_station_free(algorithm.get_occupied_stations()[agent['name']])
-                algorithm.remove_occupied_station(agent['name'])
+
+                station_name = algorithm.get_occupied_stations()[agent['name']]
+                station_pos = tuple(algorithm.get_token()['charging_stations'][station_name]['pos'])
+                agent_old_pos = tuple((self.actual_paths[agent['name']][self.time - 1]['x'], self.actual_paths[agent['name']][self.time - 1]['y']))
+
+                if agent_old_pos == station_pos:
+                    algorithm.set_free_station(algorithm.get_occupied_stations()[agent['name']])
+                    algorithm.remove_occupied_station(agent['name'])
 
         if self.batteries_level[agent['name']] <= 0:
             print("errore")

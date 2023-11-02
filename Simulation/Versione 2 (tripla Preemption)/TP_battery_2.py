@@ -131,7 +131,6 @@ class TokenPassing(object):
     def get_idle_obstacles_agents(self, agents_paths, time_start, agent_name):
         obstacles = set()
 
-
         for g in self.goal_endpoints:
             obstacles.add(tuple(g))
         for c in self.charging_stations:
@@ -162,15 +161,18 @@ class TokenPassing(object):
                 return False
 
         return True
-
     # agent_pos è da che posizione calcolare l'endpoint più vicino, old_non_task_endpoint è l'endpoint che (forse) occupi ora
     # preem_non_task_endpoint è l'endpoint che hai prenotato al momento
-    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints, old_non_task_endpoint, preem_non_task_endpoint):
+    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints, old_non_task_endpoint,
+                                      preem_non_task_endpoint):
         dist = -1
         res = -1
         for endpoint in self.non_task_endpoints:
-            if ((endpoint not in self.token['occupied_non_task_endpoints'] and endpoint not in discarded_endpoints and endpoint not in self.token['preemption_ends'])
-                    or endpoint == tuple(agent_pos) or endpoint == tuple(old_non_task_endpoint) or endpoint == tuple(preem_non_task_endpoint)):
+            if ((endpoint not in self.token[
+                'occupied_non_task_endpoints'] and endpoint not in discarded_endpoints and endpoint not in self.token[
+                     'preemption_ends'])
+                    or endpoint == tuple(agent_pos) or endpoint == tuple(old_non_task_endpoint) or endpoint == tuple(
+                        preem_non_task_endpoint)):
                 if dist == -1:
                     dist = self.admissible_heuristic(endpoint, agent_pos)
                     res = endpoint
@@ -394,7 +396,8 @@ class TokenPassing(object):
             if s['name'] not in ongoing_tasks and s['name'] not in discarded_stations:
                 estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
 
-                if ((self.token['charging_stations'][s['name']]['booked'] is False or self.token['charging_stations'][s['name']]['booked'] == agent_name) and
+                if ((self.token['charging_stations'][s['name']]['booked'] is False or
+                     self.token['charging_stations'][s['name']]['booked'] == agent_name) and
                         estimated_station_cost * self.move_consumption < self.simulation.get_batteries_level()[
                             agent_name]):
 
@@ -440,7 +443,7 @@ class TokenPassing(object):
                                                      'goal': goal, 'predicted_cost': predicted_cost}
         self.token['agents'][agent_name] = []
 
-        #se path1 non è None, allora stiamo assegnando il percorso di un task e quindi metto in path_ends
+        # se path1 non è None, allora stiamo assegnando il percorso di un task e quindi metto in path_ends
         if path1 is not None:
             self.token['path_ends'].add(tuple([last_step['x'], last_step['y']]))
             for el in path1:
@@ -448,13 +451,12 @@ class TokenPassing(object):
             # Don't repeat twice same step, elimino ultimo elemento
             self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
 
-
         for el in path2:
             self.token['agents'][agent_name].append([el['x'], el['y']])
 
     def apply_path_preemption(self, agent_name, path1, path2, path_preemption, estimated_time_to_recharge,
                               path_endpoint, station_name):
-        #prima di resettare rimuovo l'ultimo elemento del path precedente dai finali
+        # prima di resettare rimuovo l'ultimo elemento del path precedente dai finali
         self.token['preemption_ends'].discard(tuple(self.token['agents_preemption'][agent_name][-1]))
         for s in self.token['charging_stations']:
             if self.token['charging_stations'][s]['booked'] == agent_name:
@@ -562,6 +564,7 @@ class TokenPassing(object):
                     return path_to_task_start, path_to_task_goal, cost1 + cost2 - 1, consumption
                 else:
                     return False, False, False, False
+
     # agent_pos spesso è la posizione del goal appena terminato dall'agente
     # time_start è il tempo in cui l'agente termina il goal e poi va a caricarsi nel caso
     def compute_real_path_station(self, agent_name, agent_pos, all_idle_agents, station_name, time_start,
@@ -585,7 +588,7 @@ class TokenPassing(object):
             return False, False, False
 
         else:
-            #print("Solution found to charging station for agent", agent_name)
+            # print("Solution found to charging station for agent", agent_name)
             cost1 = env.compute_solution_cost(path_to_station)
             consumption = self.predicted_consumption(path_to_station[agent_name]) + task_total_consumption
             # Use cost - 1 because idle cost is 1
@@ -665,7 +668,7 @@ class TokenPassing(object):
         cbs = CBS(env)
         path_to_non_task_endpoint = self.search(cbs, agent_name, moving_obstacles_agents)
         if not path_to_non_task_endpoint:
-            #print("Solution to non-task endpoint not found for ", agent_name, " instance is not well-formed.")
+            # print("Solution to non-task endpoint not found for ", agent_name, " instance is not well-formed.")
             return False, False
         else:
             consumption = self.predicted_consumption(path_to_non_task_endpoint[agent_name]) + previous_consumption
@@ -692,6 +695,7 @@ class TokenPassing(object):
                     consumption += self.move_consumption
 
         return round(consumption, 2)
+
     # restituisco 2 insiemi di agenti con cui ho conflitti: agenti intoccabili (caricano o già pickup)
     # agenti eliminabili (non vanno a caricare)
     # def find_conflicting_agents(self, my_path):
@@ -801,7 +805,9 @@ class TokenPassing(object):
                 while not assigned and closest_non_task_endpoint != -1:
 
                     closest_non_task_endpoint = self.get_closest_non_task_endpoint(station_pos,
-                                                                                   discarded_endpoints, agent_pos, self.token['agents_preemption'][agent_name][-1])
+                                                                                   discarded_endpoints, agent_pos,
+                                                                                   self.token['agents_preemption'][
+                                                                                       agent_name][-1])
                     if closest_non_task_endpoint != -1:
                         endpoint_duration = self.admissible_heuristic(closest_non_task_endpoint,
                                                                       station_pos)
@@ -823,7 +829,8 @@ class TokenPassing(object):
                                 # nel calcolo del percorso reale verso la stazione ho già considerato il consumo in wait
                                 # di conseguenza assegno come preemption path questo al posto del precedente
                                 assigned = True
-                                self.apply_path_preemption(agent_name, None, [path_station[agent_name][0],{'t': -1, 'x': -1, 'y': -1}],
+                                self.apply_path_preemption(agent_name, None,
+                                                           [path_station[agent_name][0], {'t': -1, 'x': -1, 'y': -1}],
                                                            path_station[agent_name], estimated_time_to_recharge,
                                                            path_endpoint[agent_name], nearest_station)
 
@@ -846,7 +853,7 @@ class TokenPassing(object):
         if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
                 self.token['agents_preemption'][agent_name]):
             # se con la mia batteria arrivo giusto a caricarmi ci vado
-            #if self.compute_consumption_to_station(agent_name) == self.simulation.get_batteries_level()[agent_name]:
+            # if self.compute_consumption_to_station(agent_name) == self.simulation.get_batteries_level()[agent_name]:
             if self.last_time_to_charge(agent_name):
                 self.use_preempted_path_to_station(agent_name)
 
@@ -877,7 +884,9 @@ class TokenPassing(object):
         # fino a quando non assegno un task oppure li ho esclusi tutti
         while not assigned and closest_non_task_endpoint != -1:
 
-            closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos, discarded_endpoints1, agent_pos, self.token['agents_preemption'][agent_name][-1])
+            closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos, discarded_endpoints1, agent_pos,
+                                                                           self.token['agents_preemption'][agent_name][
+                                                                               -1])
 
             if closest_non_task_endpoint != -1:
                 endpoint_duration = self.admissible_heuristic(closest_non_task_endpoint, agent_pos)
@@ -910,7 +919,8 @@ class TokenPassing(object):
                                 # ora controllo pure il percorso reale della stazione
                                 path_station, to_station_consumption, to_station_duration = self.compute_real_path_station(
                                     agent_name, closest_non_task_endpoint, all_idle_agents, nearest_station,
-                                    real_duration_endpoint - 1, endpoint_consumption, self.simulation.get_batteries_level()[agent_name])
+                                    real_duration_endpoint - 1, endpoint_consumption,
+                                    self.simulation.get_batteries_level()[agent_name])
 
                                 # se effettivamente ho un percorso per la stazione calcolato col consumo reale, allora
                                 # posso controllare gli endpoint
@@ -928,11 +938,30 @@ class TokenPassing(object):
                                     closest_non_task_endpoint2 = 0
 
                                     while not assigned and closest_non_task_endpoint2 != -1:
-                                        closest_non_task_endpoint2 = self.get_closest_non_task_endpoint(tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y'])),
-                                            discarded_endpoints2, tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y'])), self.token['agents_preemption'][agent_name][-1])
+                                        closest_non_task_endpoint2 = self.get_closest_non_task_endpoint(tuple(
+                                            (path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y'])),
+                                                                                                        discarded_endpoints2,
+                                                                                                        tuple((
+                                                                                                              path_station[
+                                                                                                                  agent_name][
+                                                                                                                  -1][
+                                                                                                                  'x'],
+                                                                                                              path_station[
+                                                                                                                  agent_name][
+                                                                                                                  -1][
+                                                                                                                  'y'])),
+                                                                                                        self.token[
+                                                                                                            'agents_preemption'][
+                                                                                                            agent_name][
+                                                                                                            -1])
                                         if closest_non_task_endpoint2 != -1:
                                             endpoint_duration2 = self.admissible_heuristic(closest_non_task_endpoint2,
-                                                                                           tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y'])))
+                                                                                           tuple((path_station[
+                                                                                                      agent_name][-1][
+                                                                                                      'x'],
+                                                                                                  path_station[
+                                                                                                      agent_name][-1][
+                                                                                                      'y'])))
                                             endpoint_consume_heuristic2 = endpoint_duration2 * self.move_consumption
                                             if endpoint_consume_heuristic2 < self.simulation.get_max_autonomies()[
                                                 agent_name]:
@@ -940,7 +969,10 @@ class TokenPassing(object):
                                                 # real_cost è in step, non in consumo
                                                 # previous consumption è 0 perché mi sono appena caricato
                                                 path_endpoint2, real_cost2 = self.compute_real_path_to_endpoint(
-                                                    all_idle_agents, agent_name, tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y'])),
+                                                    all_idle_agents, agent_name, tuple((path_station[agent_name][-1][
+                                                                                            'x'],
+                                                                                        path_station[agent_name][-1][
+                                                                                            'y'])),
                                                     closest_non_task_endpoint2, 0, total_real_duration - 1,
                                                     self.simulation.get_max_autonomies()[
                                                         agent_name])
@@ -949,12 +981,12 @@ class TokenPassing(object):
                                                     assigned = True
                                                     # ufficializzo il path fino al primo non task endpoint
 
-
                                                     self.apply_path(agent_name, agent_pos, None,
                                                                     path_endpoint[agent_name], 'safe_idle',
                                                                     agent_pos, closest_non_task_endpoint,
                                                                     endpoint_duration)
-                                                    self.token['occupied_non_task_endpoints'].add(closest_non_task_endpoint)
+                                                    self.token['occupied_non_task_endpoints'].add(
+                                                        closest_non_task_endpoint)
                                                     self.apply_path_preemption(agent_name, None,
                                                                                path_endpoint[agent_name],
                                                                                path_station[agent_name],
@@ -1019,7 +1051,7 @@ class TokenPassing(object):
             if task_total_consumption_heuristic < self.simulation.get_batteries_level()[agent_name]:
                 # consumption to station si intende dal goal alla stazione più vicina
                 nearest_station, consumption_to_station_heuristic = self.search_nearest_available_station(
-                    task_total_duration-1, closest_task[1], agent_name, set())
+                    task_total_duration - 1, closest_task[1], agent_name, set())
 
                 # se già con i consumi euristici non arrivo alla stazione più vicina, non ha senso andare avanti
                 if nearest_station is not None:
@@ -1057,12 +1089,18 @@ class TokenPassing(object):
                                 total_real_duration = total_real_duration + estimated_time_to_recharge + to_station_duration - 1
                                 closest_non_task_endpoint = 0
 
-                                station_pos = tuple((path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y']))
+                                station_pos = tuple(
+                                    (path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y']))
                                 while not assigned and closest_non_task_endpoint != -1:
                                     closest_non_task_endpoint = self.get_closest_non_task_endpoint(station_pos,
-                                                                                                   discarded_endpoints, agent_pos, self.token['agents_preemption'][agent_name][-1])
+                                                                                                   discarded_endpoints,
+                                                                                                   agent_pos,
+                                                                                                   self.token[
+                                                                                                       'agents_preemption'][
+                                                                                                       agent_name][-1])
                                     if closest_non_task_endpoint != -1:
-                                        endpoint_duration = self.admissible_heuristic(closest_non_task_endpoint, station_pos)
+                                        endpoint_duration = self.admissible_heuristic(closest_non_task_endpoint,
+                                                                                      station_pos)
 
                                         endpoint_consume_heuristic = endpoint_duration * self.move_consumption
                                         if endpoint_consume_heuristic < self.simulation.get_max_autonomies()[
@@ -1081,7 +1119,6 @@ class TokenPassing(object):
                                                 # ufficializzo il path fino al goal
                                                 if agent_name not in self.token['agents_to_tasks']:
                                                     self.token['tasks'].pop(closest_task_name)
-
 
                                                 self.apply_path(agent_name, agent_pos, path_start[agent_name],
                                                                 path_goal[agent_name], closest_task_name,
@@ -1153,7 +1190,6 @@ class TokenPassing(object):
             return True
         else:
             return False
-
 
     def time_forward(self):
 
