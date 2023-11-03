@@ -201,4 +201,12 @@
 
 Test20-20Fallito
 simulation random.seed(1234)
-random.seed(3)
+TP random.seed(3)
+
+agent13 is dead in position  [14, 5] al timestep 1000
+Batteria negativa
+Number of completed tasks:  191 / 200
+Number of dead agents:  1
+Agent  agent13  died
+Average service time:  222.44502617801047
+Chiamate a CBS:  783

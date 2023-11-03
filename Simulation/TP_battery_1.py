@@ -78,9 +78,11 @@ class TokenPassing(object):
     def get_idle_agents(self):
         agents = {}
         for name, path in self.token['agents'].items():
-            if len(path) == 1 and not (name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][name][
-                'task_name'] == 'recharging'):  # and name not in self.token['dead_agents']:
-                agents[name] = path
+            if name not in self.token['dead_agents']:
+                if len(path) == 1 and not (
+                        name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][name][
+                    'task_name'] == 'recharging'):
+                    agents[name] = path
         return agents
 
     def get_chiamateCBS(self):
@@ -231,7 +233,7 @@ class TokenPassing(object):
     def get_token(self):
         return self.token
 
-    def search(self, cbs, agent_name, moving_obstacles_agents):
+    def search(self, cbs):
 
         path = cbs.search()
         self.chiamateCBS += 1
@@ -250,7 +252,7 @@ class TokenPassing(object):
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, moving_obstacles_agents,
                           a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
-        path_to_non_task_endpoint = self.search(cbs, agent_name, moving_obstacles_agents)
+        path_to_non_task_endpoint = self.search(cbs)
         if not path_to_non_task_endpoint:
             print("Solution to non-task endpoint not found for agent", agent_name, " instance is not well-formed.")
 
@@ -562,7 +564,7 @@ class TokenPassing(object):
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
-        path_to_task_start = self.search(cbs, agent_name, moving_obstacles_agents)
+        path_to_task_start = self.search(cbs)
 
         if not path_to_task_start:
             print("Solution not found to task start for agent", agent_name, " idling at current position...")
@@ -581,7 +583,7 @@ class TokenPassing(object):
             env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                               moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
             cbs = CBS(env)
-            path_to_task_goal = self.search(cbs, agent_name, moving_obstacles_agents)
+            path_to_task_goal = self.search(cbs)
             if not path_to_task_goal:
                 print("Solution not found to task goal for agent", agent_name, " idling at current position...")
                 return False
@@ -621,7 +623,7 @@ class TokenPassing(object):
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
-        path_to_station = self.search(cbs, agent_name, moving_obstacles_agents)
+        path_to_station = self.search(cbs)
 
         if not path_to_station:
             print("Solution not found to charging station for agent", agent_name, " idling at current position...")
@@ -655,7 +657,7 @@ class TokenPassing(object):
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           {}, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
-        path_to_station = self.search(cbs, agent_name, {})
+        path_to_station = self.search(cbs)
 
         if not path_to_station:
             return False, []
@@ -679,7 +681,7 @@ class TokenPassing(object):
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
-        path_to_task_goal = self.search(cbs, agent_name, moving_obstacles_agents)
+        path_to_task_goal = self.search(cbs)
 
         if not path_to_task_goal:
             print('errore nel ricalcolo del percorso di ', agent_name)
@@ -714,7 +716,7 @@ class TokenPassing(object):
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, moving_obstacles_agents,
                           a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
-        path_to_non_task_endpoint = self.search(cbs, agent_name, moving_obstacles_agents)
+        path_to_non_task_endpoint = self.search(cbs)
         if not path_to_non_task_endpoint:
             print("Solution to non-task endpoint not found for agent", agent_name, " instance is not well-formed.")
             return False
@@ -856,7 +858,8 @@ class TokenPassing(object):
         for a in idle_agents:
             self.check_if_dead(idle_agents[a][0], a)
         for a in self.token['dead_agents']:
-            del idle_agents[a]
+            if a in idle_agents:
+                del idle_agents[a]
         assigned = False
 
 

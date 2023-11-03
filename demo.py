@@ -14,7 +14,7 @@ import ast
 
 def read_tasks():
     data_list = []
-    with open('Modified/hardcoded204', 'r') as file:
+    with open('Modified/erroreBig', 'r') as file:
         for line in file:
             try:
                 # Valuta la stringa come un dizionario Python
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=3, type=int)  # default=1
-    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
+    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=True)
 
     args = parser.parse_args()
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    autonomies = [89.54, 89.59, 95.66, 98.1, 93.91, 83.59, 99.18, 83.3, 80.28, 94.28, 98.61, 84.33, 84.39, 82.91, 88.96, 87.25, 90.92, 92.2, 80.39, 83.53]
+    autonomies = [88.4, 91.87, 93.31, 94.54, 88.16, 90.91, 95.99, 98.18, 96.62, 90.96, 91.3, 86.97, 81.64, 92.24, 86.75, 83.45, 89.25, 97.07, 94.28, 81.88, 82.75, 99.79, 85.4, 96.37, 83.44, 93.7, 81.74, 91.27, 91.83, 84.58, 89.49, 84.24, 89.95, 89.78, 80.51, 80.55, 87.22, 97.45, 82.86, 97.28, 92.03, 83.82, 87.03, 89.13, 91.33, 83.9, 95.61, 85.58, 96.46, 87.98, 91.84, 90.09]
 
     param['autonomies'] = autonomies
 
