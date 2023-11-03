@@ -17,7 +17,7 @@ States = ['safe_idle', 'recharging', 'charge_complete']
 class TokenPassing(object):
     def __init__(self, agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation, goal_endpoints,
                  a_star_max_iter=4000, new_recovery=False):
-        random.seed(5)
+        random.seed(3)
         self.agents = agents
         self.dimensions = dimensions
         self.obstacles = set(obstacles)
@@ -161,6 +161,7 @@ class TokenPassing(object):
                 return False
 
         return True
+
     # agent_pos è da che posizione calcolare l'endpoint più vicino, old_non_task_endpoint è l'endpoint che (forse) occupi ora
     # preem_non_task_endpoint è l'endpoint che hai prenotato al momento
     def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints, old_non_task_endpoint,
@@ -940,20 +941,20 @@ class TokenPassing(object):
                                     while not assigned and closest_non_task_endpoint2 != -1:
                                         closest_non_task_endpoint2 = self.get_closest_non_task_endpoint(tuple(
                                             (path_station[agent_name][-1]['x'], path_station[agent_name][-1]['y'])),
-                                                                                                        discarded_endpoints2,
-                                                                                                        tuple((
-                                                                                                              path_station[
-                                                                                                                  agent_name][
-                                                                                                                  -1][
-                                                                                                                  'x'],
-                                                                                                              path_station[
-                                                                                                                  agent_name][
-                                                                                                                  -1][
-                                                                                                                  'y'])),
-                                                                                                        self.token[
-                                                                                                            'agents_preemption'][
-                                                                                                            agent_name][
-                                                                                                            -1])
+                                            discarded_endpoints2,
+                                            tuple((
+                                                path_station[
+                                                    agent_name][
+                                                    -1][
+                                                    'x'],
+                                                path_station[
+                                                    agent_name][
+                                                    -1][
+                                                    'y'])),
+                                            self.token[
+                                                'agents_preemption'][
+                                                agent_name][
+                                                -1])
                                         if closest_non_task_endpoint2 != -1:
                                             endpoint_duration2 = self.admissible_heuristic(closest_non_task_endpoint2,
                                                                                            tuple((path_station[

@@ -14,7 +14,7 @@ import ast
 
 def read_tasks():
     data_list = []
-    with open('Modified/hardcoded_agent_dead', 'r') as file:
+    with open('Modified/hardcoded204', 'r') as file:
         for line in file:
             try:
                 # Valuta la stringa come un dizionario Python
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    autonomies = [87.14, 89.46, 96.92, 93.9, 84.46, 92.01, 80.49, 94.16, 96.65, 87.28, 96.5, 89.19, 84.38, 92.2, 88.25, 80.12, 85.79, 92.92, 91.64, 84.58]
+    autonomies = [95.23, 96.05, 85.78, 84.37, 91.61, 90.67, 87.75, 96.73, 84.33, 97.23, 94.47, 86.23, 86.77, 93.54, 81.5, 96.63, 82.26, 99.83, 99.23, 94.1]
 
     param['autonomies'] = autonomies
 
