@@ -457,7 +457,8 @@ class TokenPassing(object):
 
         for s in self.charging_stations:
             # stazione non assegnata a un altro agente
-            if s['name'] not in self.token['agents_to_tasks'] and self.token['charging_stations'][s['name']]['free'] == 'free':
+            if s['name'] not in self.token['agents_to_tasks'] and (self.token['charging_stations'][s['name']]['free'] == 'free'
+                    or self.token['charging_stations'][s['name']]['free'] == agent_name):
                 estimated_station_cost = self.admissible_heuristic(task_final_pos, s['pos'])
                 estimated_arrival_cost = task_cost + estimated_station_cost
                 estimated_arrival_time = estimated_arrival_cost + self.simulation.get_time()
@@ -521,7 +522,7 @@ class TokenPassing(object):
             elif estimated_station_cost < dist_min:
                 dist_min = estimated_station_cost
 
-        if estimated_station_cost * self.move_consumption > self.simulation.get_batteries_level()[
+        if dist_min * self.move_consumption > self.simulation.get_batteries_level()[
             agent_name]:
             self.token['dead_agents'].add(agent_name)
             print(agent_name, 'is dead in position ', agent_pos, 'al timestep', self.simulation.get_time())
@@ -546,7 +547,7 @@ class TokenPassing(object):
             # Don't repeat twice same step, elimino ultimo elemento
             self.token['agents'][agent_name] = self.token['agents'][agent_name][:-1]
 
-        for el in path2[agent_name]:
+        for el in path2:
             self.token['agents'][agent_name].append([el['x'], el['y']])
 
     def compute_real_path(self, agent_name, agent_pos, closest_task, closest_task_name, all_idle_agents,
@@ -847,7 +848,6 @@ class TokenPassing(object):
         else:
             return False
 
-
     def time_forward(self):
 
         self.update_completed_tasks()
@@ -858,6 +858,15 @@ class TokenPassing(object):
         for a in self.token['dead_agents']:
             del idle_agents[a]
         assigned = False
+
+
+        stazioni_occupate = 0
+        for s in self.token['charging_stations']:
+            if self.token['charging_stations'][s]['free'] != 'free':
+                stazioni_occupate += 1
+
+        if stazioni_occupate != len(self.token['occupied_charging_stations']):
+            print("errore")
 
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
@@ -882,6 +891,10 @@ class TokenPassing(object):
                 # se c'erano effettivamente task disponibili ma non vengono assegnati allora ho poca batteria e devo caricarmi
                 if not assigned and len(available_tasks) > 0:
                     # print("Nessun task assegnato anche se c'erano")
+
+                    if agent_name in self.token['occupied_charging_stations']:
+                        print(agent_name, ' is already charging')
+
                     self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
             # righe 13-14 alg

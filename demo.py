@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=3, type=int)  # default=1
-    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=True)
+    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
 
     args = parser.parse_args()
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    autonomies = [95.23, 96.05, 85.78, 84.37, 91.61, 90.67, 87.75, 96.73, 84.33, 97.23, 94.47, 86.23, 86.77, 93.54, 81.5, 96.63, 82.26, 99.83, 99.23, 94.1]
+    autonomies = [89.54, 89.59, 95.66, 98.1, 93.91, 83.59, 99.18, 83.3, 80.28, 94.28, 98.61, 84.33, 84.39, 82.91, 88.96, 87.25, 90.92, 92.2, 80.39, 83.53]
 
     param['autonomies'] = autonomies
 
