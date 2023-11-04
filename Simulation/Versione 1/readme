@@ -1,0 +1,7 @@
+versione 1:
+-cancallazione dei path se devo caricarmi e sono al limite
+-vedo una stazione come disponibile solo se nessuno ci sta andando ed è stata lasciata libera dall'agente che
+la occupava predentemente
+-se sei in una stazione, ci sono available tasks e non puoi farne nessuno, vai in un NON-T.E. se possibile, altrimenti
+rimani alla stazione di ricarica
+-problema se viene cancellato il path ad un agente (da quello che deve andarsi a caricare)

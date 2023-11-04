@@ -3,10 +3,10 @@ import yaml
 import json
 import os
 import random
-from Simulation.TP_battery_1 import TokenPassing
+from Simulation.TP_battery_3 import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_1 import Simulation
+from Simulation.simulation_3 import Simulation
 import subprocess
 import sys
 import ast
@@ -14,7 +14,7 @@ import ast
 
 def read_tasks():
     data_list = []
-    with open('Modified/erroreBig', 'r') as file:
+    with open('Modified/errore(agent path tolto)', 'r') as file:
         for line in file:
             try:
                 # Valuta la stringa come un dizionario Python
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=3, type=int)  # default=1
-    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
+    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=True)
 
     args = parser.parse_args()
 
@@ -73,8 +73,7 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    # autonomies = [88.4, 91.87, 93.31, 94.54, 88.16, 90.91, 95.99, 98.18, 96.62, 90.96, 91.3, 86.97, 81.64, 92.24, 86.75, 83.45, 89.25, 97.07, 94.28, 81.88, 82.75, 99.79, 85.4, 96.37, 83.44, 93.7, 81.74, 91.27, 91.83, 84.58, 89.49, 84.24, 89.95, 89.78, 80.51, 80.55, 87.22, 97.45, 82.86, 97.28, 92.03, 83.82, 87.03, 89.13, 91.33, 83.9, 95.61, 85.58, 96.46, 87.98, 91.84, 90.09]
-
+    autonomies = [93.26, 97.66, 94.55, 83.2, 85.37, 82.0, 93.42, 90.88, 91.92, 82.1, 92.4, 91.57, 99.16, 95.34, 88.86, 95.6, 82.35, 98.52, 83.07, 88.98, 80.76, 88.82, 95.4, 80.34, 95.22, 84.09, 95.51, 86.05, 92.24, 80.64, 81.25, 96.56, 99.43, 85.64, 87.41, 90.25, 87.03, 80.74, 84.4, 86.24, 99.25, 81.81, 89.68, 90.57, 98.85, 87.07, 86.38, 87.67, 81.04, 80.41, 81.15, 98.99]
     param['autonomies'] = autonomies
 
     # assegno i tasks generati così poi li vado a scrivere

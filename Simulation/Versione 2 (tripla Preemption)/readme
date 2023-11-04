@@ -1,2 +1,3 @@
 Versione con tripla preemption, probabilmente qualche problema di shift temporale nel calcolo
 delle preemption
+-probabilmente ha il bug che non restituisce dist_min nelle nearest station
