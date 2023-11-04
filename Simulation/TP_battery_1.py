@@ -862,7 +862,6 @@ class TokenPassing(object):
                 del idle_agents[a]
         assigned = False
 
-
         stazioni_occupate = 0
         for s in self.token['charging_stations']:
             if self.token['charging_stations'][s]['free'] != 'free':
@@ -897,8 +896,13 @@ class TokenPassing(object):
 
                     if agent_name in self.token['occupied_charging_stations']:
                         print(agent_name, ' is already charging')
+                        self.go_to_closest_non_task_endpoint_or_charge(agent_name, agent_pos, all_idle_agents,
+                                                                       idle_agents, 0)
 
-                    self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
+                    else:
+                        self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
+
+
 
             # righe 13-14 alg
             # se sono in safe_idle nel momento in cui ho la batteria minima per caricarmi secondo l'euristica vado a caricarmi
