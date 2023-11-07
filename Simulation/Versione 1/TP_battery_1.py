@@ -884,8 +884,7 @@ class TokenPassing(object):
                 else:
                     print("Percorso dell'", agent_name, " verso il goal ricalcolato correttamente")
                 # in teoria end_paths già ok, available_tasks anche perché non lo reinserivo
-            # se ci sono task disponibili provo ad assegnarli all'agente a patto che almeno a livello euristico poi possa andare
-            # a caricarsi. Dopo il check con due euristiche per il task calcolo il percorso reale
+
             elif len(available_tasks) > 0:
                 assigned = self.choose_task(agent_name, agent_pos, available_tasks, all_idle_agents)
 
