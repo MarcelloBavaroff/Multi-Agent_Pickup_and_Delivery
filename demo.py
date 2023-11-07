@@ -14,7 +14,7 @@ import ast
 
 def read_tasks():
     data_list = []
-    with open('Modified/sovrascriveMovingObs', 'r') as file:
+    with open('HardcodedTasks/Strano', 'r') as file:
         for line in file:
             try:
                 # Valuta la stringa come un dizionario Python
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    #autonomies = [92.58, 82.74, 82.21, 89.83, 80.19, 91.86, 85.0, 90.43, 87.11, 85.03, 82.95, 97.61, 99.7, 88.11, 92.78, 95.78, 85.4, 96.53, 81.9, 96.15]
+    #autonomies = [99.36, 90.83, 97.45, 83.49, 95.0, 81.26, 86.54, 89.65, 89.17, 99.55, 80.62, 92.53, 83.3, 94.79, 80.24, 82.19, 86.58, 95.49, 96.25, 83.62]
 
     param['autonomies'] = autonomies
 
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     simulation = Simulation(tasks, agents, autonomies, charging_stations)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 1000:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
         simulation.time_forward(tp)
 
     print("Number of completed tasks: ", tp.get_completed_tasks(), "/", len(tasks))

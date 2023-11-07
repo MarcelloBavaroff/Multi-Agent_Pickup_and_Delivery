@@ -816,7 +816,7 @@ class TokenPassing(object):
     def decide_if_charge(self, agent_name, agent_pos, all_idle_agents, idle_agents):
         # controllo se ho un path per andarmi a caricare
         if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
-                self.token['agents_preemption'][agent_name]):
+                self.token['agents_preemption'][agent_name]) and len(self.token['agents_preemption'][agent_name]) != 0:
 
             # se con la mia batteria arrivo giusto a caricarmi ci vado
             if self.last_time_to_charge(agent_name):
@@ -1222,7 +1222,7 @@ class TokenPassing(object):
 
                     else:
                         if agent_name in self.token['agents_preemption'] and len(
-                                self.token['agents'][agent_name]) != len(self.token['agents_preemption'][agent_name]):
+                                self.token['agents'][agent_name]) != len(self.token['agents_preemption'][agent_name]) and len(self.token['agents_preemption'][agent_name]) != 0:
 
                             # uso il path preemption per andarmi a caricare
                             self.use_preempted_path_to_station(agent_name)
@@ -1248,7 +1248,7 @@ class TokenPassing(object):
             # righe 15-16 alg
             else:
                 if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
-                        self.token['agents_preemption'][agent_name]):
+                        self.token['agents_preemption'][agent_name]) and len(self.token['agents_preemption'][agent_name]) != 0:
 
                     # se non ho un percorso per andarmi a caricare dopo che vado nel NON task endpoint, vado a caricarmi
                     if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):

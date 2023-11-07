@@ -197,5 +197,5 @@ map:
           name: station18
         - pos: [ 12, 0 ]
           name: station19
-n_tasks: 200
-task_freq: 5
+n_tasks: 500
+task_freq: 2
