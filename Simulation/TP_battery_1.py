@@ -94,6 +94,7 @@ class TokenPassing(object):
 
     def set_free_station(self, station_name):
         self.token['charging_stations'][station_name]['free'] = 'free'
+
     # distanza in celle verticali ed orizzontali
     def admissible_heuristic(self, task_pos, agent_pos):
         return fabs(task_pos[0] - agent_pos[0]) + fabs(task_pos[1] - agent_pos[1])
@@ -185,6 +186,19 @@ class TokenPassing(object):
 
         return True
 
+    def check_safe_idle_strict(self, agent_pos):
+
+        if tuple(agent_pos) in self.non_task_endpoints:
+            return True
+
+        if agent_pos in self.goal_endpoints:
+            for task_name, task in self.token['tasks'].items():
+                if tuple(task[1]) == tuple(agent_pos):
+                    return False
+            return True
+
+        return False
+
     def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints):
         dist = -1
         res = -1
@@ -198,9 +212,9 @@ class TokenPassing(object):
                     if tmp < dist:
                         dist = tmp
                         res = endpoint
-        if res == -1:
-            print('Error in finding non-task endpoint, is instance well-formed?')
-            # exit(1)
+        # if res == -1:
+        #     print('Error in finding non-task endpoint, is instance well-formed?')
+        #     # exit(1)
         return res
 
     def update_ends(self, agent_pos):
@@ -286,8 +300,9 @@ class TokenPassing(object):
                                                                                                     agent_name)
 
                     if nearest_station is not None:
-                        assigned = self.compute_real_path_to_endpoint(all_idle_agents, agent_name, agent_pos, closest_non_task_endpoint,
-                                                                       consumption_to_station)
+                        assigned = self.compute_real_path_to_endpoint(all_idle_agents, agent_name, agent_pos,
+                                                                      closest_non_task_endpoint,
+                                                                      consumption_to_station)
 
                         if not assigned:
                             discarded_endpoints.add(closest_non_task_endpoint)
@@ -339,7 +354,7 @@ class TokenPassing(object):
                 for i in range(estimated_time_to_recharge):
                     self.token['agents'][agent_name].append([pos['x'], pos['y']])
 
-                #le due righe dopo non so se servono
+                # le due righe dopo non so se servono
                 all_idle_agents = self.token['agents'].copy()
                 all_idle_agents.pop(agent_name)
                 self.token['agents_to_tasks'][agent_name]['task_name'] = 'recharging'
@@ -458,7 +473,8 @@ class TokenPassing(object):
 
         for s in self.charging_stations:
             # stazione non assegnata a un altro agente
-            if s['name'] not in self.token['agents_to_tasks'] and (self.token['charging_stations'][s['name']]['free'] == 'free'
+            if s['name'] not in self.token['agents_to_tasks'] and (
+                    self.token['charging_stations'][s['name']]['free'] == 'free'
                     or self.token['charging_stations'][s['name']]['free'] == agent_name):
                 estimated_station_cost = self.admissible_heuristic(task_final_pos, s['pos'])
                 estimated_arrival_cost = task_cost + estimated_station_cost
@@ -474,7 +490,7 @@ class TokenPassing(object):
                     elif estimated_station_cost < dist_min:
                         dist_min = estimated_station_cost
                         closest_station_name = s['name']
-        #se restituisco estimated_station_cost * self.move_consumption considero sempre l'ultimo calcolato
+        # se restituisco estimated_station_cost * self.move_consumption considero sempre l'ultimo calcolato
         return closest_station_name, dist_min * self.move_consumption
 
     def search_nearest_available_station_to_agent(self, agent_pos, agent_name, discarded_stations):
@@ -491,7 +507,7 @@ class TokenPassing(object):
             # stazione non assegnata a un altro agente
             if (s['name'] not in ongoing_tasks and s['name'] not in discarded_stations
                     and (self.token['charging_stations'][s['name']]['free'] == 'free'
-                    or self.token['charging_stations'][s['name']]['free'] == agent_name)):
+                         or self.token['charging_stations'][s['name']]['free'] == agent_name)):
 
                 estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
                 # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
@@ -601,7 +617,8 @@ class TokenPassing(object):
 
                     # devo unire i percorsi to start and to goal
 
-                    self.apply_path(agent_name, agent_pos, path_to_task_start[agent_name], path_to_task_goal[agent_name], closest_task_name,
+                    self.apply_path(agent_name, agent_pos, path_to_task_start[agent_name],
+                                    path_to_task_goal[agent_name], closest_task_name,
                                     task[0], task[1], cost1 + cost2)
 
                     return True
@@ -643,7 +660,7 @@ class TokenPassing(object):
             else:
                 return False
 
-    #calcolo il percorso escludendo i percorsi degli altri agenti e se sono in idle in posizioni scomode
+    # calcolo il percorso escludendo i percorsi degli altri agenti e se sono in idle in posizioni scomode
     def compute_real_path_station_preemption(self, agent_name, agent_pos, station_name, all_idle_agents):
 
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents, 0, agent_name)
@@ -822,7 +839,8 @@ class TokenPassing(object):
             task_total_cost += self.admissible_heuristic(closest_task[1], closest_task[0])
             task_total_consumption = task_total_cost * self.move_consumption
 
-            if task_total_consumption < self.simulation.get_batteries_level()[agent_name] and closest_task_name != 'safe_idle':
+            if task_total_consumption < self.simulation.get_batteries_level()[
+                agent_name] and closest_task_name != 'safe_idle':
                 # consumption to station si intende dal goal alla stazione più vicina
                 nearest_station, consumption_to_station = self.search_nearest_available_station(task_total_cost,
                                                                                                 closest_task[1],
@@ -900,12 +918,10 @@ class TokenPassing(object):
                     else:
                         self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
-
-
             # righe 13-14 alg
             # se sono in safe_idle nel momento in cui ho la batteria minima per caricarmi secondo l'euristica vado a caricarmi
             # anche qui se serve cambio il path degli altri agenti
-            elif self.check_safe_idle(agent_pos):
+            elif self.check_safe_idle_strict(agent_pos):
                 nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                     agent_pos, agent_name, {})
 

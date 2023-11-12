@@ -173,6 +173,19 @@ class TokenPassing(object):
 
     # agent_pos è da che posizione calcolare l'endpoint più vicino, old_non_task_endpoint è l'endpoint che (forse) occupi ora
     # preem_non_task_endpoint è l'endpoint che hai prenotato al momento
+
+    def check_safe_idle_strict(self, agent_pos):
+
+        if tuple(agent_pos) in self.non_task_endpoints:
+            return True
+
+        if agent_pos in self.goal_endpoints:
+            for task_name, task in self.token['tasks'].items():
+                if tuple(task[1]) == tuple(agent_pos):
+                    return False
+            return True
+
+        return False
     def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints, old_non_task_endpoint,
                                       preem_non_task_endpoint):
         dist = -1
@@ -458,6 +471,7 @@ class TokenPassing(object):
                 break
 
         # copio solo la parte relativa alla stazione, non quella del NON task endpoint
+        #self.token['agents'][agent_name] = self.token['agents'][agent_name][:1]
         self.token['agents'][agent_name] = []
         i = 0
         while self.token['agents_preemption'][agent_name][i] != station_pos:
@@ -1180,6 +1194,15 @@ class TokenPassing(object):
         else:
             return False
 
+    def controllo_errori_stazioni(self):
+        stazioni_occupate = 0
+        for s in self.token['charging_stations']:
+            if self.token['charging_stations'][s]['free'] != 'free':
+                stazioni_occupate += 1
+
+        if stazioni_occupate != len(self.token['occupied_charging_stations']):
+            print("errore(agent path tolto)")
+
     def time_forward(self):
 
         self.update_completed_tasks()
@@ -1192,13 +1215,17 @@ class TokenPassing(object):
         assigned = False
 
         # controllo stazioni occupate coerenti
-        stazioni_occupate = 0
-        for s in self.token['charging_stations']:
-            if self.token['charging_stations'][s]['free'] != 'free':
-                stazioni_occupate += 1
+        self.controllo_errori_stazioni()
 
-        if stazioni_occupate != len(self.token['occupied_charging_stations']):
-            print("errore(agent path tolto)")
+        countNONTE = 0
+        for a in self.agents:
+            if tuple(self.token['agents'][a['name']][0]) in self.non_task_endpoints:
+                countNONTE += 1
+            elif tuple(self.token['agents'][a['name']][-1]) in self.non_task_endpoints:
+                countNONTE += 1
+
+        if countNONTE < len(self.token['occupied_non_task_endpoints']):
+            print("errore(NONTE)")
 
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
@@ -1241,7 +1268,7 @@ class TokenPassing(object):
             # righe 13-14 alg
             # se sono in safe_idle nel momento in cui ho la batteria minima per caricarmi secondo l'euristica vado a caricarmi
             # anche qui se serve cambio il path degli altri agenti
-            elif self.check_safe_idle(agent_pos):
+            elif self.check_safe_idle_strict(agent_pos):
                 # quindi ho la stazione prenotata
                 self.decide_if_charge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
