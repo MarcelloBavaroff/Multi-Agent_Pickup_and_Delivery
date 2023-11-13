@@ -3,10 +3,10 @@ import yaml
 import json
 import os
 import random
-from Simulation.TP_battery_3 import TokenPassing
+from Simulation.TP_battery_1 import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_3 import Simulation
+from Simulation.simulation_1 import Simulation
 import subprocess
 import sys
 import ast
@@ -14,7 +14,7 @@ import ast
 
 def read_tasks():
     data_list = []
-    with open('HardcodedTasks/Strano', 'r') as file:
+    with open('HardcodedTasks/Run4', 'r') as file:
         for line in file:
             try:
                 # Valuta la stringa come un dizionario Python
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=3, type=int)  # default=1
-    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=True)
+    parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
 
     args = parser.parse_args()
 
@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     print(autonomies)
 
-    autonomies = [84.12, 91.2, 89.09, 97.1, 99.02, 88.62, 99.41, 80.28, 98.63, 88.46, 86.98, 89.55, 91.86, 82.36, 87.3, 89.61, 94.57, 88.63, 80.52, 82.98]
+    #autonomies = [80.48, 84.72, 97.91, 92.35, 97.45, 90.25, 95.31, 92.1, 97.61, 94.97, 84.66, 94.95, 95.6, 90.93, 96.05, 82.49, 80.42, 99.75, 84.48, 99.21]
 
     param['autonomies'] = autonomies
 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = Simulation(tasks, agents, autonomies, charging_stations)
+    simulation = Simulation(tasks, agents, autonomies, charging_stations, 1,1)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:

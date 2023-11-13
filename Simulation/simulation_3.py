@@ -3,7 +3,7 @@ from Simulation.tasks_and_delays_maker import *
 
 
 class Simulation(object):
-    def __init__(self, tasks, agents, autonomies, charging_stations):
+    def __init__(self, tasks, agents, autonomies, charging_stations, move_consumption=1, wait_consumption=0.05):
         random.seed(1234)
         self.tasks = tasks
         self.agents = agents
@@ -17,8 +17,8 @@ class Simulation(object):
         self.max_autonomies = {}
         self.batteries_level = {}
         self.charging_stations = charging_stations
-        self.move_consumption = 1
-        self.wait_consumption = 0.05
+        self.move_consumption = move_consumption
+        self.wait_consumption = wait_consumption
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]

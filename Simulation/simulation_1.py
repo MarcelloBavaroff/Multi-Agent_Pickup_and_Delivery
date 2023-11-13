@@ -3,7 +3,7 @@ from Simulation.tasks_and_delays_maker import *
 
 
 class Simulation(object):
-    def __init__(self, tasks, agents, autonomies, charging_stations):
+    def __init__(self, tasks, agents, autonomies, charging_stations, move_consumption=1, wait_consumption=0.05):
         random.seed(1234)
         self.tasks = tasks
         self.agents = agents
@@ -17,8 +17,8 @@ class Simulation(object):
         self.max_autonomies = {}
         self.batteries_level = {}
         self.charging_stations = charging_stations
-        self.move_consumption = 1
-        self.wait_consumption = 0.05
+        self.move_consumption = move_consumption
+        self.wait_consumption = wait_consumption
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]
@@ -49,7 +49,7 @@ class Simulation(object):
                 algorithm.get_token()['agents'][agent['name']] = algorithm.get_token()['agents'][agent['name']][
                                                                  1:]
 
-                #self.batteries_level[agent['name']] += 10
+                # self.batteries_level[agent['name']] += 10
                 self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + 10, 2)
 
                 # se carica completa lo metto in idle?
@@ -81,7 +81,6 @@ class Simulation(object):
                 if self.batteries_level[agent['name']] <= 0:
                     print("Batteria negativa")
 
-
     def update_actual_paths(self, agent, algorithm, x_new, y_new, current_agent_pos):
         self.agents_moved.add(agent['name'])
         # dico che c'è un agente in questa posizione
@@ -109,7 +108,8 @@ class Simulation(object):
 
                 station_name = algorithm.get_occupied_stations()[agent['name']]
                 station_pos = tuple(algorithm.get_token()['charging_stations'][station_name]['pos'])
-                agent_old_pos = tuple((self.actual_paths[agent['name']][self.time - 1]['x'], self.actual_paths[agent['name']][self.time - 1]['y']))
+                agent_old_pos = tuple((self.actual_paths[agent['name']][self.time - 1]['x'],
+                                       self.actual_paths[agent['name']][self.time - 1]['y']))
 
                 if agent_old_pos == station_pos:
                     algorithm.set_free_station(algorithm.get_occupied_stations()[agent['name']])
