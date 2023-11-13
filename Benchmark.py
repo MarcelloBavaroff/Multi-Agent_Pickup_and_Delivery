@@ -83,9 +83,9 @@ def parameters(random_seed=1234):
     return tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, param['map'][
         'goal_locations'], args.a_star_max_iter
 
-def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run):
-    with open('Comparison/test6.txt', 'a') as file:
-        file.write("\n\n" + str(index_run) + " " + version + "\n")
+def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run, random_seed=1234):
+    with open('Comparison/test9.txt', 'a') as file:
+        file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
         s_dead_agents = "Number of dead agents: ", dead_agents
         s_makespan = "Makespan: ", makespan
@@ -100,13 +100,13 @@ def single_run(index_run, random_seed=1234):
     tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, goal_locations, max_iter = parameters(random_seed)
 
     move_consumption = 0.5
-    wait_consumption = 0.01
+    wait_consumption = 0.5
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       goal_locations, a_star_max_iter=max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2500:
         simulation.time_forward(tp)
 
     completed_tasks = tp.get_completed_tasks()
@@ -120,7 +120,7 @@ def single_run(index_run, random_seed=1234):
     average_service_time = service_time / len(tp.get_token()['completed_tasks_times'])
     cbs_calls = tp.get_chiamateCBS()
 
-    print_comparison("VersionePreem", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, random_seed)
+    print_comparison("VersionePreem", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run, random_seed)
 
     # ---------------------------------------------------------
 
