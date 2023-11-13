@@ -83,9 +83,9 @@ def parameters(random_seed=1234):
     return tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, param['map'][
         'goal_locations'], args.a_star_max_iter
 
-def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, random_seed):
-    with open('Comparison/test5.txt', 'a') as file:
-        file.write("\n\n" + str(random_seed) + " " + version + "\n")
+def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run):
+    with open('Comparison/test6.txt', 'a') as file:
+        file.write("\n\n" + str(index_run) + " " + version + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
         s_dead_agents = "Number of dead agents: ", dead_agents
         s_makespan = "Makespan: ", makespan
@@ -96,11 +96,11 @@ def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, a
         file.write(str(s_completed_tasks) + '\n' + str(s_dead_agents) + '\n' + str(s_makespan) + '\n' + str(
             s_average_service_time) + '\n' + str(s_cbs_calls))
 
-def single_run(random_seed=1234):
+def single_run(index_run, random_seed=1234):
     tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, goal_locations, max_iter = parameters(random_seed)
 
     move_consumption = 0.5
-    wait_consumption = 0.1
+    wait_consumption = 0.01
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption)
@@ -142,7 +142,7 @@ def single_run(random_seed=1234):
     average_service_time2 = service_time / len(tp.get_token()['completed_tasks_times'])
     cbs_calls2 = tp.get_chiamateCBS()
 
-    print_comparison("VersioneBase", completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, random_seed)
+    print_comparison("VersioneBase", completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, index_run)
 
     return completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2
 
@@ -165,7 +165,8 @@ if __name__ == '__main__':
 
     for i in range(20):
         print("Run numero: ", i+1)
-        completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2 = single_run(i)
+        random_seed = random.randint(0, 100000)
+        completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2 = single_run(i, random_seed)
 
         if completed_tasks == n_tasks:
             run_complete1 += 1
