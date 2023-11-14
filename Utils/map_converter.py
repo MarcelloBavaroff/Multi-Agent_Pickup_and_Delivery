@@ -6,7 +6,7 @@ import json
 
 if __name__ == '__main__':
     yaml_dic = {}
-    with open(os.path.join(os.path.join(RoothPath.get_root(), 'Benchmarks'), 'den312d.map')) as ascii_map:
+    with open(os.path.join(os.path.join(RoothPath.get_root(), 'Benchmarks'), 'den312d(dragon age).map')) as ascii_map:
         ascii_map.readline()
         h = int(re.findall(r'\d+', ascii_map.readline())[0])
         w = int(re.findall(r'\d+', ascii_map.readline())[0])
