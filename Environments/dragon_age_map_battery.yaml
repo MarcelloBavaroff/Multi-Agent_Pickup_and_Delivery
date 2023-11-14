@@ -1,41 +1,65 @@
 agents:
--   start: [48, 10]
-    name: agent0
--   start: [23, 13]
-    name: agent1
--   start: [31, 25]
-    name: agent2
--   start: [56, 25]
-    name: agent3
--   start: [53, 40]
-    name: agent4
--   start: [27, 43]
-    name: agent5
--   start: [47, 51]
-    name: agent6
--   start: [25, 56]
-    name: agent7
--   start: [17, 60]
-    name: agent8
--   start: [9, 68]
-    name: agent9
--   start: [25, 73]
-    name: agent10
--   start: [48, 69]
-    name: agent11
-
+- name: agent0
+  start:
+  - 48
+  - 10
+- name: agent1
+  start:
+  - 23
+  - 13
+- name: agent2
+  start:
+  - 31
+  - 25
+- name: agent3
+  start:
+  - 56
+  - 25
+#- name: agent4
+#  start:
+#  - 53
+#  - 40
+#- name: agent5
+#  start:
+#  - 27
+#  - 43
+#- name: agent6
+#  start:
+#  - 47
+#  - 51
+#- name: agent7
+#  start:
+#  - 25
+#  - 56
+#- name: agent8
+#  start:
+#  - 17
+#  - 60
+#- name: agent9
+#  start:
+#  - 9
+#  - 68
+#- name: agent10
+#  start:
+#  - 25
+#  - 73
+#- name: agent11
+#  start:
+#  - 48
+#  - 69
 map:
-  dimensions: [65, 81]
-
+  dimensions:
+  - 65
+  - 81
   goal_locations:
-  - - 8
-    - 10
-  - - 13
-    - 61
-  - - 57
-    - 13
-  - - 13
-    - 18
+#  - - 8
+#    - 10
+#  - - 13
+#    - 61
+#  - - 57
+#    - 13
+#  - - 13
+#    - 18
   - - 28
     - 10
   - - 9
@@ -69,29 +93,41 @@ map:
   - - 39
     - 4
   non_task_endpoints:
-  - - 48
+  - !!python/tuple
+    - 48
     - 10
-  - - 23
+  - !!python/tuple
+    - 23
     - 13
-  - - 31
+  - !!python/tuple
+    - 31
     - 25
-  - - 56
-    - 25
-  - - 53
-    - 40
-  - - 27
-    - 43
-  - - 47
-    - 51
-  - - 25
+  - !!python/tuple
     - 56
-  - - 17
+    - 25
+  - !!python/tuple
+    - 53
+    - 40
+  - !!python/tuple
+    - 27
+    - 43
+  - !!python/tuple
+    - 47
+    - 51
+  - !!python/tuple
+    - 25
+    - 56
+  - !!python/tuple
+    - 17
     - 60
-  - - 9
+  - !!python/tuple
+    - 9
     - 68
-  - - 25
+  - !!python/tuple
+    - 25
     - 73
-  - - 48
+  - !!python/tuple
+    - 48
     - 69
   obstacles:
   - !!python/tuple
@@ -8595,6 +8631,16 @@ map:
     - 64
   - - 38
     - 4
+  charging_stations:
+    - pos: [ 8, 10 ]
+      name: station0
+    - pos: [ 13, 61 ]
+      name: station1
+    - pos: [ 57, 13 ]
+      name: station2
+    - pos: [ 13, 18 ]
+      name: station3
+
 #n_delays_per_agent: 10
 n_tasks: 30
 task_freq: 1

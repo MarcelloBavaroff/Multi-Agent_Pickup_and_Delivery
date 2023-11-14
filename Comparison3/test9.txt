@@ -1,0 +1,281 @@
+
+
+0 VersionePreem 4412
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1685)
+('Average service time: ', 59.656)
+('Chiamate a CBS: ', 17979)
+
+0 VersioneBase 4412
+('Number of completed tasks: ', 410, '/', 500)
+('Number of dead agents: ', 9)
+('Makespan: ', 2000)
+('Average service time: ', 52.7)
+('Chiamate a CBS: ', 1155)
+
+1 VersionePreem 21981
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1764)
+('Average service time: ', 42.152)
+('Chiamate a CBS: ', 19377)
+
+1 VersioneBase 21981
+('Number of completed tasks: ', 426, '/', 500)
+('Number of dead agents: ', 8)
+('Makespan: ', 2000)
+('Average service time: ', 38.02347417840375)
+('Chiamate a CBS: ', 1202)
+
+2 VersionePreem 6839
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 2003)
+('Average service time: ', 43.124)
+('Chiamate a CBS: ', 23052)
+
+2 VersioneBase 6839
+('Number of completed tasks: ', 415, '/', 500)
+('Number of dead agents: ', 9)
+('Makespan: ', 2000)
+('Average service time: ', 39.34939759036145)
+('Chiamate a CBS: ', 1184)
+
+3 VersionePreem 58080
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1886)
+('Average service time: ', 47.12)
+('Chiamate a CBS: ', 21165)
+
+3 VersioneBase 58080
+('Number of completed tasks: ', 480, '/', 500)
+('Number of dead agents: ', 7)
+('Makespan: ', 2000)
+('Average service time: ', 42.90833333333333)
+('Chiamate a CBS: ', 1352)
+
+4 VersionePreem 51574
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1882)
+('Average service time: ', 48.1)
+('Chiamate a CBS: ', 21196)
+
+4 VersioneBase 51574
+('Number of completed tasks: ', 372, '/', 500)
+('Number of dead agents: ', 9)
+('Makespan: ', 2000)
+('Average service time: ', 42.965053763440864)
+('Chiamate a CBS: ', 1066)
+
+5 VersionePreem 17892
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1703)
+('Average service time: ', 49.752)
+('Chiamate a CBS: ', 18168)
+
+5 VersioneBase 17892
+('Number of completed tasks: ', 444, '/', 500)
+('Number of dead agents: ', 6)
+('Makespan: ', 2000)
+('Average service time: ', 43.53603603603604)
+('Chiamate a CBS: ', 1270)
+
+6 VersionePreem 46059
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1697)
+('Average service time: ', 52.884)
+('Chiamate a CBS: ', 18294)
+
+6 VersioneBase 46059
+('Number of completed tasks: ', 462, '/', 500)
+('Number of dead agents: ', 4)
+('Makespan: ', 2000)
+('Average service time: ', 47.87662337662338)
+('Chiamate a CBS: ', 1321)
+
+7 VersionePreem 47771
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1759)
+('Average service time: ', 46.66)
+('Chiamate a CBS: ', 19130)
+
+7 VersioneBase 47771
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 4)
+('Makespan: ', 1762)
+('Average service time: ', 44.824)
+('Chiamate a CBS: ', 1365)
+
+8 VersionePreem 71544
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1830)
+('Average service time: ', 47.458)
+('Chiamate a CBS: ', 20484)
+
+8 VersioneBase 71544
+('Number of completed tasks: ', 423, '/', 500)
+('Number of dead agents: ', 6)
+('Makespan: ', 2000)
+('Average service time: ', 46.43026004728132)
+('Chiamate a CBS: ', 1198)
+
+9 VersionePreem 57303
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1812)
+('Average service time: ', 51.104)
+('Chiamate a CBS: ', 19721)
+
+9 VersioneBase 57303
+('Number of completed tasks: ', 389, '/', 500)
+('Number of dead agents: ', 5)
+('Makespan: ', 2000)
+('Average service time: ', 45.67609254498715)
+('Chiamate a CBS: ', 2837)
+
+10 VersionePreem 65677
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1732)
+('Average service time: ', 58.118)
+('Chiamate a CBS: ', 18720)
+
+10 VersioneBase 65677
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 3)
+('Makespan: ', 1721)
+('Average service time: ', 51.892)
+('Chiamate a CBS: ', 1384)
+
+11 VersionePreem 99892
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1712)
+('Average service time: ', 49.288)
+('Chiamate a CBS: ', 18187)
+
+11 VersioneBase 99892
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 2)
+('Makespan: ', 1712)
+('Average service time: ', 46.028)
+('Chiamate a CBS: ', 1391)
+
+12 VersionePreem 27312
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1574)
+('Average service time: ', 51.19)
+('Chiamate a CBS: ', 15966)
+
+12 VersioneBase 27312
+('Number of completed tasks: ', 495, '/', 500)
+('Number of dead agents: ', 6)
+('Makespan: ', 2000)
+('Average service time: ', 47.6)
+('Chiamate a CBS: ', 1413)
+
+13 VersionePreem 1271
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1827)
+('Average service time: ', 50.96)
+('Chiamate a CBS: ', 20603)
+
+13 VersioneBase 1271
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 2)
+('Makespan: ', 1830)
+('Average service time: ', 46.908)
+('Chiamate a CBS: ', 1403)
+
+14 VersionePreem 82042
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1787)
+('Average service time: ', 47.184)
+('Chiamate a CBS: ', 19789)
+
+14 VersioneBase 82042
+('Number of completed tasks: ', 409, '/', 500)
+('Number of dead agents: ', 5)
+('Makespan: ', 2000)
+('Average service time: ', 41.96332518337408)
+('Chiamate a CBS: ', 1185)
+
+15 VersionePreem 17583
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1839)
+('Average service time: ', 46.29)
+('Chiamate a CBS: ', 20481)
+
+15 VersioneBase 17583
+('Number of completed tasks: ', 467, '/', 500)
+('Number of dead agents: ', 6)
+('Makespan: ', 2000)
+('Average service time: ', 42.059957173447536)
+('Chiamate a CBS: ', 1328)
+
+16 VersionePreem 49241
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1822)
+('Average service time: ', 42.856)
+('Chiamate a CBS: ', 20048)
+
+16 VersioneBase 49241
+('Number of completed tasks: ', 440, '/', 500)
+('Number of dead agents: ', 5)
+('Makespan: ', 2000)
+('Average service time: ', 41.01136363636363)
+('Chiamate a CBS: ', 1269)
+
+17 VersionePreem 91115
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1836)
+('Average service time: ', 52.27)
+('Chiamate a CBS: ', 20296)
+
+17 VersioneBase 91115
+('Number of completed tasks: ', 495, '/', 500)
+('Number of dead agents: ', 7)
+('Makespan: ', 2000)
+('Average service time: ', 48.12323232323232)
+('Chiamate a CBS: ', 1373)
+
+18 VersionePreem 4605
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1878)
+('Average service time: ', 51.65)
+('Chiamate a CBS: ', 21192)
+
+18 VersioneBase 4605
+('Number of completed tasks: ', 408, '/', 500)
+('Number of dead agents: ', 7)
+('Makespan: ', 2000)
+('Average service time: ', 45.3921568627451)
+('Chiamate a CBS: ', 1221)
+
+19 VersionePreem 94712
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1757)
+('Average service time: ', 50.618)
+('Chiamate a CBS: ', 19136)
+
+19 VersioneBase 94712
+('Number of completed tasks: ', 464, '/', 500)
+('Number of dead agents: ', 5)
+('Makespan: ', 2000)
+('Average service time: ', 45.5948275862069)
+('Chiamate a CBS: ', 1304)

@@ -1216,16 +1216,6 @@ class TokenPassing(object):
         # controllo stazioni occupate coerenti
         self.controllo_errori_stazioni()
 
-        countNONTE = 0
-        for a in self.agents:
-            if tuple(self.token['agents'][a['name']][0]) in self.non_task_endpoints:
-                countNONTE += 1
-            elif tuple(self.token['agents'][a['name']][-1]) in self.non_task_endpoints:
-                countNONTE += 1
-
-        if countNONTE < len(self.token['occupied_non_task_endpoints']):
-            print("errore(NONTE)")
-
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
             all_idle_agents = self.token['agents'].copy()
