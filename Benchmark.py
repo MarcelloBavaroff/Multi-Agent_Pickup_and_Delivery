@@ -84,7 +84,7 @@ def parameters(random_seed):
         'goal_locations'], args.a_star_max_iter
 
 def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run, random_seed=1234):
-    with open('Comparison1/test13.txt', 'a') as file:
+    with open('Comparison3/test6.txt', 'a') as file:
         file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
         s_dead_agents = "Number of dead agents: ", dead_agents
@@ -106,7 +106,7 @@ def single_run(index_run, random_seed):
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       goal_locations, a_star_max_iter=max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2500:
         simulation.time_forward(tp)
 
     completed_tasks = tp.get_completed_tasks()
