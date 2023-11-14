@@ -65,10 +65,11 @@ class Simulation(object):
                 self.actual_paths[agent['name']].append(
                     {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
 
-                if agent['name'] in algorithm.get_token()['agents_to_tasks']:
-                    task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
-                else:
-                    task_name = None
+                # if agent['name'] in algorithm.get_token()['agents_to_tasks']:
+                #     task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
+                # else:
+                #     task_name = None
+                task_name = 'mabel'
 
                 if task_name in algorithm.get_token()['start_tasks_times'] \
                         and algorithm.get_token()['agents_to_tasks'][agent['name']]['start'] not in \
@@ -110,11 +111,11 @@ class Simulation(object):
         # aggiorno il path dell'agente
         self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
 
-        if agent['name'] in algorithm.get_token()['agents_to_tasks']:
-            task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
-        else:
-            task_name = None
-
+        # if agent['name'] in algorithm.get_token()['agents_to_tasks']:
+        #     task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
+        # else:
+        #     task_name = None
+        task_name = 'mabel'
         if task_name in algorithm.get_token()['start_tasks_times'] \
                 and algorithm.get_token()['agents_to_tasks'][agent['name']]['start'] not in algorithm.get_token()['agents'][agent['name']]:
             self.batteries_level[agent['name']] = round(
