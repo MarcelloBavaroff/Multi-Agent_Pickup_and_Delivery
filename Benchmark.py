@@ -84,7 +84,7 @@ def parameters(random_seed):
         'goal_locations'], args.a_star_max_iter
 
 def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run, random_seed=1234):
-    with open('Comparison3/test6.txt', 'a') as file:
+    with open('Comparison4/test8.txt', 'a') as file:
         file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
         s_dead_agents = "Number of dead agents: ", dead_agents
@@ -99,8 +99,8 @@ def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, a
 def single_run(index_run, random_seed):
     tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, goal_locations, max_iter = parameters(random_seed)
 
-    move_consumption = 0.5
-    wait_consumption = 0.01
+    move_consumption = 1
+    wait_consumption = 1
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption)
