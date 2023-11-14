@@ -100,10 +100,11 @@ def single_run(index_run, random_seed):
     tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, goal_locations, max_iter = parameters(random_seed)
 
     move_consumption = 0.5
+    move_heavy_consumption = move_consumption
     wait_consumption = 0.01
 
     # Simulate
-    simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption)
+    simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption, move_heavy_consumption)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       goal_locations, a_star_max_iter=max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2500:
@@ -125,7 +126,7 @@ def single_run(index_run, random_seed):
     # ---------------------------------------------------------
 
     # Simulate
-    simulation = Sim1(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption)
+    simulation = Sim1(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption, move_heavy_consumption)
     tp = TP1(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
              goal_locations, a_star_max_iter=max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
