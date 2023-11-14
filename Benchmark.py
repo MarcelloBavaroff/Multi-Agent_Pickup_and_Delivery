@@ -33,8 +33,8 @@ def read_tasks():
     return data_list
 
 
-def parameters(random_seed=1234):
-    random_seed = random_seed
+def parameters(random_seed):
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
@@ -84,7 +84,7 @@ def parameters(random_seed=1234):
         'goal_locations'], args.a_star_max_iter
 
 def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run, random_seed=1234):
-    with open('Comparison/test9.txt', 'a') as file:
+    with open('Comparison/test13.txt', 'a') as file:
         file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
         s_dead_agents = "Number of dead agents: ", dead_agents
@@ -96,17 +96,17 @@ def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, a
         file.write(str(s_completed_tasks) + '\n' + str(s_dead_agents) + '\n' + str(s_makespan) + '\n' + str(
             s_average_service_time) + '\n' + str(s_cbs_calls))
 
-def single_run(index_run, random_seed=1234):
+def single_run(index_run, random_seed):
     tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, goal_locations, max_iter = parameters(random_seed)
 
     move_consumption = 0.5
-    wait_consumption = 0.5
+    wait_consumption = 0.01
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       goal_locations, a_star_max_iter=max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2500:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
         simulation.time_forward(tp)
 
     completed_tasks = tp.get_completed_tasks()
@@ -142,7 +142,7 @@ def single_run(index_run, random_seed=1234):
     average_service_time2 = service_time / len(tp.get_token()['completed_tasks_times'])
     cbs_calls2 = tp.get_chiamateCBS()
 
-    print_comparison("VersioneBase", completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, index_run)
+    print_comparison("VersioneBase", completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, index_run, random_seed)
 
     return completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2
 

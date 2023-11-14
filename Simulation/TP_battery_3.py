@@ -186,8 +186,8 @@ class TokenPassing(object):
             return True
 
         return False
-    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints, old_non_task_endpoint,
-                                      preem_non_task_endpoint):
+    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints,preem_non_task_endpoint):# old_non_task_endpoint,
+
         dist = -1
         res = -1
         for endpoint in self.non_task_endpoints:
@@ -196,8 +196,7 @@ class TokenPassing(object):
                 if ((endpoint not in self.token[
                     'occupied_non_task_endpoints'] and endpoint not in self.token['preemption_ends'])
                         or endpoint == tuple(agent_pos) or endpoint == tuple(
-                            old_non_task_endpoint) or endpoint == tuple(
-                            preem_non_task_endpoint)):
+                            preem_non_task_endpoint)): #or endpoint == tuple(old_non_task_endpoint)
                     if dist == -1:
                         dist = self.admissible_heuristic(endpoint, agent_pos)
                         res = endpoint
@@ -427,7 +426,7 @@ class TokenPassing(object):
                               station_name):
 
         # prima di resettare rimuovo l'ultimo elemento del path precedente dai finali
-        self.token['preemption_ends'].discard(tuple(self.token['agents_preemption'][agent_name][-1]))
+        #self.token['preemption_ends'].discard(tuple(self.token['agents_preemption'][agent_name][-1]))
         for s in self.token['charging_stations']:
             if self.token['charging_stations'][s]['booked'] == agent_name:
                 self.token['charging_stations'][s]['booked'] = False
@@ -458,7 +457,7 @@ class TokenPassing(object):
         #         self.token['agents_preemption'][agent_name].append([el['x'], el['y']])
 
         self.token['charging_stations'][station_name]['booked'] = agent_name
-        self.token['preemption_ends'].add(tuple(self.token['agents_preemption'][agent_name][-1]))
+        #self.token['preemption_ends'].add(tuple(self.token['agents_preemption'][agent_name][-1]))
 
     def use_preempted_path_to_station(self, agent_name):
 
@@ -870,8 +869,8 @@ class TokenPassing(object):
         # fino a quando non assegno un task oppure li ho esclusi tutti
         while not assigned and closest_non_task_endpoint != -1:
 
-            closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos, discarded_endpoints1, agent_pos,
-                                                                           self.token['agents_preemption'][agent_name][-1])
+            closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos, discarded_endpoints1, agent_pos)
+                                                                           #self.token['agents_preemption'][agent_name][-1])
 
             if closest_non_task_endpoint != -1:
                 endpoint_duration = self.admissible_heuristic(closest_non_task_endpoint, agent_pos)
