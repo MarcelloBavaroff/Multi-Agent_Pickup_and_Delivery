@@ -3,7 +3,7 @@ from Simulation.tasks_and_delays_maker import *
 
 
 class Simulation(object):
-    def __init__(self, tasks, agents, autonomies, charging_stations, move_consumption=1, wait_consumption=0.05):
+    def __init__(self, tasks, agents, autonomies, charging_stations, move_consumption=0.5, wait_consumption=0.05, move_heavy_consumption=1):
         random.seed(1234)
         self.tasks = tasks
         self.agents = agents
@@ -19,6 +19,7 @@ class Simulation(object):
         self.charging_stations = charging_stations
         self.move_consumption = move_consumption
         self.wait_consumption = wait_consumption
+        self.move_heavy_consumption = move_heavy_consumption
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]
@@ -64,8 +65,20 @@ class Simulation(object):
                 self.actual_paths[agent['name']].append(
                     {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
 
+                if agent['name'] in algorithm.get_token()['agents_to_tasks']:
+                    task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
+                else:
+                    task_name = None
+
+                if task_name in algorithm.get_token()['start_tasks_times'] \
+                        and algorithm.get_token()['agents_to_tasks'][agent['name']]['start'] not in \
+                        algorithm.get_token()['agents'][agent['name']]:
+
+                    self.batteries_level[agent['name']] = round(
+                        self.batteries_level[agent['name']] - self.move_heavy_consumption, 2)
+
                 # abbasso livello di batteria
-                if self.actual_paths[agent['name']][self.time]['x'] == \
+                elif self.actual_paths[agent['name']][self.time]['x'] == \
                         self.actual_paths[agent['name']][self.time - 1]['x'] and \
                         self.actual_paths[agent['name']][self.time]['y'] == \
                         self.actual_paths[agent['name']][self.time - 1]['y']:
@@ -92,7 +105,18 @@ class Simulation(object):
                                                          1:]
         # aggiorno il path dell'agente
         self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
-        if self.actual_paths[agent['name']][self.time]['x'] == \
+
+        if agent['name'] in algorithm.get_token()['agents_to_tasks']:
+            task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
+        else:
+            task_name = None
+
+        if task_name in algorithm.get_token()['start_tasks_times'] \
+                and algorithm.get_token()['agents_to_tasks'][agent['name']]['start'] not in algorithm.get_token()['agents'][agent['name']]:
+            self.batteries_level[agent['name']] = round(
+                self.batteries_level[agent['name']] - self.move_heavy_consumption, 2)
+
+        elif self.actual_paths[agent['name']][self.time]['x'] == \
                 self.actual_paths[agent['name']][self.time - 1]['x'] and \
                 self.actual_paths[agent['name']][self.time]['y'] == \
                 self.actual_paths[agent['name']][self.time - 1]['y']:
