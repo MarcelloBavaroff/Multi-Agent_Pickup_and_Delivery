@@ -9,8 +9,6 @@ from Simulation.tasks_and_delays_maker import *
 from Simulation.simulation_3 import Simulation
 from Simulation.TP_battery_1 import TokenPassing as TP1
 from Simulation.simulation_1 import Simulation as Sim1
-import subprocess
-import sys
 import ast
 
 

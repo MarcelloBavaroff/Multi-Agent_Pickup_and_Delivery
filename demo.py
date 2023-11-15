@@ -3,10 +3,10 @@ import yaml
 import json
 import os
 import random
-from Simulation.TP_battery_3 import TokenPassing
+from Simulation.TP_battery_1 import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_3 import Simulation
+from Simulation.simulation_1 import Simulation
 import subprocess
 import sys
 import ast
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = Simulation(tasks, agents, autonomies, charging_stations, 0.5, 0.1, 1)
+    simulation = Simulation(tasks, agents, autonomies, charging_stations, 0.1, 0.1, 0.1)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
