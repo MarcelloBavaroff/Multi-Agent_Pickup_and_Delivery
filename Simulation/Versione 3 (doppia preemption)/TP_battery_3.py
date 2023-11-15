@@ -668,44 +668,6 @@ class TokenPassing(object):
 
         return round(consumption, 2)
 
-    # restituisco 2 insiemi di agenti con cui ho conflitti: agenti intoccabili (caricano o già pickup)
-    # agenti eliminabili (non vanno a caricare)
-    # def find_conflicting_agents(self, my_path):
-    #
-    #     untouchable_agents = []
-    #     modifiable_agents = []
-    #     going_to_goal_agents = []
-    #
-    #     for agent in self.token['agents_to_tasks']:
-    #         # k = self.simulation.get_time()
-    #         # ottieni una lista di triple
-    #         path = self.token['agents'][agent]
-    #         for i in range(1, min(len(my_path) - 1, len(path) - 1)):
-    #
-    #             # controllo su vertex conflict e transition conflict
-    #             if (my_path[i]['x'] == path[i][0] and my_path[i]['y'] == path[i][1]) or \
-    #                     (my_path[i]['x'] == path[i + 1][0] and my_path[i]['y'] == path[i + 1][1] and
-    #                      my_path[i + 1]['x'] == path[i][0] and my_path[i + 1]['y'] == path[i][1]):
-    #
-    #                 if self.token['agents_to_tasks'][agent]['task_name'] in self.token['charging_stations']:
-    #                     untouchable_agents.append(agent)
-    #
-    #                 elif self.token['agents_to_tasks'][agent]['task_name'] == 'safe_idle':
-    #                     modifiable_agents.append(agent)
-    #
-    #                 else:
-    #                     # il secondo controllo da fare è se hanno già raggiungo lo start_task
-    #                     task_start = self.token['agents_to_tasks'][agent]['start']
-    #                     task_start = tuple(task_start)
-    #
-    #                     # se task_start è nel path (lista di tuple) rimanente da percorrere allora non ho fatto pickup
-    #                     if task_start in self.token['agents'][agent]:
-    #                         modifiable_agents.append(agent)
-    #                     else:
-    #                         going_to_goal_agents.append(agent)
-    #                 break
-    #
-    #     return untouchable_agents, modifiable_agents, going_to_goal_agents
     def reset_path_and_task(self, agent_name):
 
         # task: 'task_name', 'start', 'goal'
