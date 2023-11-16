@@ -3,8 +3,7 @@ from Simulation.tasks_and_delays_maker import *
 
 
 class Simulation(object):
-    def __init__(self, tasks, agents, autonomies, charging_stations, move_consumption=0.5, wait_consumption=0.05,
-                 move_heavy_consumption=1):
+    def __init__(self, tasks, agents, autonomies, charging_stations, move_consumption=0.5, wait_consumption=0.05, move_heavy_consumption=1):
         random.seed(1234)
         self.tasks = tasks
         self.agents = agents
@@ -106,7 +105,36 @@ class Simulation(object):
                 self.actual_paths[agent['name']].append(
                     {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
 
-                self.update_batteries(algorithm, agent, False)
+                self.update_batteries(algorithm, agent, update_actuale_path=False)
+                # # if agent['name'] in algorithm.get_token()['agents_to_tasks']:
+                # #     task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
+                # # else:
+                # #     task_name = None
+                # task_name = 'mabel'
+                #
+                # if task_name in algorithm.get_token()['start_tasks_times'] \
+                #         and algorithm.get_token()['agents_to_tasks'][agent['name']]['start'] not in \
+                #         algorithm.get_token()['agents'][agent['name']]:
+                #
+                #     self.batteries_level[agent['name']] = round(
+                #         self.batteries_level[agent['name']] - self.move_heavy_consumption, 2)
+                #
+                # # abbasso livello di batteria
+                # elif self.actual_paths[agent['name']][self.time]['x'] == \
+                #         self.actual_paths[agent['name']][self.time - 1]['x'] and \
+                #         self.actual_paths[agent['name']][self.time]['y'] == \
+                #         self.actual_paths[agent['name']][self.time - 1]['y']:
+                #
+                #     # self.batteries_level[agent['name']] -= self.wait_consumption
+                #     self.batteries_level[agent['name']] = round(
+                #         self.batteries_level[agent['name']] - self.wait_consumption, 2)
+                # else:
+                #     # self.batteries_level[agent['name']] -= self.move_consumption
+                #     self.batteries_level[agent['name']] = round(
+                #         self.batteries_level[agent['name']] - self.move_consumption, 2)
+                #
+                # if self.batteries_level[agent['name']] <= 0:
+                #     print("Batteria negativa")
 
     def update_actual_paths(self, agent, algorithm, x_new, y_new, current_agent_pos):
         self.agents_moved.add(agent['name'])
@@ -119,8 +147,44 @@ class Simulation(object):
                                                          1:]
         # aggiorno il path dell'agente
         self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
-
         self.update_batteries(algorithm, agent, True)
+        # # if agent['name'] in algorithm.get_token()['agents_to_tasks']:
+        # #     task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
+        # # else:
+        # #     task_name = None
+        # task_name = 'mabel'
+        #
+        # if task_name in algorithm.get_token()['start_tasks_times'] \
+        #         and algorithm.get_token()['agents_to_tasks'][agent['name']]['start'] not in algorithm.get_token()['agents'][agent['name']]:
+        #     self.batteries_level[agent['name']] = round(
+        #         self.batteries_level[agent['name']] - self.move_heavy_consumption, 2)
+        #
+        # elif self.actual_paths[agent['name']][self.time]['x'] == \
+        #         self.actual_paths[agent['name']][self.time - 1]['x'] and \
+        #         self.actual_paths[agent['name']][self.time]['y'] == \
+        #         self.actual_paths[agent['name']][self.time - 1]['y']:
+        #
+        #     # self.batteries_level[agent['name']] -= self.wait_consumption
+        #     self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] - self.wait_consumption, 2)
+        # else:
+        #     # self.batteries_level[agent['name']] -= self.move_consumption
+        #     self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] - self.move_consumption, 2)
+        #
+        #     # controllo che vado via dalla stazione di ricarica
+        #     if agent['name'] in algorithm.get_occupied_stations():
+        #
+        #         station_name = algorithm.get_occupied_stations()[agent['name']]
+        #         station_pos = tuple(algorithm.get_token()['charging_stations'][station_name]['pos'])
+        #         agent_old_pos = tuple((self.actual_paths[agent['name']][self.time - 1]['x'],
+        #                                self.actual_paths[agent['name']][self.time - 1]['y']))
+        #
+        #         if agent_old_pos == station_pos:
+        #             algorithm.set_free_station(algorithm.get_occupied_stations()[agent['name']])
+        #             algorithm.remove_occupied_station(agent['name'])
+        #
+        # if self.batteries_level[agent['name']] <= 0:
+        #     print("errore(agent path tolto)")
+
     def handle_loops(self, agents_to_move, algorithm):
 
         actual_pos = []
@@ -170,6 +234,10 @@ class Simulation(object):
                     x_new = algorithm.get_token()['agents'][agent['name']][1][0]
                     y_new = algorithm.get_token()['agents'][agent['name']][1][1]
 
+                    # in pratica non sapendo l'ordine in cui devo muovere gli agenti se becco
+                    # che uno occupa la posizione dove dovrei andare vengo rimesso in coda per
+                    # muovermi
+                    # PS secondo me potrei muoverli tutti assieme
                     if tuple([x_new, y_new]) not in self.agents_pos_now or \
                             tuple([x_new, y_new]) == tuple(tuple([current_agent_pos['x'], current_agent_pos['y']])):
                         self.update_actual_paths(agent, algorithm, x_new, y_new, current_agent_pos)

@@ -90,7 +90,7 @@ if __name__ == '__main__':
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
         simulation.time_forward(tp)
 
-    with open('Comparison1/test1.txt', 'a') as file:
+    with open('Comparisons/Comparison1/test1.txt', 'a') as file:
         file.write("\n\nVersione 3\n")
         completed_tasks = "Number of completed tasks: ", tp.get_completed_tasks(), "/", len(tasks)
         dead_agents = "Number of dead agents: ", len(tp.get_token()['dead_agents'])
@@ -132,8 +132,8 @@ if __name__ == '__main__':
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
         simulation.time_forward(tp)
 
-    with open('Comparison1/test1.txt', 'a') as file:
-        file.write("\n\nVersione 1\n")
+    with open('Comparisons/Comparison1/test1.txt', 'a') as file:
+        file.write("\n\nVersione Change\n")
         completed_tasks = "Number of completed tasks: ", tp.get_completed_tasks(), "/", len(tasks)
         dead_agents = "Number of dead agents: ", len(tp.get_token()['dead_agents'])
 
