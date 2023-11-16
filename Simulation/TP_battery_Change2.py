@@ -1,7 +1,3 @@
-"""
-Python implementation of Token Passing algorithms to solve MAPD problems with delays
-author: Giacomo Lodigiani (@Lodz97)
-"""
 import math
 from math import fabs
 import random
@@ -16,7 +12,7 @@ States = ['safe_idle', 'recharging', 'charge_complete']
 
 class TokenPassing(object):
     def __init__(self, agents, dimesions, obstacles, non_task_endpoints, charging_stations, simulation, goal_endpoints,
-                 a_star_max_iter=4000, new_recovery=False):
+                 a_star_max_iter=5000, new_recovery=False):
         random.seed(3)
         self.agents = agents
         self.dimensions = dimesions
@@ -316,15 +312,29 @@ class TokenPassing(object):
             print("Nessun endpoint assegnato")
             self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
-    # def get_random_close_cell(self, agent_pos, r):
-    #     while True:
-    #         cell = (
-    #             agent_pos[0] + random.choice(range(-r - 1, r + 1)), agent_pos[1] + random.choice(range(-r - 1, r + 1)))
-    #         if cell not in self.obstacles and cell not in self.token['path_ends'] and \
-    #                 cell not in self.token['occupied_non_task_endpoints'] \
-    #                 and cell not in self.get_agents_to_tasks_goals() \
-    #                 and 0 <= cell[0] < self.dimensions[0] and 0 <= cell[1] < self.dimensions[1]:
-    #             return cell
+    def go_to_closest_non_task_endpoint_before_dying(self, agent_name, agent_pos, all_idle_agents):
+
+        discarded_endpoints = set()
+        assigned = False
+        closest_non_task_endpoint = 0
+
+        # quando non ci sono endpoint disponibili restituisce -1 la funzione e quindi esco dal ciclo
+        while not assigned and closest_non_task_endpoint != -1:
+            closest_non_task_endpoint = self.get_closest_non_task_endpoint(agent_pos, discarded_endpoints)
+            if closest_non_task_endpoint != -1:
+
+                endpoint_cost = self.admissible_heuristic(closest_non_task_endpoint, agent_pos)
+                endpoint_consume = endpoint_cost * self.move_consumption
+                if endpoint_consume < self.simulation.get_batteries_level()[agent_name]:
+
+                    assigned = self.compute_real_path_to_endpoint(all_idle_agents, agent_name, agent_pos,
+                                                                  closest_non_task_endpoint, 0)
+                    if not assigned:
+                        discarded_endpoints.add(closest_non_task_endpoint)
+                    else:
+                        print("L'" + agent_name + " è andato in " + str(closest_non_task_endpoint) + " prima di morire")
+                else:
+                    discarded_endpoints.add(closest_non_task_endpoint)
 
     def set_task_name(self, agent_name, task_name):
         self.token['agents_to_tasks'][agent_name]['task_name'] = task_name
@@ -461,6 +471,7 @@ class TokenPassing(object):
                     print("Ricarica possibile dopo aver cambiato i percorsi degli altri agenti")
 
             if not find_feasible_station:
+                self.go_to_closest_non_task_endpoint_before_dying(agent_name, agent_pos, all_idle_agents)
                 self.check_if_dead(agent_pos, agent_name)
 
     # restituisce il nome della stazione più vicina a cui è possibile andare a caricarsi una
@@ -718,6 +729,7 @@ class TokenPassing(object):
             else:
                 return False
 
+    # ha apply path incluso
     def compute_real_path_to_endpoint(self, all_idle_agents, agent_name, agent_pos, closest_endpoint,
                                       consumption_to_station):
 
@@ -879,14 +891,6 @@ class TokenPassing(object):
                 del idle_agents[a]
         assigned = False
 
-        stazioni_occupate = 0
-        for s in self.token['charging_stations']:
-            if self.token['charging_stations'][s]['free'] != 'free':
-                stazioni_occupate += 1
-
-        if stazioni_occupate != len(self.token['occupied_charging_stations']):
-            print("errore(agent path tolto)")
-
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
             all_idle_agents = self.token['agents'].copy()
@@ -909,7 +913,6 @@ class TokenPassing(object):
                 # se c'erano effettivamente task disponibili ma non vengono assegnati allora ho poca batteria e devo caricarmi
                 if not assigned and len(available_tasks) > 0:
                     # print("Nessun task assegnato anche se c'erano")
-
                     if agent_name in self.token['occupied_charging_stations']:
                         print(agent_name, ' is already charging')
                         self.go_to_closest_non_task_endpoint_or_charge(agent_name, agent_pos, all_idle_agents,
