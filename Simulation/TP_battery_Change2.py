@@ -31,6 +31,7 @@ class TokenPassing(object):
         self.move_consumption = self.simulation.get_move_consumption()
         self.wait_consumption = self.simulation.get_wait_consumption()
         self.chiamateCBS = 0
+        self.chiamateCBS_recharge = 0
         self.init_token()
         # vedi sotto
 
@@ -81,6 +82,9 @@ class TokenPassing(object):
 
     def get_chiamateCBS(self):
         return self.chiamateCBS
+
+    def get_chiamateCBS_recharge(self):
+        return self.chiamateCBS_recharge
 
     def get_occupied_stations(self):
         return self.token['occupied_charging_stations']
@@ -651,6 +655,7 @@ class TokenPassing(object):
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
         path_to_station = self.search(cbs)
+        self.chiamateCBS_recharge += 1
 
         if not path_to_station:
             print("Solution not found to charging station for agent", agent_name, " idling at current position...")
@@ -685,6 +690,7 @@ class TokenPassing(object):
                           {}, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
         path_to_station = self.search(cbs)
+        self.chiamateCBS_recharge += 1
 
         if not path_to_station:
             return False, []

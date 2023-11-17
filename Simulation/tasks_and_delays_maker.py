@@ -1,10 +1,11 @@
 import random
 import math
 
-def gen_tasks(starts, goals, n_tasks, task_freq):
+def gen_tasks(starts, goals, n_tasks, task_freq, random_seed):
     arrival_time = 0
     tasks = []
 
+    random.seed(random_seed)
     for i in range(n_tasks):
         # Get the next probability value from Uniform(0,1)
         p = random.random()

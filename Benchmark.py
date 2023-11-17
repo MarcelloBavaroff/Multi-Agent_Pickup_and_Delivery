@@ -3,12 +3,12 @@ import yaml
 import json
 import os
 # import random
-from Simulation.TP_battery_3 import TokenPassing
+from Simulation.TP_battery_Preem import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_3 import Simulation
-from Simulation.TP_battery_1 import TokenPassing as TP1
-from Simulation.simulation_1 import Simulation as Sim1
+from Simulation.simulation_Preem import Simulation
+from Simulation.TP_battery_Change2 import TokenPassing as TP1
+from Simulation.simulation_Change2 import Simulation as Sim1
 import ast
 
 
@@ -81,25 +81,26 @@ def parameters(random_seed):
     return tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, param['map'][
         'goal_locations'], args.a_star_max_iter
 
-def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run, random_seed=1234):
-    with open('Comparisons/Comparison3/test13.txt', 'a') as file:
+def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run, cbs_calls_recharge,  random_seed=1234):
+    with open('Comparisons/Comparison5/test11.txt', 'a') as file:
         file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
         s_dead_agents = "Number of dead agents: ", dead_agents
         s_makespan = "Makespan: ", makespan
 
         s_average_service_time = "Average service time: ", average_service_time
+        s_cbs_calls_recharge = "Chiamate a CBS per stazioni di ricarica: ", cbs_calls_recharge
         s_cbs_calls = "Chiamate a CBS: ", cbs_calls
 
         file.write(str(s_completed_tasks) + '\n' + str(s_dead_agents) + '\n' + str(s_makespan) + '\n' + str(
-            s_average_service_time) + '\n' + str(s_cbs_calls))
+            s_average_service_time) + '\n' + str(s_cbs_calls_recharge) + '\n' + str(s_cbs_calls))
 
 def single_run(index_run, random_seed):
     tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, goal_locations, max_iter = parameters(random_seed)
 
-    move_consumption = 0.5
+    move_consumption = 1
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.01
+    wait_consumption = 0.1
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption, move_heavy_consumption)
@@ -118,8 +119,9 @@ def single_run(index_run, random_seed):
         service_time += tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a]
     average_service_time = service_time / len(tp.get_token()['completed_tasks_times'])
     cbs_calls = tp.get_chiamateCBS()
+    cbs_calls_recharge = tp.get_chiamateCBS_recharge()
 
-    print_comparison("VersionePreem", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run, random_seed)
+    print_comparison("VersionePreem", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run, cbs_calls_recharge,random_seed)
 
     # ---------------------------------------------------------
 
@@ -140,10 +142,11 @@ def single_run(index_run, random_seed):
         service_time += tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a]
     average_service_time2 = service_time / len(tp.get_token()['completed_tasks_times'])
     cbs_calls2 = tp.get_chiamateCBS()
+    cbs_calls_recharge2 = tp.get_chiamateCBS_recharge()
 
-    print_comparison("VersioneBase", completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, index_run, random_seed)
+    print_comparison("VersioneBase", completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, index_run, cbs_calls_recharge2, random_seed)
 
-    return completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2
+    return completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, cbs_calls_recharge, completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, cbs_calls_recharge2
 
 if __name__ == '__main__':
     # random.seed(1234)
@@ -161,17 +164,20 @@ if __name__ == '__main__':
     sum_service_time2 = 0
     sum_cbs_calls1 = 0
     sum_cbs_calls2 = 0
+    sum_cbs_calls_recharge1 = 0
+    sum_cbs_calls_recharge2 = 0
 
     for i in range(20):
         print("Run numero: ", i+1)
         random_seed = random.randint(0, 100000)
-        completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2 = single_run(i, random_seed)
+        completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, cbs_calls_recharge, completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, cbs_calls_recharge2 = single_run(i, random_seed)
 
         if completed_tasks == n_tasks:
             run_complete1 += 1
             sum_makespan1 += makespan
             sum_service_time1 += average_service_time
             sum_cbs_calls1 += cbs_calls
+            sum_cbs_calls_recharge1 += cbs_calls_recharge
         sum_completed_tasks1 += completed_tasks
 
         if completed_tasks2 == n_tasks2:
@@ -179,6 +185,7 @@ if __name__ == '__main__':
             sum_makespan2 += makespan2
             sum_service_time2 += average_service_time2
             sum_cbs_calls2 += cbs_calls2
+            sum_cbs_calls_recharge2 += cbs_calls_recharge2
         sum_completed_tasks2 += completed_tasks2
 
     print("\nVersionePreem")
@@ -186,11 +193,13 @@ if __name__ == '__main__':
     print("Numero medio di task completati: ", sum_completed_tasks1/20)
     print("Makespan medio: ", sum_makespan1/run_complete1)
     print("Tempo medio di servizio: ", sum_service_time1/run_complete1)
-    print("Chiamate a CBS: ", sum_cbs_calls1/run_complete1)
+    print("Chiamate a CBS per stazioni di ricarica: ", sum_cbs_calls_recharge1/run_complete1)
+    print("Chiamate a CBS totali: ", sum_cbs_calls1/run_complete1)
 
     print("\nVersioneBase")
     print("Numero di run completate: ", run_complete2)
     print("Numero medio di task completati: ", sum_completed_tasks2 / 20)
     print("Makespan medio: ", sum_makespan2/run_complete2)
     print("Tempo medio di servizio: ", sum_service_time2/run_complete2)
+    print("Chiamate a CBS per stazioni di ricarica: ", sum_cbs_calls_recharge2/run_complete2)
     print("Chiamate a CBS: ", sum_cbs_calls2/run_complete2)
