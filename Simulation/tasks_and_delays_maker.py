@@ -1,7 +1,8 @@
 import random
 import math
 
-def gen_tasks(starts, goals, n_tasks, task_freq, random_seed):
+
+def gen_tasks(starts, goals, n_tasks, task_freq, random_seed=1234):
     arrival_time = 0
     tasks = []
 
@@ -15,7 +16,7 @@ def gen_tasks(starts, goals, n_tasks, task_freq, random_seed):
         arrival_time = arrival_time + inter_arrival_time
         # Generate task
         single_task = {'start_time': int(arrival_time), 'start': random.choice(starts), 'goal': random.choice(goals),
-                      'task_name': 'task' + str(i)}
+                       'task_name': 'task' + str(i)}
         tasks.append(single_task)
         print(single_task)
 

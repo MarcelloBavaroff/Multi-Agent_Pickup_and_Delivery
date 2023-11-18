@@ -50,8 +50,6 @@ class TokenPassing(object):
         # 0,1 = coordinates, 2 = t when the agent will finish its recharging process
         self.token['charging_stations'] = {}
         self.token['occupied_charging_stations'] = {}
-        self.token['agent_at_end_path'] = []
-        self.token['agent_at_end_path_pos'] = []
         self.token['dead_agents'] = set()
 
         for a in self.agents:
@@ -129,28 +127,6 @@ class TokenPassing(object):
                         obstacles[(path[i][0], path[i][1], -k)] = name
 
         return obstacles
-
-    # def get_idle_obstacles_agents(self, agents_paths, time_start):
-    #     obstacles = set()
-    #     charging_stations_pos = set()
-    #
-    #     # for c in self.charging_stations:
-    #     #    charging_stations_pos.add(tuple(c['pos']))
-    #
-    #     for g in self.goal_endpoints:
-    #         obstacles.add(tuple(g))
-    #     for c in self.charging_stations:
-    #         obstacles.add(tuple(c['pos']))
-    #
-    #     for path in agents_paths:
-    #         # quelli nelle stazioni non li segno come ostacoli and tuple(path[0]) not in charging_stations_pos
-    #         if len(path) == 1:
-    #             obstacles.add((path[0][0], path[0][1]))
-    #         # presumo agenti che finiranno il loro percorso e si fermeranno? Quindi metto ultima
-    #         # loro posizione
-    #         if 1 < len(path) <= time_start:
-    #             obstacles.add((path[-1][0], path[-1][1]))
-    #     return obstacles
 
     def get_idle_obstacles_agents(self, agents_paths, time_start, agent_name):
         obstacles = set()
@@ -645,7 +621,6 @@ class TokenPassing(object):
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents, 0, agent_name)
         idle_obstacles_agents |= set(self.non_task_endpoints)
-
         idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos),
                                                          tuple(self.token['charging_stations'][station_name]['pos'])}
 
