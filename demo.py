@@ -78,11 +78,9 @@ if __name__ == '__main__':
         autonomies.append(round(random.uniform(80, 100), 2))
 
     print(autonomies)
-
     #autonomies = [88.32, 80.15, 80.98, 91.02, 81.92, 87.65, 99.62, 95.54, 82.78, 97.65, 81.06, 90.2, 95.29, 82.58, 89.13, 81.58, 97.27, 96.99, 95.43, 81.79]
 
     param['autonomies'] = autonomies
-
     # assegno i tasks generati così poi li vado a scrivere
     param['tasks'] = tasks
 
