@@ -3,10 +3,10 @@ import yaml
 import json
 import os
 # import random
-from Simulation.TP_battery_Preem import TokenPassing
+from Simulation.TP_battery_Queue import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_Preem import Simulation
+from Simulation.simulation_Queue import Simulation
 from Simulation.TP_battery_Change2 import TokenPassing as TP1
 from Simulation.simulation_Change2 import Simulation as Sim1
 import ast

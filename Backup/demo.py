@@ -2,10 +2,10 @@ import argparse
 import yaml
 import json
 import os
-from Simulation.TP_battery_Preem import TokenPassing
+from Simulation.TP_battery_Queue import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_Preem import Simulation
+from Simulation.simulation_Queue import Simulation
 import subprocess
 import sys
 
