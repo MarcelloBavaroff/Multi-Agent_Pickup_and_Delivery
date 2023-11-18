@@ -82,7 +82,7 @@ def parameters(random_seed):
         'goal_locations'], args.a_star_max_iter
 
 def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, index_run, cbs_calls_recharge,  random_seed=1234):
-    with open('Comparisons/Comparison5/test13.txt', 'a') as file:
+    with open('Comparisons/Comparison6/test13.txt', 'a') as file:
         file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
         s_dead_agents = "Number of dead agents: ", dead_agents
