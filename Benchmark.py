@@ -166,6 +166,8 @@ if __name__ == '__main__':
     sum_cbs_calls2 = 0
     sum_cbs_calls_recharge1 = 0
     sum_cbs_calls_recharge2 = 0
+    sum_dead_agents1 = 0
+    sum_dead_agents2 = 0
 
     for i in range(20):
         print("Run numero: ", i+1)
@@ -179,6 +181,7 @@ if __name__ == '__main__':
             sum_cbs_calls1 += cbs_calls
             sum_cbs_calls_recharge1 += cbs_calls_recharge
         sum_completed_tasks1 += completed_tasks
+        sum_dead_agents1 += dead_agents
 
         if completed_tasks2 == n_tasks2:
             run_complete2 += 1
@@ -187,10 +190,12 @@ if __name__ == '__main__':
             sum_cbs_calls2 += cbs_calls2
             sum_cbs_calls_recharge2 += cbs_calls_recharge2
         sum_completed_tasks2 += completed_tasks2
+        sum_dead_agents2 += dead_agents2
 
     print("\nVersionePreem")
     print("Numero di run completate: ", run_complete1)
     print("Numero medio di task completati: ", sum_completed_tasks1/20)
+    print("Numero medio di agenti morti: ", sum_dead_agents1/20)
     print("Makespan medio: ", sum_makespan1/run_complete1)
     print("Tempo medio di servizio: ", sum_service_time1/run_complete1)
     print("Chiamate a CBS per stazioni di ricarica: ", sum_cbs_calls_recharge1/run_complete1)
@@ -199,6 +204,7 @@ if __name__ == '__main__':
     print("\nVersioneBase")
     print("Numero di run completate: ", run_complete2)
     print("Numero medio di task completati: ", sum_completed_tasks2 / 20)
+    print("Numero medio di agenti morti: ", sum_dead_agents2 / 20)
     print("Makespan medio: ", sum_makespan2/run_complete2)
     print("Tempo medio di servizio: ", sum_service_time2/run_complete2)
     print("Chiamate a CBS per stazioni di ricarica: ", sum_cbs_calls_recharge2/run_complete2)
