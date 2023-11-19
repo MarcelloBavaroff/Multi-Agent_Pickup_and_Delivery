@@ -13,7 +13,7 @@ States = ['safe_idle', 'recharging', 'charge_complete']
 
 class TokenPassing(object):
     def __init__(self, agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation, goal_endpoints,
-                 a_star_max_iter=4000, new_recovery=False):
+                 a_star_max_iter=5000, new_recovery=False):
         random.seed(3)
         self.agents = agents
         self.dimensions = dimensions
@@ -68,15 +68,17 @@ class TokenPassing(object):
             # ogni stazione contiene un dizionario con posizione e booked
             self.token['charging_stations'][c['name']] = {}
             self.token['charging_stations'][c['name']]['pos'] = c['pos']
-            self.token['charging_stations'][c['name']]['booked'] = False
+            self.token['charging_stations'][c['name']]['queue_pos'] = c['queue']
+            # self.token['charging_stations'][c['name']]['booked'] = False
             self.token['charging_stations'][c['name']]['free'] = 'free'
+            self.token['charging_stations'][c['name']]['queue'] = 'free'
 
     # in teoria agenti in idle hanno il path verso la loro posizione attuale (se sta caricando no)
     def get_idle_agents(self):
         agents = {}
         for name, path in self.token['agents'].items():
             if len(path) == 1 and not (name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][name][
-                'task_name'] == 'recharging'):  # and name not in self.token['dead_agents']:
+                'task_name'] == 'recharging'):
                 agents[name] = path
         return agents
 
@@ -268,6 +270,7 @@ class TokenPassing(object):
                     self.token['agents'][agent_name].append([pos['x'], pos['y']])
 
                 self.token['agents_to_tasks'][agent_name]['task_name'] = 'recharging'
+                self.token['agents_preemption'][agent_name].append(self.token['charging_stations'][station_name]['queue_pos'])
 
             # se agente assegnato ad un task E le sue coordinate attuali sono = al suo goal
             # E il suo path attuale lungo 1 ed il suo task non è safe idle, recharging, charge_complete
@@ -318,18 +321,17 @@ class TokenPassing(object):
         for s in self.charging_stations:
             # stazione non assegnata a un altro agente
             if s['name'] not in self.token['agents_to_tasks'] and s['name'] not in discarded_stations \
-                    and (self.token['charging_stations'][s['name']]['free'] == 'free'
-                         or self.token['charging_stations'][s['name']]['free'] == agent_name):
+                    and (self.token['charging_stations'][s['name']]['free'] == 'free' or
+                         self.token['charging_stations'][s['name']]['free'] == agent_name or
+                         self.token['charging_stations'][s['name']]['queue'] == 'free' or
+                         self.token['charging_stations'][s['name']]['queue'] == agent_name):
 
                 estimated_to_station_duration = self.admissible_heuristic(task_final_pos, s['pos'])
                 estimated_total_duration = task_duration + estimated_to_station_duration
-                # estimated_arrival_time = estimated_total_duration + self.simulation.get_time()
 
                 # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
-                if ((self.token['charging_stations'][s['name']]['booked'] == False or
-                     self.token['charging_stations'][s['name']]['booked'] == agent_name) and
-                        estimated_total_duration * self.move_consumption < self.simulation.get_batteries_level()[
-                            agent_name]):
+                if (estimated_total_duration * self.move_consumption < self.simulation.get_batteries_level()[
+                    agent_name]):
 
                     if dist_min == -1:
                         dist_min = estimated_to_station_duration
@@ -354,14 +356,14 @@ class TokenPassing(object):
         for s in self.charging_stations:
             # stazione non assegnata a un altro agente
             if s['name'] not in ongoing_tasks and s['name'] not in discarded_stations and (
-                    self.token['charging_stations'][s['name']]['free'] == 'free'
-                    or self.token['charging_stations'][s['name']]['free'] == agent_name):
-                estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
+                    self.token['charging_stations'][s['name']]['free'] == 'free' or
+                    self.token['charging_stations'][s['name']]['free'] == agent_name or
+                    self.token['charging_stations'][s['name']]['queue'] == 'free' or
+                    self.token['charging_stations'][s['name']]['queue'] == agent_name):
 
-                if ((self.token['charging_stations'][s['name']]['booked'] is False or
-                     self.token['charging_stations'][s['name']]['booked'] == agent_name) and
-                        estimated_station_cost * self.move_consumption < self.simulation.get_batteries_level()[
-                            agent_name]):
+                estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
+                if (estimated_station_cost * self.move_consumption < self.simulation.get_batteries_level()[
+                    agent_name]):
 
                     if dist_min == -1:
                         dist_min = estimated_station_cost
@@ -421,10 +423,10 @@ class TokenPassing(object):
 
         # prima di resettare rimuovo l'ultimo elemento del path precedente dai finali
         # self.token['preemption_ends'].discard(tuple(self.token['agents_preemption'][agent_name][-1]))
-        for s in self.token['charging_stations']:
-            if self.token['charging_stations'][s]['booked'] == agent_name:
-                self.token['charging_stations'][s]['booked'] = False
-                break
+        # for s in self.token['charging_stations']:
+        #     if self.token['charging_stations'][s]['booked'] == agent_name:
+        #         self.token['charging_stations'][s]['booked'] = False
+        #         break
 
         self.token['agents_preemption'][agent_name] = []
         if path1 is not None:
@@ -444,13 +446,12 @@ class TokenPassing(object):
         el = path_preemption[-1]
         for i in range(estimated_time_to_recharge):
             self.token['agents_preemption'][agent_name].append([el['x'], el['y']])
-
         # if path_endpoint is not None:
         #     self.token['agents_preemption'][agent_name] = self.token['agents_preemption'][agent_name][:-1]
         #     for el in path_endpoint:
         #         self.token['agents_preemption'][agent_name].append([el['x'], el['y']])
 
-        self.token['charging_stations'][station_name]['booked'] = agent_name
+        # self.token['charging_stations'][station_name]['booked'] = agent_name
         # self.token['preemption_ends'].add(tuple(self.token['agents_preemption'][agent_name][-1]))
 
     def use_preempted_path_to_station(self, agent_name):
@@ -481,7 +482,7 @@ class TokenPassing(object):
                                                      'goal': tuple([last_step[0], last_step[1]]),
                                                      'predicted_cost': len(self.token['agents'][agent_name]) - 1}
 
-        self.token['charging_stations'][station_name]['booked'] = False
+        # self.token['charging_stations'][station_name]['booked'] = False
 
         self.token['occupied_charging_stations'][agent_name] = station_name
         self.token['charging_stations'][station_name]['free'] = agent_name
@@ -536,7 +537,8 @@ class TokenPassing(object):
     def compute_real_path_station(self, agent_name, agent_pos, all_idle_agents, station_name, time_start,
                                   task_total_consumption, battery):
 
-        moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents_preemption'], time_start, agent_name)
+        moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents_preemption'], time_start,
+                                                                   agent_name)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents, time_start, agent_name)
         idle_obstacles_agents |= set(self.non_task_endpoints)
         idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos),
@@ -607,7 +609,6 @@ class TokenPassing(object):
                     consumption += self.move_consumption
 
         return round(consumption, 2)
-
 
     # se hai un percorso di ricarica, ma non hai la batteria uguale al minimo per andarci controlli
     # se anche al turno dopo avrai un percorso valido per andare. Se si cambi il preemption path con quello
@@ -707,10 +708,10 @@ class TokenPassing(object):
         assigned = False
         discarded_endpoints1 = set()
 
-        for s in self.token['charging_stations']:
-            if self.token['charging_stations'][s]['booked'] == agent_name:
-                self.token['charging_stations'][s]['booked'] = False
-                break
+        # for s in self.token['charging_stations']:
+        #     if self.token['charging_stations'][s]['booked'] == agent_name:
+        #         self.token['charging_stations'][s]['booked'] = False
+        #         break
 
         closest_non_task_endpoint = 1
         # fino a quando non assegno un task oppure li ho esclusi tutti
@@ -803,10 +804,10 @@ class TokenPassing(object):
         discarded_tasks = {}
 
         # annullo la prenotazione precedente
-        for s in self.token['charging_stations']:
-            if self.token['charging_stations'][s]['booked'] == agent_name:
-                self.token['charging_stations'][s]['booked'] = False
-                break
+        # for s in self.token['charging_stations']:
+        #     if self.token['charging_stations'][s]['booked'] == agent_name:
+        #         self.token['charging_stations'][s]['booked'] = False
+        #         break
 
         # fino a quando non assegno un task oppure li ho esclusi tutti
         while not assigned and len(discarded_tasks) < len(available_tasks):
@@ -925,6 +926,21 @@ class TokenPassing(object):
         if stazioni_occupate != len(self.token['occupied_charging_stations']):
             print("errore(agent path tolto)")
 
+
+    # sposta l'agente dalla stazione di ricarica alla coda, se questa è libera
+    def move_to_queue(self, agent_name):
+        station_name = self.token['occupied_charging_stations'][agent_name]
+        queue_pos = self.token['charging_stations'][station_name]['queue_pos']
+
+        # se la coda è libera ci vado e segno che ora sono io ad occuparla
+        if self.token['charging_stations'][station_name]['queue'] == 'free':
+            self.token['agents'][agent_name].append(queue_pos)
+            self.token['charging_stations'][station_name]['queue'] = agent_name
+            self.token['charging_stations'][station_name]['free'] = 'free'
+
+
+
+
     def time_forward(self):
 
         self.update_completed_tasks()
@@ -949,7 +965,6 @@ class TokenPassing(object):
             if len(available_tasks) > 0:
 
                 assigned = self.choose_task_and_station(agent_name, agent_pos, all_idle_agents, available_tasks)
-
                 if not assigned and len(available_tasks) > 0:
                     # questo implica che in passato qualcuno ha già calcolato il mio path per andare a caricarmi
                     # self.decide_if_charge(agent_name, agent_pos, all_idle_agents, idle_agents)
@@ -958,7 +973,7 @@ class TokenPassing(object):
                         print(agent_name, ' is already charging')
                         if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):
                             print(agent_name, "non ha trovato un NON-T.E. appropriato")
-
+                            self.move_to_queue(agent_name)
                     else:
                         if agent_name in self.token['agents_preemption'] and len(
                                 self.token['agents'][agent_name]) != len(
