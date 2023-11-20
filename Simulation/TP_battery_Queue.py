@@ -462,6 +462,8 @@ class TokenPassing(object):
         #         self.token['charging_stations'][s]['booked'] = False
         #         break
 
+        if self.token['charging_stations'][station_name]['charger'] == 'free':
+
         self.token['agents_preemption'][agent_name] = []
         if path1 is not None:
             for el in path1:
@@ -979,8 +981,12 @@ class TokenPassing(object):
         if self.token['charging_stations'][station_name]['extra_slot'] == 'free':
             self.token['agents'][agent_name].append(queue_pos)
             self.token['charging_stations'][station_name]['extra_slot'] = agent_name
-            self.token['charging_stations'][station_name]['charger'] = 'free'
             del self.token['occupied_charging_stations'][agent_name]
+
+            if self.token['charging_stations'][station_name]['in_queuu'] is not None:
+                self.token['charging_stations'][station_name]['charger'] = self.token['charging_stations'][station_name]['in_queuu']
+            else:
+                self.token['charging_stations'][station_name]['charger'] = 'free'
 
     def time_forward(self):
 
