@@ -69,7 +69,8 @@ class Simulation(object):
                     if agent_old_pos == station_pos:
                         #algorithm.set_free_station(algorithm.get_occupied_stations()[agent['name']])
                         algorithm.remove_occupied_station(agent['name'])
-                        #gestire il cambio di agente che occuperà la stazione
+                        #gestire il cambio di agente che occuperà la stazione, in realtà non serve perché dovrebbe
+                        #essere già stato fatto in use_preemption_path che mi elimina se ero in una stazione o extra_slot
 
         if self.batteries_level[agent['name']] <= 0:
             print("Batteria negativa")
