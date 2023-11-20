@@ -409,20 +409,20 @@ class TokenPassing(object):
 
     # viene chiamata all'interno di apply_path, quindi c'è un percorso verso qualcosa che non è
     # una stazione di ricarica, quello avviene in apply_path_preemption
-    def update_charging_queue(self, agent_name):
-
-        if agent_name in self.token['occupied_charging_stations']:
-            station_name = self.token['occupied_charging_stations'][agent_name]
-
-            if self.token['charging_stations'][station_name]['in_queue'] is not None:
-                # cambio l'agente che occupa la stazione
-                del self.token['occupied_charging_stations'][agent_name]
-                agent_in_queue = self.token['charging_stations'][station_name]['in_queue']
-                self.token['occupied_charging_stations'][agent_in_queue] = station_name
-
-
-                self.token['charging_stations'][station_name]['in_queue'] = None
-
+    # def update_charging_queue(self, agent_name):
+    #
+    #     if agent_name in self.token['occupied_charging_stations']:
+    #         station_name = self.token['occupied_charging_stations'][agent_name]
+    #
+    #         if self.token['charging_stations'][station_name]['in_queue'] is not None:
+    #             # cambio l'agente che occupa la stazione
+    #             del self.token['occupied_charging_stations'][agent_name]
+    #             agent_in_queue = self.token['charging_stations'][station_name]['in_queue']
+    #             self.token['occupied_charging_stations'][agent_in_queue] = station_name
+    #
+    #
+    #             self.token['charging_stations'][station_name]['in_queue'] = None
+    #
 
 
 
@@ -434,8 +434,6 @@ class TokenPassing(object):
     def apply_path(self, agent_name, agent_pos, path1, path2, task_name, start, goal, predicted_cost):
         last_step = path2[-1]
         self.update_ends(agent_pos)
-
-
 
         self.token['agents_to_tasks'][agent_name] = {'task_name': task_name, 'start': start,
                                                      'goal': goal, 'predicted_cost': predicted_cost}
@@ -452,17 +450,32 @@ class TokenPassing(object):
         for el in path2:
             self.token['agents'][agent_name].append([el['x'], el['y']])
 
-    def apply_path_preemption(self, agent_name, path1, path2, path_preemption, estimated_time_to_recharge,
-                              station_name):
-
+    def apply_path_preemption(self, agent_name, path1, path2, path_preemption, estimated_time_to_recharge, station_name):
         # prima di resettare rimuovo l'ultimo elemento del path precedente dai finali
         # self.token['preemption_ends'].discard(tuple(self.token['agents_preemption'][agent_name][-1]))
         # for s in self.token['charging_stations']:
         #     if self.token['charging_stations'][s]['booked'] == agent_name:
         #         self.token['charging_stations'][s]['booked'] = False
         #         break
-
         if self.token['charging_stations'][station_name]['charger'] == 'free':
+            self.token['charging_stations'][station_name]['charger'] = agent_name
+
+        elif (self.token['charging_stations'][station_name]['extra_slot'] == 'free' and not
+            self.token['charging_stations'][station_name]['charger'] == agent_name):
+            self.token['charging_stations'][station_name]['in_queue'] = agent_name
+        # else: vuol dire che ero già io il charger o il in_queue
+
+        # bisogna gestire il caso in cui avevo prenotato un'altra stazione
+        for s in self.charging_stations:
+            if s != station_name:
+                if self.token['charging_stations'][s]['in_queue'] == agent_name:
+                    self.token['charging_stations'][s]['in_queue'] = None
+                    break
+                elif self.token['charging_stations'][s]['charger'] == agent_name:
+                    self.token['charging_stations'][s]['charger'] = 'free'
+                    break
+
+
 
         self.token['agents_preemption'][agent_name] = []
         if path1 is not None:
@@ -521,17 +534,11 @@ class TokenPassing(object):
         # self.token['charging_stations'][station_name]['booked'] = False
 
         # se sto andando diretto alla stazione perché non è occupata da nessuno
-        if self.token['charging_stations'][station_name]['charger'] == 'free'\
-                or self.token['charging_stations'][station_name]['charger'] == agent_name:
-            self.token['charging_stations'][station_name]['charger'] = agent_name
+        # in teoria se ci sto andando l'ho bloccata io, quindi == free penso da togliere
+        if self.token['charging_stations'][station_name]['charger'] == agent_name:
             # questo ufficializza che ci sto andando, non solo l'ho prenotata
             self.token['occupied_charging_stations'][agent_name] = station_name
 
-        # se sto andando alla stazione perché c'è un extra slot libero
-        else:
-            self.token['charging_stations'][station_name]['in_queue'] = agent_name
-
-        #self.token['charging_stations'][station_name]['charger'] = agent_name
 
     def compute_real_path(self, agent_name, agent_pos, closest_task, all_idle_agents,
                           predicted_consumption_to_station):
