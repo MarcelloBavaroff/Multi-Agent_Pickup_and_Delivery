@@ -596,15 +596,15 @@ class TokenPassing(object):
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption += self.wait_consumption
                 else:
-                    consumption = round(consumption + self.move_consumption, 2)
+                    consumption += self.move_consumption
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption += self.wait_consumption
                 else:
-                    consumption = round(consumption + self.move_consumption, 2)
+                    consumption += self.move_consumption
 
         return round(consumption, 2)
 
@@ -748,7 +748,7 @@ class TokenPassing(object):
                             while nearest_station is not None and assigned is False:
 
                                 # ora controllo pure il percorso reale della stazione
-                                path_station, to_station_consumption, to_station_duration = self.compute_real_path_station(
+                                path_station, total_real_consumption, to_station_duration = self.compute_real_path_station(
                                     agent_name, closest_non_task_endpoint, all_idle_agents, nearest_station,
                                     real_duration_endpoint - 1, endpoint_consumption,
                                     self.simulation.get_batteries_level()[agent_name])
@@ -759,7 +759,7 @@ class TokenPassing(object):
                                     # discarded_endpoints2 = set()
                                     # assigned = False
                                     assigned = True
-                                    total_real_consumption = endpoint_consumption + to_station_consumption
+                                    #total_real_consumption = endpoint_consumption + to_station_consumption
                                     estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                                   self.simulation.get_batteries_level()[
                                                                       agent_name] + total_real_consumption) / 10
@@ -838,7 +838,7 @@ class TokenPassing(object):
                         while nearest_station is not None and assigned is False:
 
                             # ora controllo pure il percorso reale della stazione
-                            path_station, to_station_consumption, to_station_duration = self.compute_real_path_station(
+                            path_station, total_real_consumption, to_station_duration = self.compute_real_path_station(
                                 agent_name, closest_task[1], all_idle_agents, nearest_station, total_real_duration - 1,
                                 task_total_consumption, self.simulation.get_batteries_level()[agent_name])
 
@@ -848,7 +848,7 @@ class TokenPassing(object):
                                 # discarded_endpoints = set()
                                 # assigned = False
                                 assigned = True
-                                total_real_consumption = task_total_consumption + to_station_consumption
+                                #total_real_consumption = task_total_consumption + to_station_consumption
 
                                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                               self.simulation.get_batteries_level()[
