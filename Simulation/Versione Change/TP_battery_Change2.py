@@ -754,18 +754,17 @@ class TokenPassing(object):
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
-                    consumption += self.wait_consumption
+                    consumption = round(consumption + self.wait_consumption, 2)
                 else:
-                    consumption += self.move_consumption
+                    consumption = round(consumption + self.move_consumption, 2)
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
-                    consumption += self.wait_consumption
+                    consumption = round(consumption + self.wait_consumption, 2)
                 else:
-                    consumption += self.move_consumption
+                    consumption = round(consumption + self.move_consumption, 2)
 
         return round(consumption, 2)
-
     # restituisco 2 insiemi di agenti con cui ho conflitti: agenti intoccabili (caricano o già pickup)
     # agenti eliminabili (non vanno a caricare)
     def find_conflicting_agents(self, my_path):

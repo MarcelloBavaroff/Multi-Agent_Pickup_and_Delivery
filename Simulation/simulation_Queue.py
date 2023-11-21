@@ -3,7 +3,8 @@ from Simulation.tasks_and_delays_maker import *
 
 
 class Simulation(object):
-    def __init__(self, tasks, agents, autonomies, charging_stations, move_consumption=1, wait_consumption=0.05, move_heavy_consumption=1):
+    def __init__(self, tasks, agents, autonomies, charging_stations, move_consumption=1, wait_consumption=0.05,
+                 move_heavy_consumption=1):
         random.seed(1234)
         self.tasks = tasks
         self.agents = agents
@@ -67,10 +68,10 @@ class Simulation(object):
                                            self.actual_paths[agent['name']][self.time - 1]['y']))
 
                     if agent_old_pos == station_pos:
-                        #algorithm.set_free_station(algorithm.get_occupied_stations()[agent['name']])
+                        # algorithm.set_free_station(algorithm.get_occupied_stations()[agent['name']])
                         algorithm.remove_occupied_station(agent['name'])
-                        #gestire il cambio di agente che occuperà la stazione, in realtà non serve perché dovrebbe
-                        #essere già stato fatto in use_preemption_path che mi elimina se ero in una stazione o extra_slot
+                        # gestire il cambio di agente che occuperà la stazione, in realtà non serve perché dovrebbe
+                        # essere già stato fatto in use_preemption_path che mi elimina se ero in una stazione o extra_slot
 
         if self.batteries_level[agent['name']] <= 0:
             print("Batteria negativa")
@@ -110,6 +111,7 @@ class Simulation(object):
                     {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
 
                 self.update_batteries(algorithm, agent, update_actuale_path=False)
+                #questo è per quando l'agente è in idle e si calcola il percorso di ricarica per il turno dopo
                 algorithm.get_token()['agents_preemption'][agent['name']] = algorithm.get_token()['agents_preemption'][
                                                                                 agent['name']][1:]
 
@@ -129,9 +131,7 @@ class Simulation(object):
 
         self.update_batteries(algorithm, agent, update_actuale_path=True)
 
-
     def handle_loops(self, agents_to_move, algorithm):
-
         actual_pos = []
         for a in agents_to_move:
             actual_pos.append(tuple(algorithm.get_token()['agents'][a['name']][0]))

@@ -596,15 +596,15 @@ class TokenPassing(object):
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
-                    consumption += self.wait_consumption
+                    consumption = round(consumption + self.wait_consumption, 2)
                 else:
-                    consumption += self.move_consumption
+                    consumption = round(consumption + self.move_consumption, 2)
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
-                    consumption += self.wait_consumption
+                    consumption = round(consumption + self.wait_consumption, 2)
                 else:
-                    consumption += self.move_consumption
+                    consumption = round(consumption + self.move_consumption, 2)
 
         return round(consumption, 2)
 
