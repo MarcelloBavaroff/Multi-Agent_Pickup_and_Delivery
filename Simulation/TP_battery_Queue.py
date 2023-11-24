@@ -471,13 +471,18 @@ class TokenPassing(object):
         # else: vuol dire che ero già io il charger o il in_queue
 
         # bisogna gestire il caso in cui avevo prenotato un'altra stazione
+        # modifico la vecchia stazione dov'ero prenotato
         for s in self.charging_stations:
             if s['name'] != station_name:
                 if self.token['charging_stations'][s['name']]['in_queue'] == agent_name:
                     self.token['charging_stations'][s['name']]['in_queue'] = None
                     break
-                elif self.token['charging_stations'][s['name']]['charger'] == agent_name:
+                elif self.token['charging_stations'][s['name']]['charger'] == agent_name and self.token['charging_stations'][s['name']]['in_queue'] is None:
                     self.token['charging_stations'][s['name']]['charger'] = 'free'
+                    break
+                elif self.token['charging_stations'][s['name']]['charger'] == agent_name and self.token['charging_stations'][s['name']]['in_queue'] is not None:
+                    self.token['charging_stations'][s['name']]['charger'] = self.token['charging_stations'][s['name']]['in_queue']
+                    self.token['charging_stations'][s['name']]['in_queue'] = None
                     break
 
         self.token['agents_preemption'][agent_name] = []
