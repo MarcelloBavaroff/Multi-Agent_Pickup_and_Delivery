@@ -714,7 +714,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # tra quanti timestep dovrei caricarmi
-                if self.early_arrival_control(nearest_station, time_start + to_station_duration,
+                if self.early_arrival_control(nearest_station, time_start + to_station_duration - 1,
                                               estimated_time_to_recharge, agent_name):
                     assigned = True
                     if first_time:
@@ -780,7 +780,8 @@ class TokenPassing(object):
                 agent_charger = self.token['charging_stations'][nearest_station]['charger']
                 station_pos = self.token['charging_stations'][nearest_station]['pos']
 
-                for i in range(arrival_time, min(arrival_time + estimated_time_to_recharge,
+                # +1 perché range esclude l'ultimo elemento
+                for i in range(arrival_time, min(arrival_time + estimated_time_to_recharge + 1,
                                                  len(self.token['agents_preemption'][agent_charger]))):
                     if station_pos in self.token['agents_preemption'][agent_charger][i]:
                         return False
@@ -853,7 +854,7 @@ class TokenPassing(object):
 
                                     estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
-                                    if self.early_arrival_control(nearest_station, real_duration_endpoint - 1 + len(
+                                    if self.early_arrival_control(nearest_station, real_duration_endpoint - 2 + len(
                                             path_station[agent_name]), estimated_time_to_recharge, agent_name):
                                         assigned = True
                                         self.apply_path(agent_name, agent_pos, None, path_endpoint[agent_name],
@@ -951,9 +952,9 @@ class TokenPassing(object):
                                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
                                 # tra quanti timestep dovrei caricarmi
                                 # total_real_duration = total_real_duration + estimated_time_to_recharge + to_station_duration - 1
-
+                                # -2 per una questione di indici
                                 if self.early_arrival_control(nearest_station,
-                                                              total_real_duration - 1 + len(path_station[agent_name]),
+                                                              total_real_duration - 2 + len(path_station[agent_name]),
                                                               estimated_time_to_recharge, agent_name):
                                     assigned = True
                                     if agent_name not in self.token['agents_to_tasks']:
