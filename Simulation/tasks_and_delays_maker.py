@@ -2,7 +2,7 @@ import random
 import math
 
 
-def gen_tasks(starts, goals, n_tasks, task_freq, random_seed=1234):
+def gen_tasks(starts, goals, n_tasks, task_freq, random_seed=1236):
     arrival_time = 0
     tasks = []
 
