@@ -143,6 +143,12 @@ class TokenPassing(object):
             obstacles.add(tuple(c['pos']))
             obstacles.add(tuple(c['queue']))
 
+        if agent_name in self.token['occupied_charging_stations']:
+            station_name = self.token['occupied_charging_stations'][agent_name]
+            obstacles.remove(tuple(self.token['charging_stations'][station_name]['pos']))
+            # potrei mettere controllo su extra slot, ma in realtà lo vede nei moving obstacles
+            obstacles.remove(tuple(self.token['charging_stations'][station_name]['queue_pos']))
+
         for agent in agents_paths:
 
             if agent != agent_name:
@@ -454,9 +460,10 @@ class TokenPassing(object):
         #         break
         if self.token['charging_stations'][station_name]['charger'] == 'free':
             self.token['charging_stations'][station_name]['charger'] = agent_name
-
+        #però ammetti che io arrivo prima..?
         elif (self.token['charging_stations'][station_name]['extra_slot'] == 'free' and not
         self.token['charging_stations'][station_name]['charger'] == agent_name):
+            # considero che se fossero occupati entrambi non avrei scelto la stazione
             self.token['charging_stations'][station_name]['in_queue'] = agent_name
 
         elif (self.token['charging_stations'][station_name]['charger'] == agent_name and
