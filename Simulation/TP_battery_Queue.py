@@ -143,8 +143,10 @@ class TokenPassing(object):
             obstacles.add(tuple(c['pos']))
             obstacles.add(tuple(c['queue']))
 
-        if agent_name in self.token['occupied_charging_stations']:
-            station_name = self.token['occupied_charging_stations'][agent_name]
+        station_name = self.token['occupied_charging_stations'][agent_name]
+        if agent_name in self.token['occupied_charging_stations'] and self.token['agents'][agent_name][0] == \
+                self.token['charging_stations'][station_name]['pos']:
+
             obstacles.remove(tuple(self.token['charging_stations'][station_name]['pos']))
             # potrei mettere controllo su extra slot, ma in realtà lo vede nei moving obstacles
             obstacles.remove(tuple(self.token['charging_stations'][station_name]['queue_pos']))
