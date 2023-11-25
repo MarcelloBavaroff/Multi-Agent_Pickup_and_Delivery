@@ -778,7 +778,7 @@ class TokenPassing(object):
                     station_pos = self.token['charging_stations'][nearest_station]['pos']
                     for i in range(arrival_time, min(arrival_time + estimated_time_to_recharge,
                                                      len(self.token['agents_preemption'][agent_in_queue]))):
-                        if station_pos in self.token['agents_preemption'][agent_in_queue][i]:
+                        if station_pos == self.token['agents_preemption'][agent_in_queue][i]:
                             return False
             # se non sono io charger vuol dire che o sono io quello in coda o non esiste
             else:
@@ -788,7 +788,7 @@ class TokenPassing(object):
                 # +1 perché range esclude l'ultimo elemento
                 for i in range(arrival_time, min(arrival_time + estimated_time_to_recharge + 1,
                                                  len(self.token['agents_preemption'][agent_charger]))):
-                    if station_pos in self.token['agents_preemption'][agent_charger][i]:
+                    if station_pos == self.token['agents_preemption'][agent_charger][i]:
                         return False
 
         return True
