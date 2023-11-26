@@ -33,6 +33,9 @@ def read_tasks():
 
 if __name__ == '__main__':
     # random.seed(1234)
+    #seed = random.randint(0, 100000)
+    seed = 5503
+    print("Seed: ", seed)
     parser = argparse.ArgumentParser()
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
                         default=5000, type=int)
@@ -70,7 +73,7 @@ if __name__ == '__main__':
     else:
         # Generate random tasks and delays
         tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'],
-                          param['n_tasks'], param['task_freq'])
+                          param['n_tasks'], param['task_freq'], random_seed=seed)
 
     # batteria casuale tra 80 e 100
     autonomies = []
@@ -88,7 +91,7 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = Simulation(tasks, agents, autonomies, charging_stations, 1, 0.1, 1)
+    simulation = Simulation(tasks, agents, autonomies, charging_stations, 0.1, 0.1, 0.1)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:

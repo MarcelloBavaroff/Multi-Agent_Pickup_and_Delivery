@@ -143,4 +143,4 @@ map:
           name: station6
           queue: [ 4, 0 ]
 n_tasks: 500
-task_freq: 5
+task_freq: 0.3

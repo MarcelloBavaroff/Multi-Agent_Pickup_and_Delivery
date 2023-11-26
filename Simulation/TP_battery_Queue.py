@@ -850,14 +850,9 @@ class TokenPassing(object):
 
                         # real_cost è in step, non in consumo
                         # previous consumption in questo caso lo faccio valere come il costo per andare a caricarmi
-                        path_endpoint, real_duration_endpoint = self.compute_real_path_to_endpoint(all_idle_agents,
-                                                                                                   agent_name,
-                                                                                                   agent_pos,
-                                                                                                   closest_non_task_endpoint,
-                                                                                                   consumption_to_station_heuristic,
-                                                                                                   0,
-                                                                                                   self.simulation.get_batteries_level()[
-                                                                                                       agent_name])
+                        path_endpoint, real_duration_endpoint = self.compute_real_path_to_endpoint(all_idle_agents, agent_name, agent_pos, closest_non_task_endpoint,
+                                                                                                   consumption_to_station_heuristic, 0,  self.simulation.get_batteries_level()[agent_name])
+
                         # endpoint_consumption = self.predicted_consumption(path_endpoint[agent_name])
                         # se il path reale (con consumo euristico verso la stazione) non esiste non ha senso andare avanti
                         if path_endpoint is not False:
