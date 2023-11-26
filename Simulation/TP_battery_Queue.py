@@ -581,6 +581,13 @@ class TokenPassing(object):
             station_name = self.token['occupied_charging_stations'][agent_name]
             idle_obstacles_agents.remove(tuple(self.token['charging_stations'][station_name]['queue_pos']))
 
+            in_queue_agent = self.token['charging_stations'][station_name]['in_queue']
+            if in_queue_agent is not None:
+                index_last_el = len(self.token['agents_preemption'][in_queue_agent]) - 1
+                last_el = self.token['agents_preemption'][in_queue_agent][index_last_el]
+                del moving_obstacles_agents[(last_el[0], last_el[1], -index_last_el)]
+                del moving_obstacles_agents[(last_el[0], last_el[1], index_last_el)]
+
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
@@ -663,6 +670,14 @@ class TokenPassing(object):
                 self.token['charging_stations'][self.token['occupied_charging_stations'][agent_name]]['pos']:
             station_name = self.token['occupied_charging_stations'][agent_name]
             idle_obstacles_agents.remove(tuple(self.token['charging_stations'][station_name]['queue_pos']))
+
+            in_queue_agent = self.token['charging_stations'][station_name]['in_queue']
+            if in_queue_agent is not None:
+                index_last_el = len(self.token['agents_preemption'][in_queue_agent]) - 1
+                last_el = self.token['agents_preemption'][in_queue_agent][index_last_el]
+                del moving_obstacles_agents[(last_el[0], last_el[1], -index_last_el)]
+                del moving_obstacles_agents[(last_el[0], last_el[1], index_last_el)]
+
 
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_endpoint}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, moving_obstacles_agents,

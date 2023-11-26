@@ -67,6 +67,12 @@ class Animation:
             x, y = c['pos'][0], c['pos'][1]
             self.patches.append(Circle((x, y), 0.4, facecolor='blue', edgecolor='black'))
 
+        if len(map["map"]["charging_stations"][0].keys()) > 2:
+            for c in map["map"]["charging_stations"]:
+                x, y = c['queue'][0], c['queue'][1]
+                self.patches.append(Rectangle((x - 0.5, y - 0.5), 1, 1, facecolor='red', edgecolor='black'))
+
+
         task_colors = np.random.rand(len(map["tasks"]), 3)
         for t, i in zip(map["tasks"], range(len(map["tasks"]))):
             x_s, y_s = t['start'][0], t['start'][1]

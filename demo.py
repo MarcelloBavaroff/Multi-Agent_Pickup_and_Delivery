@@ -33,8 +33,8 @@ def read_tasks():
 
 if __name__ == '__main__':
     # random.seed(1234)
-    #seed = random.randint(0, 100000)
-    seed = 5503
+    seed = random.randint(0, 100000)
+    #seed = 5503
     print("Seed: ", seed)
     parser = argparse.ArgumentParser()
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
