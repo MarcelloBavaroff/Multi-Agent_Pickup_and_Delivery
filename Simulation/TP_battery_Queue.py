@@ -894,8 +894,7 @@ class TokenPassing(object):
                                     else:
                                         discarded_stations.add(nearest_station)
                                         nearest_station, consumption_to_station_heuristic = self.search_nearest_available_station(
-                                            endpoint_duration, closest_non_task_endpoint, agent_name,
-                                            discarded_stations)
+                                            endpoint_duration, closest_non_task_endpoint, agent_name, discarded_stations)
 
                                 else:
                                     discarded_stations.add(nearest_station)
@@ -991,13 +990,11 @@ class TokenPassing(object):
                         # se alla fine del ciclo delle stazioni non ho assegnato il task allora lo metto tra gli scartati
                         if not assigned:
                             discarded_tasks[closest_task_name] = closest_task
-
                     # qui non metto break perché magari ci sono task con distanza euristica minore, ma che hanno
                     # percorso reale meno esoso in termini di risorse
                     else:
                         discarded_tasks[closest_task_name] = closest_task
                         # prima qui era break
-
                 else:
                     break
             else:
