@@ -571,6 +571,7 @@ class TokenPassing(object):
                 self.token['charging_stations'][self.token['occupied_charging_stations'][agent_name]]['pos']:
             station_name = self.token['occupied_charging_stations'][agent_name]
             idle_obstacles_agents.remove(tuple(self.token['charging_stations'][station_name]['queue_pos']))
+            idle_obstacles_agents.add(tuple(self.token['charging_stations'][station_name]['pos']))
 
             in_queue_agent = self.token['charging_stations'][station_name]['in_queue']
             if in_queue_agent is not None and not self.token['agents_preemption'][in_queue_agent][0] == \
@@ -663,6 +664,7 @@ class TokenPassing(object):
                 self.token['charging_stations'][self.token['occupied_charging_stations'][agent_name]]['pos']:
             station_name = self.token['occupied_charging_stations'][agent_name]
             idle_obstacles_agents.remove(tuple(self.token['charging_stations'][station_name]['queue_pos']))
+            idle_obstacles_agents.add(tuple(self.token['charging_stations'][station_name]['pos']))
 
             in_queue_agent = self.token['charging_stations'][station_name]['in_queue']
             # se l'agente in coda non è nell'extra slot
@@ -1049,6 +1051,12 @@ class TokenPassing(object):
 
         # se la coda è libera ci vado e segno che ora sono io ad occuparla
         if self.token['charging_stations'][station_name]['extra_slot'] == 'free':
+
+
+
+
+
+
             self.token['agents'][agent_name].append(queue_pos)
             self.token['charging_stations'][station_name]['extra_slot'] = agent_name
             del self.token['occupied_charging_stations'][agent_name]
