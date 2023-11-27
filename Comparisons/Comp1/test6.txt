@@ -1,0 +1,161 @@
+
+
+0 VersionePreem 77440
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1507)
+('Average service time: ', 563.406)
+('Chiamate a CBS per stazioni di ricarica: ', 14964)
+('Chiamate a CBS: ', 16151)
+
+1 VersionePreem 7986
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1494)
+('Average service time: ', 552.232)
+('Chiamate a CBS per stazioni di ricarica: ', 15175)
+('Chiamate a CBS: ', 16359)
+
+2 VersionePreem 21251
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1610)
+('Average service time: ', 570.886)
+('Chiamate a CBS per stazioni di ricarica: ', 17205)
+('Chiamate a CBS: ', 18388)
+
+3 VersionePreem 75067
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1458)
+('Average service time: ', 542.074)
+('Chiamate a CBS per stazioni di ricarica: ', 14497)
+('Chiamate a CBS: ', 15659)
+
+4 VersionePreem 82657
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1382)
+('Average service time: ', 543.958)
+('Chiamate a CBS per stazioni di ricarica: ', 13008)
+('Chiamate a CBS: ', 14157)
+
+5 VersionePreem 77820
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1559)
+('Average service time: ', 550.24)
+('Chiamate a CBS per stazioni di ricarica: ', 16561)
+('Chiamate a CBS: ', 17734)
+
+6 VersionePreem 32454
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1532)
+('Average service time: ', 578.21)
+('Chiamate a CBS per stazioni di ricarica: ', 15584)
+('Chiamate a CBS: ', 16750)
+
+7 VersionePreem 53357
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1636)
+('Average service time: ', 566.312)
+('Chiamate a CBS per stazioni di ricarica: ', 17771)
+('Chiamate a CBS: ', 18967)
+
+8 VersionePreem 67328
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1489)
+('Average service time: ', 557.418)
+('Chiamate a CBS per stazioni di ricarica: ', 15079)
+('Chiamate a CBS: ', 16278)
+
+9 VersionePreem 95708
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1603)
+('Average service time: ', 546.498)
+('Chiamate a CBS per stazioni di ricarica: ', 17647)
+('Chiamate a CBS: ', 18814)
+
+10 VersionePreem 88210
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1507)
+('Average service time: ', 556.376)
+('Chiamate a CBS per stazioni di ricarica: ', 15481)
+('Chiamate a CBS: ', 16645)
+
+11 VersionePreem 84116
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1459)
+('Average service time: ', 531.022)
+('Chiamate a CBS per stazioni di ricarica: ', 15260)
+('Chiamate a CBS: ', 16433)
+
+12 VersionePreem 93134
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1523)
+('Average service time: ', 550.88)
+('Chiamate a CBS per stazioni di ricarica: ', 15842)
+('Chiamate a CBS: ', 17031)
+
+13 VersionePreem 51041
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1463)
+('Average service time: ', 559.124)
+('Chiamate a CBS per stazioni di ricarica: ', 14561)
+('Chiamate a CBS: ', 15722)
+
+14 VersionePreem 62070
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1455)
+('Average service time: ', 554.752)
+('Chiamate a CBS per stazioni di ricarica: ', 14530)
+('Chiamate a CBS: ', 15673)
+
+15 VersionePreem 24417
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1682)
+('Average service time: ', 557.078)
+('Chiamate a CBS per stazioni di ricarica: ', 18638)
+('Chiamate a CBS: ', 19847)
+
+16 VersionePreem 93877
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1592)
+('Average service time: ', 555.396)
+('Chiamate a CBS per stazioni di ricarica: ', 17134)
+('Chiamate a CBS: ', 18279)
+
+17 VersionePreem 58768
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1788)
+('Average service time: ', 573.4)
+('Chiamate a CBS per stazioni di ricarica: ', 20843)
+('Chiamate a CBS: ', 21979)
+
+18 VersionePreem 65806
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1548)
+('Average service time: ', 557.018)
+('Chiamate a CBS per stazioni di ricarica: ', 16295)
+('Chiamate a CBS: ', 17469)
+
+19 VersionePreem 45753
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1472)
+('Average service time: ', 566.536)
+('Chiamate a CBS per stazioni di ricarica: ', 14367)
+('Chiamate a CBS: ', 15551)
