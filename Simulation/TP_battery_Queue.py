@@ -573,7 +573,8 @@ class TokenPassing(object):
             idle_obstacles_agents.remove(tuple(self.token['charging_stations'][station_name]['queue_pos']))
 
             in_queue_agent = self.token['charging_stations'][station_name]['in_queue']
-            if in_queue_agent is not None:
+            if in_queue_agent is not None and not self.token['agents_preemption'][in_queue_agent][0] == \
+                                                  self.token['charging_stations'][station_name]['queue_pos']:
                 index_last_el = len(self.token['agents_preemption'][in_queue_agent]) - 1
                 last_el = self.token['agents_preemption'][in_queue_agent][index_last_el]
                 del moving_obstacles_agents[(last_el[0], last_el[1], -index_last_el)]
@@ -657,13 +658,15 @@ class TokenPassing(object):
         idle_obstacles_agents |= set(self.non_task_endpoints)
         idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos), closest_endpoint}
 
+        # se sono l'agente in carica che ha appena finito e sono ancora lì
         if agent_name in self.token['occupied_charging_stations'] and self.token['agents'][agent_name][0] == \
                 self.token['charging_stations'][self.token['occupied_charging_stations'][agent_name]]['pos']:
             station_name = self.token['occupied_charging_stations'][agent_name]
             idle_obstacles_agents.remove(tuple(self.token['charging_stations'][station_name]['queue_pos']))
 
             in_queue_agent = self.token['charging_stations'][station_name]['in_queue']
-            if in_queue_agent is not None:
+            # se l'agente in coda non è nell'extra slot
+            if in_queue_agent is not None and not self.token['agents_preemption'][in_queue_agent][0] == self.token['charging_stations'][station_name]['queue_pos']:
                 index_last_el = len(self.token['agents_preemption'][in_queue_agent]) - 1
                 last_el = self.token['agents_preemption'][in_queue_agent][index_last_el]
                 del moving_obstacles_agents[(last_el[0], last_el[1], -index_last_el)]

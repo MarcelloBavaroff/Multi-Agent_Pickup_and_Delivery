@@ -33,8 +33,8 @@ def read_tasks():
 
 if __name__ == '__main__':
     # random.seed(1234)
-    seed = random.randint(0, 100000)
-    #seed = 5503
+    #seed = random.randint(0, 100000)
+    seed = 52230
     print("Seed: ", seed)
     parser = argparse.ArgumentParser()
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
@@ -43,7 +43,6 @@ if __name__ == '__main__':
     parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
 
     args = parser.parse_args()
-
     with open(os.path.join(RoothPath.get_root(), 'config.json'), 'r') as json_file:
         config = json.load(json_file)
     args.param = os.path.join(RoothPath.get_root(), os.path.join(config['input_path'], config['input_name']))
@@ -63,7 +62,8 @@ if __name__ == '__main__':
 
     non_task_endpoints = param['map']['non_task_endpoints']
     if type(non_task_endpoints[0]) is not tuple:
-        non_task_endpoints = [tuple((non_task_endpoint[0], non_task_endpoint[1])) for non_task_endpoint in non_task_endpoints]
+        non_task_endpoints = [tuple((non_task_endpoint[0], non_task_endpoint[1])) for non_task_endpoint in
+                              non_task_endpoints]
 
     agents = param['agents']
     charging_stations = param['map']['charging_stations']
@@ -79,14 +79,12 @@ if __name__ == '__main__':
     autonomies = []
     for i in range(len(agents)):
         autonomies.append(round(random.uniform(80, 100), 2))
-
     print(autonomies)
-    #autonomies = [88.32, 80.15, 80.98, 91.02, 81.92, 87.65, 99.62, 95.54, 82.78, 97.65, 81.06, 90.2, 95.29, 82.58, 89.13, 81.58, 97.27, 96.99, 95.43, 81.79]
+    # autonomies = [88.32, 80.15, 80.98, 91.02, 81.92, 87.65, 99.62, 95.54, 82.78, 97.65, 81.06, 90.2, 95.29, 82.58, 89.13, 81.58, 97.27, 96.99, 95.43, 81.79]
 
     param['autonomies'] = autonomies
     # assegno i tasks generati così poi li vado a scrivere
     param['tasks'] = tasks
-
     with open(args.param + config['visual_postfix'], 'w') as param_file:
         yaml.safe_dump(param, param_file)
 

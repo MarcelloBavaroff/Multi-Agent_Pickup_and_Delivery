@@ -3,10 +3,10 @@ import yaml
 import json
 import os
 # import random
-from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
+from Simulation.TP_battery_Queue import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.Versione_Preemption.simulation_Preem import Simulation
+from Simulation.simulation_Queue import Simulation
 import ast
 
 
@@ -60,7 +60,7 @@ def parameters(seed):
 
 def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls,
                      index_run, cbs_calls_recharge, random_seed=1234):
-    with open('Comparisons/Comp1/test6.txt', 'a') as file:
+    with open('Comparisons/Comp1/test1.txt', 'a') as file:
         file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
         s_dead_agents = "Number of dead agents: ", dead_agents
