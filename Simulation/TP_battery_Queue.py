@@ -772,9 +772,9 @@ class TokenPassing(object):
                                                    nearest_station)
                 else:
                     discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
-
                     nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                         agent_pos, agent_name, discarded_stations)
+                    path_station = False
 
         return assigned
 
