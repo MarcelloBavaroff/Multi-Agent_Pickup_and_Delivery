@@ -3,10 +3,10 @@ import yaml
 import json
 import os
 # import random
-from Simulation.TP_battery_Queue import TokenPassing
+from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_Queue import Simulation
+from Simulation.Versione_Change.simulation_Change2 import Simulation
 import ast
 
 
@@ -60,7 +60,7 @@ def parameters(seed):
 
 def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls,
                      index_run, cbs_calls_recharge, random_seed=1234):
-    with open('Comparisons/Comp1/test2.txt', 'a') as file:
+    with open('Comparisons/Comp2/change/test8.txt', 'a') as file:
         file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
         s_dead_agents = "Number of dead agents: ", dead_agents
@@ -77,9 +77,9 @@ def single_run(index_run, random_seed):
     tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, goal_locations, max_iter = parameters(
         random_seed)
 
-    move_consumption = 0.5
+    move_consumption = 1
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.5
+    wait_consumption = 1
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption,
@@ -101,7 +101,7 @@ def single_run(index_run, random_seed):
     cbs_calls = tp.get_chiamateCBS()
     cbs_calls_recharge = tp.get_chiamateCBS_recharge()
 
-    print_comparison("VersioneQueue", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls,
+    print_comparison("VersioneChange", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls,
                      index_run, cbs_calls_recharge, random_seed)
     # ---------------------------------------------------------
 
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    with open('Comparisons/seeds2.txt', 'r') as file:
+    with open('Comparisons/seeds1.txt', 'r') as file:
         # inserisci ogni riga in una lista
         seeds = file.read()
     seeds = seeds.split(" ")
