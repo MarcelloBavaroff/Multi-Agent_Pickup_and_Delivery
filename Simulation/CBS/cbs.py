@@ -91,7 +91,10 @@ class Constraints(object):
             "EC: " + str([str(ec) for ec in self.edge_constraints])
 
 class Environment(object):
-    def __init__(self, dimension, agents, obstacles, moving_obstacles=None, a_star_max_iter=-1):
+    #passo charging_stations come dizionario
+    def __init__(self, dimension, agents, obstacles, charging_stations=None, moving_obstacles=None, a_star_max_iter=-1):
+        if charging_stations is None:
+            charging_stations = dict()
         if moving_obstacles is None:
             moving_obstacles = []
         self.dimension = dimension
@@ -109,6 +112,8 @@ class Environment(object):
 
         self.a_star = AStar(self)
 
+        self.charging_stations = charging_stations
+
     def get_neighbors(self, state):
         neighbors = []
 
@@ -118,22 +123,21 @@ class Environment(object):
             neighbors.append(n)
         # Up action
         n = State(state.time + 1, Location(state.location.x, state.location.y+1))
-        if self.state_valid(n) and self.transition_valid(state, n):
+        if self.state_valid(n) and self.transition_valid(state, n) and self.extra_slot_valid(state, n):
             neighbors.append(n)
         # Down action
         n = State(state.time + 1, Location(state.location.x, state.location.y-1))
-        if self.state_valid(n) and self.transition_valid(state, n):
+        if self.state_valid(n) and self.transition_valid(state, n) and self.extra_slot_valid(state, n):
             neighbors.append(n)
         # Left action
         n = State(state.time + 1, Location(state.location.x-1, state.location.y))
-        if self.state_valid(n) and self.transition_valid(state, n):
+        if self.state_valid(n) and self.transition_valid(state, n) and self.extra_slot_valid(state, n):
             neighbors.append(n)
         # Right action
         n = State(state.time + 1, Location(state.location.x+1, state.location.y))
-        if self.state_valid(n) and self.transition_valid(state, n):
+        if self.state_valid(n) and self.transition_valid(state, n) and self.extra_slot_valid(state, n):
             neighbors.append(n)
         return neighbors
-
 
     def get_first_conflict(self, solution):
         max_t = max([len(plan) for plan in solution.values()])
@@ -217,7 +221,21 @@ class Environment(object):
         if tup_1 in self.moving_obstacles and tup_2 in self.moving_obstacles and \
                 self.moving_obstacles[tup_1] == self.moving_obstacles[tup_2]:
             return False
+
         return EdgeConstraint(state_1.time, state_1.location, state_2.location) not in self.constraints.edge_constraints
+
+    def extra_slot_valid(self, state_old, state_new):
+
+        # se posizione nuova è un extra_slot, ci puoi arrivare solo dalla stazione di ricarica corrispondente
+        tup_new = [state_new.location.x, state_new.location.y]
+        for s in self.charging_stations:
+            if tup_new == s['queue']:
+                if state_old.location.x == s['pos'][0] and state_old.location.y == s['pos'][1]:
+                    return True
+                else:
+                    return False
+
+        return True
 
     def is_solution(self, agent_name):
         pass
@@ -225,7 +243,6 @@ class Environment(object):
     def admissible_heuristic(self, state, agent_name):
         goal = self.agent_dict[agent_name]["goal"]
         return fabs(state.location.x - goal.location.x) + fabs(state.location.y - goal.location.y)
-
 
     def is_at_goal(self, state, agent_name):
         goal_state = self.agent_dict[agent_name]["goal"]

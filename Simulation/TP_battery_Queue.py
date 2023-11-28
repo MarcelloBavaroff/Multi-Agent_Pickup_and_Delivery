@@ -582,7 +582,7 @@ class TokenPassing(object):
                 del moving_obstacles_agents[(last_el[0], last_el[1], index_last_el)]
 
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
-        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
+        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, self.charging_stations,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
         path_to_task_start = self.search(cbs)
@@ -602,7 +602,7 @@ class TokenPassing(object):
             idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos), tuple(closest_task[1])}
 
             agent = {'name': agent_name, 'start': closest_task[0], 'goal': closest_task[1]}
-            env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
+            env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, self.charging_stations,
                               moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
             cbs = CBS(env)
             path_to_task_goal = self.search(cbs)
@@ -631,7 +631,7 @@ class TokenPassing(object):
                                                          tuple(self.token['charging_stations'][station_name]['pos'])}
         # cambiare goal
         agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_stations'][station_name]['pos']}
-        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
+        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, self.charging_stations,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
         path_to_station = self.search(cbs)
@@ -676,7 +676,7 @@ class TokenPassing(object):
 
 
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_endpoint}
-        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, moving_obstacles_agents,
+        env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, self.charging_stations, moving_obstacles_agents,
                           a_star_max_iter=self.a_star_max_iter)
         cbs = CBS(env)
         path_to_non_task_endpoint = self.search(cbs)
