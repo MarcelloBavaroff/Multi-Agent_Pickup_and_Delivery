@@ -82,7 +82,7 @@ def single_run(index_run, random_seed, file_name):
 
     move_consumption = 0.5
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.1
+    wait_consumption = 0.01
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption,
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     sum_cbs_calls1 = 0
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
-    file_name = 'Comparisons/Comp1/test5.txt'
+    file_name = 'Comparisons/Comp1/test6.txt'
 
     with open('Comparisons/seeds2.txt', 'r') as file:
         # inserisci ogni riga in una lista
@@ -173,7 +173,7 @@ if __name__ == '__main__':
     print("Chiamate a CBS totali: ", sum_cbs_calls1 / run_complete1)
 
     with open(file_name, 'a') as file:
-        file.write("Numero di run completate: " + str(run_complete1) + "\n")
+        file.write("\n\n" + "Numero di run completate: " + str(run_complete1) + "\n")
         file.write("Numero medio di task completati: " + str(sum_completed_tasks1 / 20) + "\n")
         file.write("Numero medio di agenti morti: " + str(sum_dead_agents1 / 20) + "\n")
         file.write("Makespan medio: " + str(sum_makespan1 / run_complete1) + "\n")

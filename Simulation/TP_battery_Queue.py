@@ -14,7 +14,7 @@ States = ['safe_idle', 'recharging', 'charge_complete']
 class TokenPassing(object):
     def __init__(self, agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation, goal_endpoints,
                  a_star_max_iter=5000, new_recovery=False):
-        random.seed(3)
+        random.seed(5)
         self.agents = agents
         self.dimensions = dimensions
         self.obstacles = set(obstacles)
@@ -263,9 +263,9 @@ class TokenPassing(object):
                 station_name = self.token['agents_to_tasks'][agent_name]['task_name']
                 # self.token['agents_to_tasks'][agent_name]['task_name'] = 'recharging'
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
-                                              self.simulation.get_batteries_level()[
-                                                  agent_name]) / 10
-                estimated_time_to_recharge = round(estimated_time_to_recharge, 2)
+                                              self.simulation.get_batteries_level()[agent_name]) / 10
+
+                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
@@ -754,7 +754,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name] + total_real_consumption) / 10
-                estimated_time_to_recharge = round(estimated_time_to_recharge, 2)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # tra quanti timestep dovrei caricarmi
@@ -879,7 +879,7 @@ class TokenPassing(object):
                                     estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                                   self.simulation.get_batteries_level()[
                                                                       agent_name] + total_real_consumption) / 10
-                                    estimated_time_to_recharge = round(estimated_time_to_recharge, 2)
+                                    estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
 
                                     estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
@@ -967,7 +967,7 @@ class TokenPassing(object):
                                 # total_real_consumption = task_total_consumption + to_station_consumption
                                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                               self.simulation.get_batteries_level()[agent_name] + total_real_consumption) / 10
-                                estimated_time_to_recharge = round(estimated_time_to_recharge, 2)
+                                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
                                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
                                 # tra quanti timestep dovrei caricarmi
                                 # total_real_duration = total_real_duration + estimated_time_to_recharge + to_station_duration - 1

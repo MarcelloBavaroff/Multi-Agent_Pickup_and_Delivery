@@ -5,7 +5,7 @@ from Simulation.tasks_and_delays_maker import *
 class Simulation(object):
     def __init__(self, tasks, agents, autonomies, charging_stations, move_consumption=1, wait_consumption=0.05,
                  move_heavy_consumption=1):
-        random.seed(1234)
+        random.seed(5)
         self.tasks = tasks
         self.agents = agents
         self.time = 0
@@ -99,7 +99,6 @@ class Simulation(object):
                 algorithm.get_token()['agents_preemption'][agent['name']] = algorithm.get_token()['agents_preemption'][
                                                                                 agent['name']][1:]
 
-                # self.batteries_level[agent['name']] += 10
                 self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + 10, 2)
 
                 # se carica completa lo metto in idle?
