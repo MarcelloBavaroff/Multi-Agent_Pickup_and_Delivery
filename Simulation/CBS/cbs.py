@@ -92,7 +92,7 @@ class Constraints(object):
 
 class Environment(object):
     #passo charging_stations come dizionario
-    def __init__(self, dimension, agents, obstacles, charging_stations=None, moving_obstacles=None, a_star_max_iter=-1):
+    def __init__(self, dimension, agents, obstacles, moving_obstacles=None, a_star_max_iter=-1, charging_stations=None):
         if charging_stations is None:
             charging_stations = dict()
         if moving_obstacles is None:
