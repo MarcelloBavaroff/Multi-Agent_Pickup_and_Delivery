@@ -3,17 +3,18 @@ import yaml
 import json
 import os
 # import random
-from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
+from Simulation.TP_battery_Queue import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.Versione_Change.simulation_Change2 import Simulation
-import ast
+from Simulation.simulation_Queue import Simulation
+
 
 
 def parameters(seed):
     random.seed(seed)
     parser = argparse.ArgumentParser()
-    parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm', default=5000, type=int)
+    parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
+                        default=5000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=1, type=int)  # default=1
     parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
     args = parser.parse_args()
@@ -58,9 +59,10 @@ def parameters(seed):
     return tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, param['map'][
         'goal_locations'], args.a_star_max_iter
 
+
 def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls,
-                     index_run, cbs_calls_recharge, random_seed=1234):
-    with open('Comparisons/Comp2/change/test8.txt', 'a') as file:
+                     index_run, cbs_calls_recharge, random_seed=1234, file_name='Comparisons/Comp1/test3.txt'):
+    with open(file_name, 'a') as file:
         file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
         s_dead_agents = "Number of dead agents: ", dead_agents
@@ -73,13 +75,14 @@ def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, a
         file.write(str(s_completed_tasks) + '\n' + str(s_dead_agents) + '\n' + str(s_makespan) + '\n' + str(
             s_average_service_time) + '\n' + str(s_cbs_calls_recharge) + '\n' + str(s_cbs_calls))
 
-def single_run(index_run, random_seed):
+
+def single_run(index_run, random_seed, file_name):
     tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, goal_locations, max_iter = parameters(
         random_seed)
 
-    move_consumption = 1
+    move_consumption = 0.5
     move_heavy_consumption = move_consumption
-    wait_consumption = 1
+    wait_consumption = 0.1
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption,
@@ -101,8 +104,8 @@ def single_run(index_run, random_seed):
     cbs_calls = tp.get_chiamateCBS()
     cbs_calls_recharge = tp.get_chiamateCBS_recharge()
 
-    print_comparison("VersioneChange", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls,
-                     index_run, cbs_calls_recharge, random_seed)
+    print_comparison("VersioneQueue", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls,
+                     index_run, cbs_calls_recharge, random_seed, file_name)
     # ---------------------------------------------------------
 
     # # Simulate
@@ -127,6 +130,7 @@ def single_run(index_run, random_seed):
     # print_comparison("VersioneBase", completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, index_run, cbs_calls_recharge2, random_seed)
     return completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, cbs_calls_recharge  # , completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, cbs_calls_recharge2
 
+
 if __name__ == '__main__':
 
     run_complete1 = 0
@@ -136,17 +140,19 @@ if __name__ == '__main__':
     sum_cbs_calls1 = 0
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
+    file_name = 'Comparisons/Comp1/test5.txt'
 
-    with open('Comparisons/seeds1.txt', 'r') as file:
+    with open('Comparisons/seeds2.txt', 'r') as file:
         # inserisci ogni riga in una lista
         seeds = file.read()
     seeds = seeds.split(" ")
 
     for i in range(20):
         print("Run numero: ", i + 1)
-        #random_seed = random.randint(0, 100000)
+        # random_seed = random.randint(0, 100000)
         random_seed = int(seeds[i])
-        completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, cbs_calls_recharge = single_run(i, random_seed)
+        completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, cbs_calls_recharge = single_run(
+            i, random_seed, file_name)
 
         if completed_tasks == n_tasks:
             run_complete1 += 1
@@ -157,7 +163,7 @@ if __name__ == '__main__':
         sum_completed_tasks1 += completed_tasks
         sum_dead_agents1 += dead_agents
 
-    #print("\nVersioneChange")
+    # print("\nVersioneChange")
     print("Numero di run completate: ", run_complete1)
     print("Numero medio di task completati: ", sum_completed_tasks1 / 20)
     print("Numero medio di agenti morti: ", sum_dead_agents1 / 20)
@@ -166,3 +172,11 @@ if __name__ == '__main__':
     print("Chiamate a CBS per stazioni di ricarica: ", sum_cbs_calls_recharge1 / run_complete1)
     print("Chiamate a CBS totali: ", sum_cbs_calls1 / run_complete1)
 
+    with open(file_name, 'a') as file:
+        file.write("Numero di run completate: " + str(run_complete1) + "\n")
+        file.write("Numero medio di task completati: " + str(sum_completed_tasks1 / 20) + "\n")
+        file.write("Numero medio di agenti morti: " + str(sum_dead_agents1 / 20) + "\n")
+        file.write("Makespan medio: " + str(sum_makespan1 / run_complete1) + "\n")
+        file.write("Tempo medio di servizio: " + str(sum_service_time1 / run_complete1) + "\n")
+        file.write("Chiamate a CBS per stazioni di ricarica: " + str(sum_cbs_calls_recharge1 / run_complete1) + "\n")
+        file.write("Chiamate a CBS totali: " + str(sum_cbs_calls1 / run_complete1) + "\n")
