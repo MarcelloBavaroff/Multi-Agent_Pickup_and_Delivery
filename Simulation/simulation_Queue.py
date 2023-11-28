@@ -64,6 +64,7 @@ class Simulation(object):
 
                     station_name = algorithm.get_occupied_stations()[agent['name']]
                     station_pos = tuple(algorithm.get_token()['charging_stations'][station_name]['pos'])
+                    queue_pos = tuple(algorithm.get_token()['charging_stations'][station_name]['queue_pos'])
                     agent_old_pos = tuple((self.actual_paths[agent['name']][self.time - 1]['x'],
                                            self.actual_paths[agent['name']][self.time - 1]['y']))
 
@@ -72,6 +73,8 @@ class Simulation(object):
                         algorithm.remove_occupied_station(agent['name'])
                         # gestire il cambio di agente che occuperà la stazione, in realtà non serve perché dovrebbe
                         # essere già stato fatto in use_preemption_path che mi elimina se ero in una stazione o extra_slot
+                    elif agent_old_pos == queue_pos:
+                        algorithm.get_token()['charging_stations'][station_name]['extra_slot'] = 'free'
 
         if self.batteries_level[agent['name']] <= 0:
             print("Batteria negativa")

@@ -1052,20 +1052,25 @@ class TokenPassing(object):
         # se la coda è libera ci vado e segno che ora sono io ad occuparla
         if self.token['charging_stations'][station_name]['extra_slot'] == 'free':
 
+            free = True
+            for a in self.token['agents_preemption']:
+                if a != agent_name and len(self.token['agents_preemption'][a]) > 1 and self.token['agents_preemption'][a][1] == queue_pos:
+                    free = False
+                    break
+
+            if free:
+                self.token['agents'][agent_name].append(queue_pos)
+                self.token['charging_stations'][station_name]['extra_slot'] = agent_name
+                del self.token['occupied_charging_stations'][agent_name]
+
+                if self.token['charging_stations'][station_name]['in_queue'] is not None:
+                    self.token['charging_stations'][station_name]['charger'] = self.token['charging_stations'][station_name]['in_queue']
+                    self.token['charging_stations'][station_name]['in_queue'] = None
+
+                else:
+                    self.token['charging_stations'][station_name]['charger'] = 'free'
 
 
-
-
-
-            self.token['agents'][agent_name].append(queue_pos)
-            self.token['charging_stations'][station_name]['extra_slot'] = agent_name
-            del self.token['occupied_charging_stations'][agent_name]
-
-            if self.token['charging_stations'][station_name]['in_queue'] is not None:
-                self.token['charging_stations'][station_name]['charger'] = \
-                    self.token['charging_stations'][station_name]['in_queue']
-            else:
-                self.token['charging_stations'][station_name]['charger'] = 'free'
 
     def time_forward(self):
 
