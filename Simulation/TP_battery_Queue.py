@@ -497,6 +497,9 @@ class TokenPassing(object):
                     self.token['charging_stations'][s['name']]['charger'] = \
                         self.token['charging_stations'][s['name']]['in_queue']
                     self.token['charging_stations'][s['name']]['in_queue'] = None
+
+                    new_charger_agent = self.token['charging_stations'][s['name']]['charger']
+                    self.token['occupied_charging_stations'][new_charger_agent] = s['name']
                     break
 
     def apply_path_preemption(self, agent_name, path1, path2, path_preemption, estimated_time_to_recharge,
