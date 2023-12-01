@@ -9,7 +9,6 @@ from Simulation.tasks_and_delays_maker import *
 from Simulation.simulation_Queue import Simulation
 
 
-
 def parameters(seed):
     random.seed(seed)
     parser = argparse.ArgumentParser()
@@ -80,9 +79,9 @@ def single_run(index_run, random_seed, file_name):
     tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, goal_locations, max_iter = parameters(
         random_seed)
 
-    move_consumption = 0.5
+    move_consumption = 1
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.01
+    wait_consumption = 1
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption,
@@ -140,7 +139,7 @@ if __name__ == '__main__':
     sum_cbs_calls1 = 0
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
-    file_name = 'Comparisons/Comp1/queue10/test13.txt'
+    file_name = 'Comparisons/testX.txt'
 
     with open('Comparisons/seeds1.txt', 'r') as file:
         # inserisci ogni riga in una lista

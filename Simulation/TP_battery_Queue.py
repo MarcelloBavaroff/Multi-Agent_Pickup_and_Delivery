@@ -498,8 +498,11 @@ class TokenPassing(object):
                         self.token['charging_stations'][s['name']]['in_queue']
                     self.token['charging_stations'][s['name']]['in_queue'] = None
 
+                    station_pos = self.token['charging_stations'][s['name']]['pos']
                     new_charger_agent = self.token['charging_stations'][s['name']]['charger']
-                    self.token['occupied_charging_stations'][new_charger_agent] = s['name']
+
+                    if station_pos in self.token['agents'][new_charger_agent]:
+                        self.token['occupied_charging_stations'][new_charger_agent] = s['name']
                     break
 
     def apply_path_preemption(self, agent_name, path1, path2, path_preemption, estimated_time_to_recharge,
@@ -603,7 +606,7 @@ class TokenPassing(object):
                                                                        agent_name)
             idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents, cost1 - 1, agent_name)
             idle_obstacles_agents |= set(self.non_task_endpoints)
-            idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos), tuple(closest_task[1])}
+            idle_obstacles_agents = idle_obstacles_agents - {tuple(closest_task[0]), tuple(closest_task[1])}
 
             agent = {'name': agent_name, 'start': closest_task[0], 'goal': closest_task[1]}
             env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
@@ -1076,8 +1079,6 @@ class TokenPassing(object):
 
                 else:
                     self.token['charging_stations'][station_name]['charger'] = 'free'
-
-
 
     def time_forward(self):
 

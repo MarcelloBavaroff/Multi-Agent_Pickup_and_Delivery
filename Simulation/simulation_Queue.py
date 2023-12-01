@@ -76,7 +76,7 @@ class Simulation(object):
                     elif agent_old_pos == queue_pos:
                         algorithm.get_token()['charging_stations'][station_name]['extra_slot'] = 'free'
 
-        if self.batteries_level[agent['name']] <= 0:
+        if self.batteries_level[agent['name']] < 0:
             print("Batteria negativa")
 
     def handle_agents_lenPath1(self, agents_to_move, algorithm):

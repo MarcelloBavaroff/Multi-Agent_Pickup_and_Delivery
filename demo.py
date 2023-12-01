@@ -34,7 +34,7 @@ def read_tasks():
 if __name__ == '__main__':
     # random.seed(1234)
     # seed = random.randint(0, 100000)
-    seed = 93134
+    seed = 89598
     random.seed(seed)
     print("Seed: ", seed)
     parser = argparse.ArgumentParser()
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = Simulation(tasks, agents, autonomies, charging_stations, 0.5, 0.5, 0.5)
+    simulation = Simulation(tasks, agents, autonomies, charging_stations, 1, 1, 1)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
