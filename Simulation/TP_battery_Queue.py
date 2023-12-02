@@ -789,28 +789,28 @@ class TokenPassing(object):
         if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
                 self.token['agents_preemption'][agent_name]) and len(self.token['agents_preemption'][agent_name]) != 0:
 
-            # se con la mia batteria arrivo giusto a caricarmi ci vado
-            if self.last_time_to_charge(agent_name):
+            # # se con la mia batteria arrivo giusto a caricarmi ci vado
+            # if self.last_time_to_charge(agent_name):
+            #     self.use_preempted_path_to_station(agent_name)
+            #
+            # # altrimenti calcolo il percorso per andare a caricarmi a turno dopo e se esiste assegno quello al preem
+            # # se non esiste assegno quello già calcolato
+            # else:
+            changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
+            if not changed:
                 self.use_preempted_path_to_station(agent_name)
-
-            # altrimenti calcolo il percorso per andare a caricarmi a turno dopo e se esiste assegno quello al preem
-            # se non esiste assegno quello già calcolato
-            else:
-                changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
-                if not changed:
-                    self.use_preempted_path_to_station(agent_name)
 
         else:
             changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, True)
             if not changed:
                 print("Errore ", agent_name, " non aveva un percorso per andare a caricarsi e non lo trova ora")
             else:
-                if self.last_time_to_charge(agent_name):
+                # if self.last_time_to_charge(agent_name):
+                #     self.use_preempted_path_to_station(agent_name)
+                #else:
+                changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
+                if not changed:
                     self.use_preempted_path_to_station(agent_name)
-                else:
-                    changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
-                    if not changed:
-                        self.use_preempted_path_to_station(agent_name)
 
     def early_arrival_control(self, nearest_station, arrival_time, estimated_time_to_recharge, agent_name):
 

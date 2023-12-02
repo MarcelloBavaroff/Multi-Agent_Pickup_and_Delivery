@@ -673,33 +673,45 @@ class TokenPassing(object):
 
         return assigned
 
+    def last_time_to_charge(self, agent_name):
+
+        if self.simulation.get_batteries_level()[agent_name] >= self.compute_consumption_to_station(agent_name) >= \
+                self.simulation.get_batteries_level()[agent_name] - self.simulation.get_wait_consumption():
+            return True
+        else:
+            return False
+
     def decide_if_charge(self, agent_name, agent_pos, all_idle_agents, idle_agents):
         # controllo se ho un path per andarmi a caricare
         if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
                 self.token['agents_preemption'][agent_name]) and len(self.token['agents_preemption'][agent_name]) != 0:
 
-            # se con la mia batteria arrivo giusto a caricarmi ci vado
-            if self.last_time_to_charge(agent_name):
+            changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
+            if not changed:
                 self.use_preempted_path_to_station(agent_name)
 
-            # altrimenti calcolo il percorso per andare a caricarmi a turno dopo e se esiste assegno quello al preem
-            # se non esiste assegno quello già calcolato
-            else:
-                changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
-                if not changed:
-                    self.use_preempted_path_to_station(agent_name)
+            # # se con la mia batteria arrivo giusto a caricarmi ci vado
+            # if self.last_time_to_charge(agent_name):
+            #     self.use_preempted_path_to_station(agent_name)
+            #
+            # # altrimenti calcolo il percorso per andare a caricarmi a turno dopo e se esiste assegno quello al preem
+            # # se non esiste assegno quello già calcolato
+            # else:
+            #     changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
+            #     if not changed:
+            #         self.use_preempted_path_to_station(agent_name)
 
         else:
             changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, True)
             if not changed:
                 print("Errore ", agent_name, " non aveva un percorso per andare a caricarsi e non lo trova ora")
             else:
-                if self.last_time_to_charge(agent_name):
+                # if self.last_time_to_charge(agent_name):
+                #     self.use_preempted_path_to_station(agent_name)
+                # else:
+                changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
+                if not changed:
                     self.use_preempted_path_to_station(agent_name)
-                else:
-                    changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
-                    if not changed:
-                        self.use_preempted_path_to_station(agent_name)
 
     # qui io non sono già in un NONTE
     def choose_NON_task_endpoint_and_station(self, agent_name, agent_pos, all_idle_agents):
@@ -909,13 +921,7 @@ class TokenPassing(object):
 
         return consumption
 
-    def last_time_to_charge(self, agent_name):
 
-        if self.simulation.get_batteries_level()[agent_name] >= self.compute_consumption_to_station(agent_name) >= \
-                self.simulation.get_batteries_level()[agent_name] - self.simulation.get_wait_consumption():
-            return True
-        else:
-            return False
 
     def controllo_errori_stazioni(self):
         stazioni_occupate = 0
