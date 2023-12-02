@@ -31,6 +31,7 @@ class TokenPassing(object):
         self.charging_stations = charging_stations
         self.move_consumption = self.simulation.get_move_consumption()
         self.wait_consumption = self.simulation.get_wait_consumption()
+        self.heavy_consumption = self.simulation.get_heavy_consumption()
         self.chiamateCBS = 0
         self.chiamateCBS_recharge = 0
         self.init_token()
@@ -619,7 +620,7 @@ class TokenPassing(object):
             else:
                 print("Solution found to task goal for agent", agent_name, " doing task...")
                 cost2 = env.compute_solution_cost(path_to_task_goal)
-                consumption += self.predicted_consumption(path_to_task_goal[agent_name])
+                consumption += self.predicted_consumption_heavy(path_to_task_goal[agent_name])
 
                 if self.simulation.get_batteries_level()[agent_name] >= consumption + predicted_consumption_to_station:
                     return path_to_task_start, path_to_task_goal, cost1 + cost2 - 1, consumption
@@ -700,7 +701,6 @@ class TokenPassing(object):
     def predicted_consumption(self, path):
 
         consumption = 0
-
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
@@ -713,6 +713,25 @@ class TokenPassing(object):
                     consumption = round(consumption + self.wait_consumption, 2)
                 else:
                     consumption = round(consumption + self.move_consumption, 2)
+
+        return round(consumption, 2)
+
+    def predicted_consumption_heavy(self, path):
+
+        consumption = 0
+
+        if type(path[0]) is dict:
+            for i in range(len(path) - 1):
+                if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
+                    consumption = round(consumption + self.wait_consumption, 2)
+                else:
+                    consumption = round(consumption + self.heavy_consumption, 2)
+        else:
+            for i in range(len(path) - 1):
+                if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
+                    consumption = round(consumption + self.wait_consumption, 2)
+                else:
+                    consumption = round(consumption + self.heavy_consumption, 2)
 
         return round(consumption, 2)
 
