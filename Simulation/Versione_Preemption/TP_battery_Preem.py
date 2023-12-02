@@ -261,6 +261,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name]) / 10
+                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
@@ -658,6 +659,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name] + total_real_consumption) / 10
+                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # tra quanti timestep dovrei caricarmi
@@ -776,6 +778,7 @@ class TokenPassing(object):
                                                                   self.simulation.get_batteries_level()[
                                                                       agent_name] + total_real_consumption) / 10
 
+                                    estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
                                     estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                                     self.apply_path(agent_name, agent_pos, None, path_endpoint[agent_name], 'safe_idle',
@@ -865,7 +868,7 @@ class TokenPassing(object):
                                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                               self.simulation.get_batteries_level()[
                                                                   agent_name] + total_real_consumption) / 10
-
+                                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
                                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
                                 # tra quanti timestep dovrei caricarmi
                                 # total_real_duration = total_real_duration + estimated_time_to_recharge + to_station_duration - 1

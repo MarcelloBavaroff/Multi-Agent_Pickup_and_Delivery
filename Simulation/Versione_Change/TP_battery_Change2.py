@@ -338,6 +338,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name]) / 10
+                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
@@ -897,7 +898,6 @@ class TokenPassing(object):
                         print(agent_name, ' is already charging')
                         self.go_to_closest_non_task_endpoint_or_charge(agent_name, agent_pos, all_idle_agents,
                                                                        idle_agents, 0)
-
                     else:
                         self.no_availableTasks_try_recharge(agent_name, agent_pos, all_idle_agents, idle_agents)
 

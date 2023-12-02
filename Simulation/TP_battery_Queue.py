@@ -886,7 +886,6 @@ class TokenPassing(object):
                                                                   self.simulation.get_batteries_level()[
                                                                       agent_name] + total_real_consumption) / 10
                                     estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
-
                                     estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                                     if self.early_arrival_control(nearest_station, real_duration_endpoint - 2 + len(
