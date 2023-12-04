@@ -3,10 +3,10 @@ import yaml
 import json
 import os
 # import random
-from Simulation.TP_battery_Queue import TokenPassing
+from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_Queue import Simulation
+from Simulation.Versione_Change.simulation_Change2 import Simulation
 
 
 def parameters(seed):
@@ -59,7 +59,7 @@ def parameters(seed):
         'goal_locations'], args.a_star_max_iter
 
 
-def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls,
+def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev,cbs_calls,
                      index_run, cbs_calls_recharge, random_seed=1234, file_name='Comparisons/Comp1/test3.txt'):
     with open(file_name, 'a') as file:
         file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
@@ -68,20 +68,17 @@ def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, a
         s_makespan = "Makespan: ", makespan
 
         s_average_service_time = "Average service time: ", average_service_time
+        s_std_dev = "Standard deviation: ", std_dev
         s_cbs_calls_recharge = "Chiamate a CBS per stazioni di ricarica: ", cbs_calls_recharge
         s_cbs_calls = "Chiamate a CBS: ", cbs_calls
 
         file.write(str(s_completed_tasks) + '\n' + str(s_dead_agents) + '\n' + str(s_makespan) + '\n' + str(
-            s_average_service_time) + '\n' + str(s_cbs_calls_recharge) + '\n' + str(s_cbs_calls))
+            s_average_service_time) + '\n' + str(s_std_dev) + '\n' + str(s_cbs_calls_recharge) + '\n' + str(s_cbs_calls))
 
 
-def single_run(index_run, random_seed, file_name):
+def single_run(index_run, random_seed, file_name, move_consumption=1.0, move_heavy_consumption=1.0, wait_consumption=1.0):
     tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, goal_locations, max_iter = parameters(
         random_seed)
-
-    move_consumption = 1
-    move_heavy_consumption = move_consumption
-    wait_consumption = 1
 
     # Simulate
     simulation = Simulation(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption,
@@ -96,38 +93,24 @@ def single_run(index_run, random_seed, file_name):
     dead_agents = len(tp.get_token()['dead_agents'])
     makespan = simulation.get_time()
 
-    service_time = 0
+    #service_time = 0
+    delta_times = []
     for a in tp.get_token()['completed_tasks_times']:
-        service_time += tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a]
+        #service_time += tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a]
+        delta_times.append(tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a])
+
+    service_time = sum(delta_times)
     average_service_time = service_time / len(tp.get_token()['completed_tasks_times'])
+    variance = sum((x - average_service_time) ** 2 for x in delta_times) / len(tp.get_token()['completed_tasks_times'])
+    std_dev = math.sqrt(variance)
+
     cbs_calls = tp.get_chiamateCBS()
     cbs_calls_recharge = tp.get_chiamateCBS_recharge()
 
-    print_comparison("VersioneQueue", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls,
+    print_comparison("VersioneQueue", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev,cbs_calls,
                      index_run, cbs_calls_recharge, random_seed, file_name)
-    # ---------------------------------------------------------
 
-    # # Simulate
-    # simulation = Sim1(tasks, agents, autonomies, charging_stations, move_consumption, wait_consumption, move_heavy_consumption)
-    # tp = TP1(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
-    #          goal_locations, a_star_max_iter=max_iter, new_recovery=True)
-    # while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
-    #     simulation.time_forward(tp)
-    #
-    # completed_tasks2 = tp.get_completed_tasks()
-    # n_tasks2 = len(tasks)
-    # dead_agents2 = len(tp.get_token()['dead_agents'])
-    # makespan2 = simulation.get_time()
-    #
-    # service_time = 0
-    # for a in tp.get_token()['completed_tasks_times']:
-    #     service_time += tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a]
-    # average_service_time2 = service_time / len(tp.get_token()['completed_tasks_times'])
-    # cbs_calls2 = tp.get_chiamateCBS()
-    # cbs_calls_recharge2 = tp.get_chiamateCBS_recharge()
-    #
-    # print_comparison("VersioneBase", completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, index_run, cbs_calls_recharge2, random_seed)
-    return completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, cbs_calls_recharge  # , completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, cbs_calls_recharge2
+    return completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev, cbs_calls, cbs_calls_recharge  # , completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, cbs_calls_recharge2
 
 
 if __name__ == '__main__':
@@ -136,10 +119,15 @@ if __name__ == '__main__':
     sum_completed_tasks1 = 0
     sum_makespan1 = 0
     sum_service_time1 = 0
+    sum_std_dev1 = 0
     sum_cbs_calls1 = 0
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
-    file_name = 'Comparisons/testX.txt'
+
+    file_name = 'Comparisons/Comp1new/test14.txt'
+    move_consumption = 0.5
+    move_heavy_consumption = 1.0
+    wait_consumption = 0.01
 
     with open('Comparisons/seeds1.txt', 'r') as file:
         # inserisci ogni riga in una lista
@@ -150,15 +138,17 @@ if __name__ == '__main__':
         print("Run numero: ", i + 1)
         # random_seed = random.randint(0, 100000)
         random_seed = int(seeds[i])
-        completed_tasks, n_tasks, dead_agents, makespan, average_service_time, cbs_calls, cbs_calls_recharge = single_run(
-            i, random_seed, file_name)
+        completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev, cbs_calls, cbs_calls_recharge = single_run(
+            i, random_seed, file_name, move_consumption, move_heavy_consumption, wait_consumption)
 
         if completed_tasks == n_tasks:
             run_complete1 += 1
             sum_makespan1 += makespan
             sum_service_time1 += average_service_time
+            sum_std_dev1 += std_dev
             sum_cbs_calls1 += cbs_calls
             sum_cbs_calls_recharge1 += cbs_calls_recharge
+
         sum_completed_tasks1 += completed_tasks
         sum_dead_agents1 += dead_agents
 
@@ -168,6 +158,7 @@ if __name__ == '__main__':
     print("Numero medio di agenti morti: ", sum_dead_agents1 / 20)
     print("Makespan medio: ", sum_makespan1 / run_complete1)
     print("Tempo medio di servizio: ", sum_service_time1 / run_complete1)
+    print("Deviazione standard media: ", sum_std_dev1 / run_complete1)
     print("Chiamate a CBS per stazioni di ricarica: ", sum_cbs_calls_recharge1 / run_complete1)
     print("Chiamate a CBS totali: ", sum_cbs_calls1 / run_complete1)
 
@@ -177,5 +168,6 @@ if __name__ == '__main__':
         file.write("Numero medio di agenti morti: " + str(sum_dead_agents1 / 20) + "\n")
         file.write("Makespan medio: " + str(sum_makespan1 / run_complete1) + "\n")
         file.write("Tempo medio di servizio: " + str(sum_service_time1 / run_complete1) + "\n")
+        file.write("Deviazione standard media: " + str(sum_std_dev1 / run_complete1) + "\n")
         file.write("Chiamate a CBS per stazioni di ricarica: " + str(sum_cbs_calls_recharge1 / run_complete1) + "\n")
         file.write("Chiamate a CBS totali: " + str(sum_cbs_calls1 / run_complete1) + "\n")
