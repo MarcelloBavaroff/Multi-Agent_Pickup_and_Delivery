@@ -33,21 +33,21 @@ class Simulation(object):
             self.actual_paths[agent['name']] = [{'t': 0, 'x': agent['start'][0], 'y': agent['start'][1]}]
 
     def update_batteries(self, algorithm, agent, update_actuale_path=True):
-        # if agent['name'] in algorithm.get_token()['agents_to_tasks']:
-        #     task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
-        # else:
-        #     task_name = None
-        task_name = 'mabel'
+        if agent['name'] in algorithm.get_token()['agents_to_tasks']:
+            task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
+        else:
+            task_name = None
 
         if task_name in algorithm.get_token()['start_tasks_times'] \
                 and algorithm.get_token()['agents_to_tasks'][agent['name']]['start'] not in \
                 algorithm.get_token()['agents'][agent['name']]:
 
-            self.batteries_level[agent['name']] = round(
-                self.batteries_level[agent['name']] - self.move_heavy_consumption, 2)
+            effective_move_consumption = self.move_heavy_consumption
+        else:
+            effective_move_consumption = self.move_consumption
 
         # abbasso livello di batteria
-        elif self.actual_paths[agent['name']][self.time]['x'] == \
+        if self.actual_paths[agent['name']][self.time]['x'] == \
                 self.actual_paths[agent['name']][self.time - 1]['x'] and \
                 self.actual_paths[agent['name']][self.time]['y'] == \
                 self.actual_paths[agent['name']][self.time - 1]['y']:
@@ -56,7 +56,7 @@ class Simulation(object):
                 self.batteries_level[agent['name']] - self.wait_consumption, 2)
         else:
             self.batteries_level[agent['name']] = round(
-                self.batteries_level[agent['name']] - self.move_consumption, 2)
+                self.batteries_level[agent['name']] - effective_move_consumption, 2)
 
             if update_actuale_path:
                 if agent['name'] in algorithm.get_occupied_stations():
@@ -70,7 +70,7 @@ class Simulation(object):
                         algorithm.set_free_station(algorithm.get_occupied_stations()[agent['name']])
                         algorithm.remove_occupied_station(agent['name'])
 
-        if self.batteries_level[agent['name']] <= 0:
+        if self.batteries_level[agent['name']] < 0:
             print("Batteria negativa")
 
     def handle_agents_lenPath1(self, agents_to_move, algorithm):
@@ -295,3 +295,6 @@ class Simulation(object):
 
     def get_wait_consumption(self):
         return self.wait_consumption
+
+    def get_heavy_consumption(self):
+        return self.move_heavy_consumption

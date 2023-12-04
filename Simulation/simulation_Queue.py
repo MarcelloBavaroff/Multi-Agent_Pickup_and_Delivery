@@ -38,7 +38,6 @@ class Simulation(object):
             task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
         else:
             task_name = None
-        # task_name = 'mabel'
 
         if task_name in algorithm.get_token()['start_tasks_times'] \
                 and algorithm.get_token()['agents_to_tasks'][agent['name']]['start'] not in \
