@@ -93,10 +93,8 @@ def single_run(index_run, random_seed, file_name, move_consumption=1.0, move_hea
     dead_agents = len(tp.get_token()['dead_agents'])
     makespan = simulation.get_time()
 
-    #service_time = 0
     delta_times = []
     for a in tp.get_token()['completed_tasks_times']:
-        #service_time += tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a]
         delta_times.append(tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a])
 
     service_time = sum(delta_times)
