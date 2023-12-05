@@ -3,14 +3,13 @@ import yaml
 import json
 import os
 import random
-from Simulation.TP_battery_Queue import TokenPassing
+from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.simulation_Queue import Simulation
+from Simulation.Versione_Change.simulation_Change2 import Simulation
 import subprocess
 import sys
 import ast
-
 
 def read_tasks():
     data_list = []

@@ -3,10 +3,10 @@ import yaml
 import json
 import os
 # import random
-from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
+from Simulation.TP_battery_Queue import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.Versione_Change.simulation_Change2 import Simulation
+from Simulation.simulation_Queue import Simulation
 
 
 def parameters(seed):
@@ -124,9 +124,9 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/Comp1new/test14.txt'
+    file_name = 'Comparisons/Comp1new/queue/test14.txt'
     move_consumption = 0.5
-    move_heavy_consumption = 1.0
+    move_heavy_consumption = 1
     wait_consumption = 0.01
 
     with open('Comparisons/seeds1.txt', 'r') as file:
