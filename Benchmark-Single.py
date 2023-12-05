@@ -122,9 +122,9 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/Comp1new/queue/test14.txt'
+    file_name = 'Comparisons/Comp2new/queue/test13.txt'
     move_consumption = 0.5
-    move_heavy_consumption = 1
+    move_heavy_consumption = move_consumption
     wait_consumption = 0.01
 
     with open('Comparisons/seeds1.txt', 'r') as file:

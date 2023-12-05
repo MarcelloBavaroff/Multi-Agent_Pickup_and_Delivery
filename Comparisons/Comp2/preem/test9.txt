@@ -1,0 +1,169 @@
+
+
+0 VersioneQueue 9422
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1676)
+('Average service time: ', 69.336)
+('Chiamate a CBS per stazioni di ricarica: ', 2807)
+('Chiamate a CBS: ', 3942)
+
+1 VersioneQueue 96519
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1935)
+('Average service time: ', 47.204)
+('Chiamate a CBS per stazioni di ricarica: ', 4814)
+('Chiamate a CBS: ', 5945)
+
+2 VersioneQueue 71414
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1667)
+('Average service time: ', 71.484)
+('Chiamate a CBS per stazioni di ricarica: ', 2627)
+('Chiamate a CBS: ', 3717)
+
+3 VersioneQueue 22300
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1881)
+('Average service time: ', 53.554)
+('Chiamate a CBS per stazioni di ricarica: ', 4483)
+('Chiamate a CBS: ', 5590)
+
+4 VersioneQueue 36551
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1864)
+('Average service time: ', 45.928)
+('Chiamate a CBS per stazioni di ricarica: ', 4398)
+('Chiamate a CBS: ', 5521)
+
+5 VersioneQueue 63211
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1852)
+('Average service time: ', 52.198)
+('Chiamate a CBS per stazioni di ricarica: ', 4039)
+('Chiamate a CBS: ', 5155)
+
+6 VersioneQueue 36286
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1724)
+('Average service time: ', 51.83)
+('Chiamate a CBS per stazioni di ricarica: ', 3535)
+('Chiamate a CBS: ', 4643)
+
+7 VersioneQueue 89598
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1865)
+('Average service time: ', 53.68)
+('Chiamate a CBS per stazioni di ricarica: ', 4180)
+('Chiamate a CBS: ', 5313)
+
+8 VersioneQueue 96537
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1783)
+('Average service time: ', 52.096)
+('Chiamate a CBS per stazioni di ricarica: ', 3816)
+('Chiamate a CBS: ', 4919)
+
+9 VersioneQueue 71399
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1826)
+('Average service time: ', 50.626)
+('Chiamate a CBS per stazioni di ricarica: ', 3991)
+('Chiamate a CBS: ', 5110)
+
+10 VersioneQueue 80726
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1838)
+('Average service time: ', 52.028)
+('Chiamate a CBS per stazioni di ricarica: ', 3945)
+('Chiamate a CBS: ', 5083)
+
+11 VersioneQueue 63731
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1801)
+('Average service time: ', 53.25)
+('Chiamate a CBS per stazioni di ricarica: ', 3733)
+('Chiamate a CBS: ', 4874)
+
+12 VersioneQueue 22450
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1806)
+('Average service time: ', 56.506)
+('Chiamate a CBS per stazioni di ricarica: ', 4203)
+('Chiamate a CBS: ', 5302)
+
+13 VersioneQueue 92332
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1834)
+('Average service time: ', 57.736)
+('Chiamate a CBS per stazioni di ricarica: ', 3986)
+('Chiamate a CBS: ', 5111)
+
+14 VersioneQueue 96550
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1792)
+('Average service time: ', 52.574)
+('Chiamate a CBS per stazioni di ricarica: ', 3756)
+('Chiamate a CBS: ', 4854)
+
+15 VersioneQueue 1088
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1779)
+('Average service time: ', 56.304)
+('Chiamate a CBS per stazioni di ricarica: ', 3756)
+('Chiamate a CBS: ', 4869)
+
+16 VersioneQueue 83629
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1766)
+('Average service time: ', 57.152)
+('Chiamate a CBS per stazioni di ricarica: ', 3553)
+('Chiamate a CBS: ', 4650)
+
+17 VersioneQueue 3994
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1818)
+('Average service time: ', 50.706)
+('Chiamate a CBS per stazioni di ricarica: ', 4134)
+('Chiamate a CBS: ', 5249)
+
+18 VersioneQueue 74082
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1748)
+('Average service time: ', 54.774)
+('Chiamate a CBS per stazioni di ricarica: ', 3515)
+('Chiamate a CBS: ', 4621)
+
+19 VersioneQueue 54011
+('Number of completed tasks: ', 500, '/', 500)
+('Number of dead agents: ', 0)
+('Makespan: ', 1656)
+('Average service time: ', 53.114)
+('Chiamate a CBS per stazioni di ricarica: ', 2761)
+('Chiamate a CBS: ', 3887)
+
+Numero di run completate: 20
+Numero medio di task completati: 500.0
+Numero medio di agenti morti: 0.0
+Makespan medio: 1795.55
+Tempo medio di servizio: 54.604
+Chiamate a CBS per stazioni di ricarica: 3801.6
+Chiamate a CBS totali: 4917.75

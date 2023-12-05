@@ -148,4 +148,4 @@ map:
         - pos: [ 12, 0 ]
           name: station19
 n_tasks: 500
-task_freq: 0.3
+task_freq: 5

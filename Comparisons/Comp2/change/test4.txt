@@ -1,6 +1,6 @@
 
 
-0 VersioneChange 77440
+0 VersioneQueue 77440
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 2)
 ('Makespan: ', 1563)
@@ -8,7 +8,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 147)
 ('Chiamate a CBS: ', 1398)
 
-1 VersioneChange 7986
+1 VersioneQueue 7986
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 2)
 ('Makespan: ', 1522)
@@ -16,7 +16,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 136)
 ('Chiamate a CBS: ', 1321)
 
-2 VersioneChange 21251
+2 VersioneQueue 21251
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 2)
 ('Makespan: ', 1702)
@@ -24,7 +24,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 138)
 ('Chiamate a CBS: ', 1413)
 
-3 VersioneChange 75067
+3 VersioneQueue 75067
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 2)
 ('Makespan: ', 1584)
@@ -32,7 +32,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 127)
 ('Chiamate a CBS: ', 1339)
 
-4 VersioneChange 82657
+4 VersioneQueue 82657
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 2)
 ('Makespan: ', 1506)
@@ -40,7 +40,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 129)
 ('Chiamate a CBS: ', 1382)
 
-5 VersioneChange 77820
+5 VersioneQueue 77820
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 5)
 ('Makespan: ', 2015)
@@ -48,7 +48,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 132)
 ('Chiamate a CBS: ', 1386)
 
-6 VersioneChange 32454
+6 VersioneQueue 32454
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 4)
 ('Makespan: ', 1831)
@@ -56,7 +56,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 126)
 ('Chiamate a CBS: ', 1319)
 
-7 VersioneChange 53357
+7 VersioneQueue 53357
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 3)
 ('Makespan: ', 1624)
@@ -64,7 +64,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 132)
 ('Chiamate a CBS: ', 1259)
 
-8 VersioneChange 67328
+8 VersioneQueue 67328
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 3)
 ('Makespan: ', 1593)
@@ -72,7 +72,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 132)
 ('Chiamate a CBS: ', 1367)
 
-9 VersioneChange 95708
+9 VersioneQueue 95708
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 2)
 ('Makespan: ', 1548)
@@ -80,7 +80,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 135)
 ('Chiamate a CBS: ', 1336)
 
-10 VersioneChange 88210
+10 VersioneQueue 88210
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 4)
 ('Makespan: ', 1544)
@@ -88,7 +88,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 134)
 ('Chiamate a CBS: ', 1372)
 
-11 VersioneChange 84116
+11 VersioneQueue 84116
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 2)
 ('Makespan: ', 1560)
@@ -96,7 +96,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 126)
 ('Chiamate a CBS: ', 1286)
 
-12 VersioneChange 93134
+12 VersioneQueue 93134
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 3)
 ('Makespan: ', 1555)
@@ -104,7 +104,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 129)
 ('Chiamate a CBS: ', 1353)
 
-13 VersioneChange 51041
+13 VersioneQueue 51041
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 5)
 ('Makespan: ', 1990)
@@ -112,7 +112,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 124)
 ('Chiamate a CBS: ', 1309)
 
-14 VersioneChange 62070
+14 VersioneQueue 62070
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 5)
 ('Makespan: ', 1869)
@@ -120,7 +120,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 127)
 ('Chiamate a CBS: ', 1368)
 
-15 VersioneChange 24417
+15 VersioneQueue 24417
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 5)
 ('Makespan: ', 1989)
@@ -128,7 +128,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 125)
 ('Chiamate a CBS: ', 1313)
 
-16 VersioneChange 93877
+16 VersioneQueue 93877
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 5)
 ('Makespan: ', 1968)
@@ -136,7 +136,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 129)
 ('Chiamate a CBS: ', 1423)
 
-17 VersioneChange 58768
+17 VersioneQueue 58768
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 5)
 ('Makespan: ', 1944)
@@ -144,7 +144,7 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 127)
 ('Chiamate a CBS: ', 1265)
 
-18 VersioneChange 65806
+18 VersioneQueue 65806
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 5)
 ('Makespan: ', 1971)
@@ -152,10 +152,18 @@
 ('Chiamate a CBS per stazioni di ricarica: ', 124)
 ('Chiamate a CBS: ', 1388)
 
-19 VersioneChange 45753
+19 VersioneQueue 45753
 ('Number of completed tasks: ', 500, '/', 500)
 ('Number of dead agents: ', 3)
 ('Makespan: ', 1642)
 ('Average service time: ', 670.35)
 ('Chiamate a CBS per stazioni di ricarica: ', 134)
 ('Chiamate a CBS: ', 1438)
+
+Numero di run completate: 20
+Numero medio di task completati: 500.0
+Numero medio di agenti morti: 3.45
+Makespan medio: 1726.0
+Tempo medio di servizio: 704.5759999999999
+Chiamate a CBS per stazioni di ricarica: 130.65
+Chiamate a CBS totali: 1351.75

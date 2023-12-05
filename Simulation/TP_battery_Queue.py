@@ -1170,10 +1170,8 @@ class TokenPassing(object):
                         if agent_name in self.token['occupied_charging_stations']:
                             print(agent_name, ' is already charging')
                             self.move_to_extra_slot(agent_name)
-
                         else:
                             self.use_preempted_path_to_station(agent_name)
-
 
                 # sono in una stazione
                 else:
