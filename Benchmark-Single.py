@@ -37,7 +37,13 @@ def parameters(seed):
 
     dimensions = param['map']['dimensions']
     obstacles = param['map']['obstacles']
+    if type(obstacles[0]) is not tuple:
+        obstacles = [tuple((obstacle[0], obstacle[1])) for obstacle in obstacles]
+
     non_task_endpoints = param['map']['non_task_endpoints']
+    if type(non_task_endpoints[0]) is not tuple:
+        non_task_endpoints = [tuple((non_task_endpoint[0], non_task_endpoint[1])) for non_task_endpoint in
+                              non_task_endpoints]
     agents = param['agents']
     charging_stations = param['map']['charging_stations']
 
@@ -127,10 +133,10 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/Comp2new/change/test13.txt'
-    move_consumption = 0.5
+    file_name = 'Comparisons/testMilan01.txt'
+    move_consumption = 0.1
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.01
+    wait_consumption = 0.1
 
     with open('Comparisons/seeds1.txt', 'r') as file:
         # inserisci ogni riga in una lista

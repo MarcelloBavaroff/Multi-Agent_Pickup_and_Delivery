@@ -111,6 +111,18 @@ map:
     - 38
   - - 17
     - 17
+  - - 0
+    - 39
+  - - 34
+    - 37
+  - - 39
+    - 32
+  - - 9
+    - 33
+  - - 38
+    - 0
+  - - 9
+    - 0
   goal_locations:
   - - 16
     - 24
@@ -1146,6 +1158,6 @@ map:
       name: station17
 
 
-n_tasks: 50
-task_freq: 1
+n_tasks: 500
+task_freq: 5
 
