@@ -3,10 +3,12 @@ import yaml
 import json
 import os
 import random
-from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
-from Simulation.Versione_Change.simulation_Change2 import Simulation
+#from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
+#from Simulation.Versione_Change.simulation_Change2 import Simulation
 #from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
 #from Simulation.Versione_Preemption.simulation_Preem import Simulation
+from Simulation.TP_battery_Queue import TokenPassing
+from Simulation.simulation_Queue import Simulation
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
 
@@ -96,7 +98,7 @@ if __name__ == '__main__':
     simulation = Simulation(tasks, agents, autonomies, charging_stations, 0.1, 0.1, 0.1)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 2000:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 3000:
         simulation.time_forward(tp)
 
     print("Number of completed tasks: ", tp.get_completed_tasks(), "/", len(tasks))

@@ -1122,40 +1122,31 @@ map:
   charging_stations:
     - pos: [ 39, 6 ]
       name: station0
-    - pos: [ 39, 7 ]
-      name: station1
+      queue: [ 39, 7 ]
     - pos: [ 39, 8 ]
       name: station2
-    - pos: [ 39, 9 ]
-      name: station3
+      queue: [ 39, 9 ]
     - pos: [ 39, 10 ]
       name: station4
-    - pos: [ 39, 11 ]
-      name: station5
-    - pos: [ 29, 39 ]
-      name: station6
+      queue: [ 39, 11 ]
     - pos: [ 28, 39 ]
       name: station7
-    - pos: [ 27, 39 ]
-      name: station8
+      queue: [ 27, 39 ]
     - pos: [ 26, 39 ]
       name: station9
-    - pos: [ 25, 39 ]
-      name: station10
+      queue: [ 25, 39 ]
     - pos: [ 12, 39 ]
       name: station11
-    - pos: [ 13, 39 ]
-      name: station12
+      queue: [ 13, 39 ]
     - pos: [ 14, 39 ]
       name: station13
-    - pos: [ 15, 39 ]
-      name: station14
+      queue: [ 15, 39 ]
     - pos: [ 20, 0 ]
       name: station15
-    - pos: [ 21, 0 ]
-      name: station16
+      queue: [ 21, 0 ]
     - pos: [ 22, 0 ]
       name: station17
+      queue: [ 23, 0 ]
 
 
 n_tasks: 500

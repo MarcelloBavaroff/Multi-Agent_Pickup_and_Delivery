@@ -1,6 +1,6 @@
 {
     "input_path": "Environments",
-    "input_name": "milan_40_battery.yaml",
+    "input_name": "milan_40_battery_coda.yaml",
     "visual_postfix": "_tmp",
     "experiments_path": "Experiments",
     "experiments_name": "experiments_new2_big_07_10_2021_00_42_53.json"
