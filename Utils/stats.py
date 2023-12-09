@@ -3,8 +3,7 @@ import yaml
 import json
 import os
 import RoothPath
-from Simulation.simulation_Queue import Simulation
-from Simulation.tasks_and_delays_maker import *
+from Simulation.Versione_Queue.simulation_Queue import Simulation
 from statistics import *
 import matplotlib.pyplot as plt
 from Utils.pool_with_subprocess import PoolWithSubprocess

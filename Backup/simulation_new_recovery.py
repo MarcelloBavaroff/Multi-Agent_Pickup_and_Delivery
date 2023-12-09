@@ -3,7 +3,7 @@ import yaml
 import json
 import os
 import time
-from Simulation.TP_battery_Queue import TokenPassing
+from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
 
