@@ -60,7 +60,7 @@ class AStar:
             open_set -= {current}
             closed_set |= {current}
 
-            neighbor_list = self.get_neighbors(current)
+            neighbor_list = self.get_neighbors(current, agent_name)
 
             for neighbor in neighbor_list:
                 if neighbor in closed_set:

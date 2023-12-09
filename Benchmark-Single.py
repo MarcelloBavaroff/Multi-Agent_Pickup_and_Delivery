@@ -96,7 +96,7 @@ def single_run(index_run, random_seed, file_name, move_consumption=1.0, move_hea
                             move_heavy_consumption)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       goal_locations, a_star_max_iter=max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 3000:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 5000:
         simulation.time_forward(tp)
 
     completed_tasks = tp.get_completed_tasks()
@@ -134,9 +134,9 @@ if __name__ == '__main__':
     sum_dead_agents1 = 0
 
     file_name = 'Comparisons/testMilan01_queue.txt'
-    move_consumption = 0.1
-    move_heavy_consumption = move_consumption
-    wait_consumption = 0.1
+    move_consumption = 0.5
+    move_heavy_consumption = 1
+    wait_consumption = 0.01
 
     with open('Comparisons/seeds1.txt', 'r') as file:
         # inserisci ogni riga in una lista

@@ -330,7 +330,7 @@ class TokenPassing(object):
                     ((self.token['charging_stations'][s['name']]['charger'] == 'free' or
                       self.token['charging_stations'][s['name']]['charger'] == agent_name) or
                      # opzione 2: extra slot free e in_queue = None o prenotato da me
-                     (self.token['charging_stations'][s['name']]['extra_slot'] == 'free' and
+                     ((self.token['charging_stations'][s['name']]['extra_slot'] == 'free' or self.token['charging_stations'][s['name']]['extra_slot'] == agent_name) and
                       (self.token['charging_stations'][s['name']]['in_queue'] is None or
                        self.token['charging_stations'][s['name']]['in_queue'] == agent_name)))):
 
@@ -368,7 +368,7 @@ class TokenPassing(object):
                     ((self.token['charging_stations'][s['name']]['charger'] == 'free' or
                       self.token['charging_stations'][s['name']]['charger'] == agent_name) or
                      # opzione 2: extra slot free e in_queue = None o prenotato da me
-                     (self.token['charging_stations'][s['name']]['extra_slot'] == 'free' and
+                     ((self.token['charging_stations'][s['name']]['extra_slot'] == 'free' or self.token['charging_stations'][s['name']]['extra_slot'] == agent_name) and
                       (self.token['charging_stations'][s['name']]['in_queue'] is None or
                        self.token['charging_stations'][s['name']]['in_queue'] == agent_name)))):
 

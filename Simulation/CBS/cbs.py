@@ -134,7 +134,7 @@ class Environment(object):
 
         self.charging_stations = charging_stations
 
-    def get_neighbors(self, state):
+    def get_neighbors(self, state, agent_name):
         neighbors = []
 
         # Wait action
@@ -143,19 +143,19 @@ class Environment(object):
             neighbors.append(n)
         # Up action
         n = State(state.time + 1, Location(state.location.x, state.location.y + 1))
-        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n):
+        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n) and self.station_only_if_goal(state, n, agent_name):
             neighbors.append(n)
         # Down action
         n = State(state.time + 1, Location(state.location.x, state.location.y - 1))
-        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n):
+        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n) and self.station_only_if_goal(state, n, agent_name):
             neighbors.append(n)
         # Left action
         n = State(state.time + 1, Location(state.location.x - 1, state.location.y))
-        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n):
+        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n) and self.station_only_if_goal(state, n, agent_name):
             neighbors.append(n)
         # Right action
         n = State(state.time + 1, Location(state.location.x + 1, state.location.y))
-        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n):
+        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n) and self.station_only_if_goal(state, n, agent_name):
             neighbors.append(n)
         return neighbors
 
@@ -266,6 +266,17 @@ class Environment(object):
                     return False
                 else:
                     return True
+        return True
+
+    # posso andare in una stazione solo se ho come goal quella stazione
+    def station_only_if_goal(self, state_old, state_new, agent_name):
+        tup_new = [state_new.location.x, state_new.location.y]
+        for s in self.charging_stations:
+            if tup_new == s['pos']:
+                if self.is_at_goal(state_new, agent_name):
+                    return True
+                else:
+                    return False
         return True
 
 
