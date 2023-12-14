@@ -99,32 +99,32 @@ if __name__ == '__main__':
     simulation = Simulation(tasks, agents, autonomies, charging_stations, 1, 1, 1)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 100:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 0:
         simulation.time_forward(tp)
 
-    print("Number of completed tasks: ", tp.get_completed_tasks(), "/", len(tasks))
-    print("Number of dead agents: ", len(tp.get_token()['dead_agents']))
-
-    for a in tp.get_token()['dead_agents']:
-        print("Agent ", a, " died")
-
-    delta_times = []
-    for a in tp.get_token()['completed_tasks_times']:
-        delta_times.append(tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a])
-
-    service_time = sum(delta_times)
-    average_service_time = service_time / len(tp.get_token()['completed_tasks_times'])
-    variance = sum((x - average_service_time) ** 2 for x in delta_times) / len(tp.get_token()['completed_tasks_times'])
-    std_dev = math.sqrt(variance)
-
-    print("Chiamate a CBS per ricaricarsi: ", tp.get_chiamateCBS_recharge())
-    print("Chiamate a CBS: ", tp.get_chiamateCBS())
-
-    # print all delta times
-    i = 0
-    for a in tp.get_token()['completed_tasks_times']:
-        print(str(tp.get_token()['completed_tasks_times'][a]) + '-' + str(delta_times[i]))
-        i += 1
+    # print("Number of completed tasks: ", tp.get_completed_tasks(), "/", len(tasks))
+    # print("Number of dead agents: ", len(tp.get_token()['dead_agents']))
+    #
+    # for a in tp.get_token()['dead_agents']:
+    #     print("Agent ", a, " died")
+    #
+    # delta_times = []
+    # for a in tp.get_token()['completed_tasks_times']:
+    #     delta_times.append(tp.get_token()['completed_tasks_times'][a] - tp.get_token()['start_tasks_times'][a])
+    #
+    # service_time = sum(delta_times)
+    # average_service_time = service_time / len(tp.get_token()['completed_tasks_times'])
+    # variance = sum((x - average_service_time) ** 2 for x in delta_times) / len(tp.get_token()['completed_tasks_times'])
+    # std_dev = math.sqrt(variance)
+    #
+    # print("Chiamate a CBS per ricaricarsi: ", tp.get_chiamateCBS_recharge())
+    # print("Chiamate a CBS: ", tp.get_chiamateCBS())
+    #
+    # # print all delta times
+    # i = 0
+    # for a in tp.get_token()['completed_tasks_times']:
+    #     print(str(tp.get_token()['completed_tasks_times'][a]) + '-' + str(delta_times[i]))
+    #     i += 1
 
     cost = 0
     for path in simulation.actual_paths.values():
