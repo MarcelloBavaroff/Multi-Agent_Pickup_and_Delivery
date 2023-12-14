@@ -342,14 +342,14 @@ class TokenPassing(object):
                 mixed_queue_agents = agents_in_queue_slots.union(
                     set(self.token['charging_stations'][s['name']]['in_queue']))
                 is_agent_in_queue = agent_name in mixed_queue_agents
-                is_limit_reached = len(agents_in_queue_slots) < self.token['charging_stations'][s['name']]['queue_len']
+                is_limit_not_reached = len(agents_in_queue_slots) < self.token['charging_stations'][s['name']]['queue_len']
 
                 # opzione 1: charger free o prenotato da me
                 # opzione 2: sono fisicamente in coda o in_queue prenotato da me
                 # opzione 3: c'è spazio libero
                 if (self.token['charging_stations'][s['name']]['charger'] == 'free' or
                     self.token['charging_stations'][s['name']]['charger'] == agent_name) \
-                        or is_agent_in_queue or is_limit_reached:
+                        or is_agent_in_queue or is_limit_not_reached:
 
                     estimated_to_station_duration = self.admissible_heuristic(task_final_pos, s['pos'])
                     estimated_total_duration = task_duration + estimated_to_station_duration
@@ -384,14 +384,14 @@ class TokenPassing(object):
                 mixed_queue_agents = agents_in_queue_slots.union(
                     set(self.token['charging_stations'][s['name']]['in_queue']))
                 is_agent_in_queue = agent_name in mixed_queue_agents
-                is_limit_reached = len(agents_in_queue_slots) < self.token['charging_stations'][s['name']]['queue_len']
+                is_limit_not_reached = len(agents_in_queue_slots) < self.token['charging_stations'][s['name']]['queue_len']
 
                 # opzione 1: charger free o prenotato da me
                 # opzione 2: sono fisicamente in coda o in_queue prenotato da me
                 # opzione 3: c'è spazio libero
                 if (self.token['charging_stations'][s['name']]['charger'] == 'free' or
                     self.token['charging_stations'][s['name']]['charger'] == agent_name) \
-                        or is_agent_in_queue or is_limit_reached:
+                        or is_agent_in_queue or is_limit_not_reached:
 
                     estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
                     if estimated_station_cost * self.move_consumption < self.simulation.get_batteries_level()[
@@ -467,17 +467,30 @@ class TokenPassing(object):
         for el in path2:
             self.token['agents'][agent_name].append([el['x'], el['y']])
 
+
+    def update_in_queue_agents(self, station_name, agent_name):
+        agent_arrival = len(self.token['agents_preemption'][agent_name])
+
+        for a in self.token['charging_stations'][station_name]['in_queue']:
+
     def handle_charging_stations_in_apply_path_preemption(self, agent_name, station_name):
 
         old_charger_agent = self.token['charging_stations'][station_name]['charger']
-        old_in_queue_agent = self.token['charging_stations'][station_name]['in_queue']
+        #ora è una lista ordinata di agenti che hanno prenotato la stazione
+        old_in_queue_agents = self.token['charging_stations'][station_name]['in_queue']
+
+        agents_in_queue_slots = self.set_of_agents_extra_slots(station_name)
+        mixed_queue_agents = agents_in_queue_slots.union(
+            set(self.token['charging_stations'][station_name]['in_queue']))
+        is_agent_in_queue_mix = agent_name in mixed_queue_agents
+        # vero se c'è spazio libero
+        is_limit_not_reached = len(agents_in_queue_slots) < self.token['charging_stations'][station_name]['queue_len']
 
         if old_charger_agent == 'free':
             self.token['charging_stations'][station_name]['charger'] = agent_name
 
         # se c'è un charger che non sono io e l'extra slot è libero di regola io dovrei andare in_queue, ma se per caso arrivassi prima del charger?
-        elif self.token['charging_stations'][station_name][
-            'extra_slot'] == 'free' and not old_charger_agent == agent_name:
+        elif not old_charger_agent == agent_name and is_limit_not_reached:
 
             # se arrivo prima di quello che è charger, divento io charger
             if len(self.token['agents_preemption'][agent_name]) < len(
