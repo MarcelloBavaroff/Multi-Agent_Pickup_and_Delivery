@@ -1,108 +1,55 @@
 agents:
--   start: [0, 1]
+-   start: [3, 4]
     name: agent0
--   start: [0, 5]
+-   start: [3, 8]
     name: agent1
--   start: [0, 7]
+-   start: [3, 12]
     name: agent2
--   start: [0, 9]
+-   start: [3, 16]
     name: agent3
--   start: [0, 11]
+-   start: [3, 17]
     name: agent4
--   start: [0, 15]
+-   start: [3, 19]
     name: agent5
--   start: [24, 1]
+-   start: [3, 20]
     name: agent6
--   start: [24, 5]
+-   start: [3, 21]
     name: agent7
--   start: [24, 7]
+-   start: [3, 23]
     name: agent8
--   start: [24, 9]
+-   start: [3, 24]
     name: agent9
--   start: [24, 11]
+-   start: [3, 28]
     name: agent10
--   start: [24, 15]
+-   start: [3, 32]
     name: agent11
--   start: [2, 1]
+-   start: [3, 36]
     name: agent12
--   start: [2, 5]
+-   start: [36, 4]
     name: agent13
--   start: [2, 7]
+-   start: [36, 8]
     name: agent14
--   start: [2, 9]
+-   start: [36, 12]
     name: agent15
--   start: [2, 11]
+-   start: [36, 16]
     name: agent16
--   start: [2, 15]
+-   start: [36, 17]
     name: agent17
--   start: [22, 1]
+-   start: [36, 19]
     name: agent18
--   start: [22, 5]
+-   start: [36, 20]
     name: agent19
--   start: [22, 7]
+-   start: [36, 21]
     name: agent20
--   start: [22, 9]
+-   start: [36, 23]
     name: agent21
--   start: [22, 11]
+-   start: [36, 24]
     name: agent22
--   start: [22, 15]
+-   start: [36, 28]
     name: agent23
--   start: [0, 21]
+-   start: [36, 32]
     name: agent24
--   start: [0, 25]
-    name: agent25
--   start: [0, 27]
-    name: agent26
--   start: [0, 29]
-    name: agent27
--   start: [0, 31]
-    name: agent28
--   start: [0, 35]
-    name: agent29
--   start: [24, 21]
-    name: agent30
--   start: [24, 25]
-    name: agent31
--   start: [24, 27]
-    name: agent32
--   start: [24, 29]
-    name: agent33
--   start: [24, 31]
-    name: agent34
--   start: [24, 35]
-    name: agent35
--   start: [2, 21]
-    name: agent36
--   start: [2, 25]
-    name: agent37
--   start: [2, 27]
-    name: agent38
--   start: [2, 29]
-    name: agent39
--   start: [2, 31]
-    name: agent40
--   start: [2, 35]
-    name: agent41
--   start: [22, 21]
-    name: agent42
--   start: [22, 25]
-    name: agent43
--   start: [22, 27]
-    name: agent44
--   start: [22, 29]
-    name: agent45
--   start: [22, 31]
-    name: agent46
--   start: [22, 35]
-    name: agent47
--   start: [0, 18]
-    name: agent48
--   start: [2, 18]
-    name: agent49
--   start: [22, 18]
-    name: agent50
--   start: [24, 18]
-    name: agent51
+
 map:
     dimensions: [40, 40]
     obstacles:
@@ -685,58 +632,32 @@ map:
     - !!python/tuple [ 35, 36 ]
     - !!python/tuple [ 35, 37 ]
     non_task_endpoints:
-    - !!python/tuple [0, 1]
-    - !!python/tuple [0, 5]
-    - !!python/tuple [0, 7]
-    - !!python/tuple [0, 9]
-    - !!python/tuple [0, 11]
-    - !!python/tuple [0, 15]
-    - !!python/tuple [24, 1]
-    - !!python/tuple [24, 5]
-    - !!python/tuple [24, 7]
-    - !!python/tuple [24, 9]
-    - !!python/tuple [24, 11]
-    - !!python/tuple [24, 15]
-    - !!python/tuple [2, 1]
-    - !!python/tuple [2, 5]
-    - !!python/tuple [2, 7]
-    - !!python/tuple [2, 9]
-    - !!python/tuple [2, 11]
-    - !!python/tuple [2, 15]
-    - !!python/tuple [22, 1]
-    - !!python/tuple [22, 5]
-    - !!python/tuple [22, 7]
-    - !!python/tuple [22, 9]
-    - !!python/tuple [22, 11]
-    - !!python/tuple [22, 15]
-    - !!python/tuple [0, 21]
-    - !!python/tuple [0, 25]
-    - !!python/tuple [0, 27]
-    - !!python/tuple [0, 29]
-    - !!python/tuple [0, 31]
-    - !!python/tuple [0, 35]
-    - !!python/tuple [24, 21]
-    - !!python/tuple [24, 25]
-    - !!python/tuple [24, 27]
-    - !!python/tuple [24, 29]
-    - !!python/tuple [24, 31]
-    - !!python/tuple [24, 35]
-    - !!python/tuple [2, 21]
-    - !!python/tuple [2, 25]
-    - !!python/tuple [2, 27]
-    - !!python/tuple [2, 29]
-    - !!python/tuple [2, 31]
-    - !!python/tuple [2, 35]
-    - !!python/tuple [22, 21]
-    - !!python/tuple [22, 25]
-    - !!python/tuple [22, 27]
-    - !!python/tuple [22, 29]
-    - !!python/tuple [22, 31]
-    - !!python/tuple [22, 35]
-    - !!python/tuple [0, 18]
-    - !!python/tuple [2, 18]
-    - !!python/tuple [22, 18]
-    - !!python/tuple [24, 18]
+    - !!python/tuple [3, 4]
+    - !!python/tuple [3, 8]
+    - !!python/tuple [3, 12]
+    - !!python/tuple [3, 16]
+    - !!python/tuple [3, 17]
+    - !!python/tuple [3, 19]
+    - !!python/tuple [3, 20]
+    - !!python/tuple [3, 21]
+    - !!python/tuple [3, 23]
+    - !!python/tuple [3, 24]
+    - !!python/tuple [3, 28]
+    - !!python/tuple [3, 32]
+    - !!python/tuple [3, 36]
+
+    - !!python/tuple [36, 4]
+    - !!python/tuple [36, 8]
+    - !!python/tuple [36, 12]
+    - !!python/tuple [36, 16]
+    - !!python/tuple [36, 17]
+    - !!python/tuple [36, 19]
+    - !!python/tuple [36, 20]
+    - !!python/tuple [36, 21]
+    - !!python/tuple [36, 24]
+    - !!python/tuple [36, 28]
+    - !!python/tuple [36, 32]
+    - !!python/tuple [36, 36]
     start_locations:
     - [5, 3]
     - [7, 3]
@@ -972,34 +893,47 @@ map:
     - [32, 37]
     - [34, 37]
     goal_locations:
-    -   [3, 4]
-    -   [3, 8]
-    -   [3, 12]
-    -   [3, 16]
-    -   [3, 17]
-    -   [3, 19]
-    -   [3, 20]
-    -   [3, 21]
-    -   [3, 23]
-    -   [3, 24]
-    -   [3, 28]
-    -   [3, 32]
-    -   [3, 36]
+    - [0, 4]
+    - [0, 5]
+    - [0, 6]
+    - [0, 7]
+    - [0, 8]
+    - [0, 9]
+    - [0, 10]
+    - [0, 11]
+    - [0, 12]
+    - [0, 13]
+    - [0, 26]
+    - [0, 27]
+    - [0, 28]
+    - [0, 29]
+    - [0, 30]
+    - [0, 31]
+    - [0, 32]
+    - [0, 33]
+    - [0, 34]
+    - [0, 35]
 
-    -   [36, 4]
-    -   [36, 8]
-    -   [36, 12]
-    -   [36, 16]
-    -   [36, 17]
-    -   [36, 19]
-    -   [36, 20]
-    -   [36, 21]
-    -   [36, 24]
-    -   [36, 28]
-    -   [36, 32]
-    -   [36, 36]
-
-
+    - [39, 4]
+    - [39, 5]
+    - [39, 6]
+    - [39, 7]
+    - [39, 8]
+    - [39, 9]
+    - [39, 10]
+    - [39, 11]
+    - [39, 12]
+    - [39, 13]
+    - [39, 26]
+    - [39, 27]
+    - [39, 28]
+    - [39, 29]
+    - [39, 30]
+    - [39, 31]
+    - [39, 32]
+    - [39, 33]
+    - [39, 34]
+    - [39, 35]
     charging_stations:
         - pos: [ 0, 15 ]
           name: station0
@@ -1053,8 +987,6 @@ map:
           name: station23
         - pos: [ 20, 39 ]
           name: station24
-
-
 
 n_tasks: 500
 task_freq: 50
