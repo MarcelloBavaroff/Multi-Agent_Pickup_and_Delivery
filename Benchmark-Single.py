@@ -133,12 +133,12 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/testMilan01_change.txt'
-    move_consumption = 0.5
+    file_name = 'Comparisons/big_change.txt'
+    move_consumption = 0.1
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.01
+    wait_consumption = 0.1
 
-    with open('Comparisons/seeds1.txt', 'r') as file:
+    with open('Comparisons/seeds2.txt', 'r') as file:
         # inserisci ogni riga in una lista
         seeds = file.read()
     seeds = seeds.split(" ")
