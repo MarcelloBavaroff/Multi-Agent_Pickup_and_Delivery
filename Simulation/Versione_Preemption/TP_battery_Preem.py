@@ -77,7 +77,7 @@ class TokenPassing(object):
         agents = {}
         for name, path in self.token['agents'].items():
             if len(path) == 1 and not (name in self.token['agents_to_tasks'] and self.token['agents_to_tasks'][name][
-                'task_name'] == 'recharging'):  # and name not in self.token['dead_agents']:
+                'task_name'] == 'recharging'):
                 agents[name] = path
         return agents
 
@@ -323,7 +323,7 @@ class TokenPassing(object):
                     and (self.token['charging_stations'][s['name']]['free'] == 'free'
                          or self.token['charging_stations'][s['name']]['free'] == agent_name):
 
-                estimated_to_station_duration = self.admissible_heuristic(task_final_pos, s['pos'])
+                estimated_to_station_duration = round(self.admissible_heuristic(task_final_pos, s['pos']),2)
                 estimated_total_duration = task_duration + estimated_to_station_duration
                 # estimated_arrival_time = estimated_total_duration + self.simulation.get_time()
 
@@ -341,7 +341,7 @@ class TokenPassing(object):
                         dist_min = estimated_to_station_duration
                         closest_station_name = s['name']
 
-        return closest_station_name, dist_min * self.move_consumption
+        return closest_station_name, round(dist_min * self.move_consumption, 2)
 
     def search_nearest_available_station_to_agent(self, agent_pos, agent_name, discarded_stations):
 
@@ -358,7 +358,7 @@ class TokenPassing(object):
             if s['name'] not in ongoing_tasks and s['name'] not in discarded_stations and (
                     self.token['charging_stations'][s['name']]['free'] == 'free'
                     or self.token['charging_stations'][s['name']]['free'] == agent_name):
-                estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
+                estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']),2)
 
                 if ((self.token['charging_stations'][s['name']]['booked'] is False or
                      self.token['charging_stations'][s['name']]['booked'] == agent_name) and
@@ -376,21 +376,21 @@ class TokenPassing(object):
         if closest_station_name is None:
             return None, None
         else:
-            return closest_station_name, dist_min * self.move_consumption
+            return closest_station_name, round(dist_min * self.move_consumption,2)
 
     def check_if_dead(self, agent_pos, agent_name):
         dist_min = -1
         estimated_station_cost = None
 
         for s in self.charging_stations:
-            estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
+            estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']), 2)
             if dist_min == -1:
                 dist_min = estimated_station_cost
 
             elif estimated_station_cost < dist_min:
                 dist_min = estimated_station_cost
 
-        if dist_min * self.move_consumption > self.simulation.get_batteries_level()[
+        if round(dist_min * self.move_consumption, 2) > self.simulation.get_batteries_level()[
             agent_name]:
             self.token['dead_agents'].add(agent_name)
             print(agent_name, 'is dead in position ', agent_pos, 'al timestep', self.simulation.get_time())

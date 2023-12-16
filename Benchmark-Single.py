@@ -6,12 +6,12 @@ import os
 
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-#from Simulation.TP_battery_Queue import TokenPassing
-#from Simulation.simulation_Queue import Simulation
+from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
+from Simulation.Versione_Queue.simulation_Queue import Simulation
 #from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
 #from Simulation.Versione_Preemption.simulation_Preem import Simulation
-from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
-from Simulation.Versione_Change.simulation_Change2 import Simulation
+#from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
+#from Simulation.Versione_Change.simulation_Change2 import Simulation
 
 
 def parameters(seed):
@@ -96,7 +96,7 @@ def single_run(index_run, random_seed, file_name, move_consumption=1.0, move_hea
                             move_heavy_consumption)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       goal_locations, a_star_max_iter=max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 5000:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 10000:
         simulation.time_forward(tp)
 
     completed_tasks = tp.get_completed_tasks()
@@ -133,12 +133,12 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/big_change.txt'
-    move_consumption = 0.1
-    move_heavy_consumption = move_consumption
-    wait_consumption = 0.1
+    file_name = 'Comparisons/Comp1new/queue/test28.txt'
+    move_consumption = 0.5
+    move_heavy_consumption = 1
+    wait_consumption = 0.01
 
-    with open('Comparisons/seeds2.txt', 'r') as file:
+    with open('Comparisons/seeds1.txt', 'r') as file:
         # inserisci ogni riga in una lista
         seeds = file.read()
     seeds = seeds.split(" ")
