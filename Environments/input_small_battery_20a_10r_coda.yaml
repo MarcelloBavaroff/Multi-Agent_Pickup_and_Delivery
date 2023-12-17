@@ -187,5 +187,5 @@ map:
         - pos: [ 11, 0 ]
           name: station9
           queue: [ 10, 0 ]
-n_tasks: 500
+n_tasks: 2000
 task_freq: 0.3

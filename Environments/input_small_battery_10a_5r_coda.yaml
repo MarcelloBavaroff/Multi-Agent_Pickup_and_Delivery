@@ -142,5 +142,5 @@ map:
         - pos: [ 5, 0 ]
           name: station6
           queue: [ 4, 0 ]
-n_tasks: 500
+n_tasks: 2000
 task_freq: 0.3
