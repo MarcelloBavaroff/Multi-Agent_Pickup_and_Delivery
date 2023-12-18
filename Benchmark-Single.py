@@ -133,8 +133,8 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/Big/test10.txt'
-    move_consumption = 0.01
+    file_name = 'Comparisons/Big/change/test13.txt'
+    move_consumption = 0.02
     move_heavy_consumption = move_consumption
     wait_consumption = 0.01
 
