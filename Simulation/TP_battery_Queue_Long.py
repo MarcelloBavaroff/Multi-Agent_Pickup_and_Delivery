@@ -342,7 +342,8 @@ class TokenPassing(object):
                 mixed_queue_agents = agents_in_queue_slots.union(
                     set(self.token['charging_stations'][s['name']]['in_queue']))
                 is_agent_in_queue = agent_name in mixed_queue_agents
-                is_limit_not_reached = len(agents_in_queue_slots) < self.token['charging_stations'][s['name']]['queue_len']
+                is_limit_not_reached = len(agents_in_queue_slots) < self.token['charging_stations'][s['name']][
+                    'queue_len']
 
                 # opzione 1: charger free o prenotato da me
                 # opzione 2: sono fisicamente in coda o in_queue prenotato da me
@@ -384,7 +385,8 @@ class TokenPassing(object):
                 mixed_queue_agents = agents_in_queue_slots.union(
                     set(self.token['charging_stations'][s['name']]['in_queue']))
                 is_agent_in_queue = agent_name in mixed_queue_agents
-                is_limit_not_reached = len(agents_in_queue_slots) < self.token['charging_stations'][s['name']]['queue_len']
+                is_limit_not_reached = len(agents_in_queue_slots) < self.token['charging_stations'][s['name']][
+                    'queue_len']
 
                 # opzione 1: charger free o prenotato da me
                 # opzione 2: sono fisicamente in coda o in_queue prenotato da me
@@ -467,16 +469,28 @@ class TokenPassing(object):
         for el in path2:
             self.token['agents'][agent_name].append([el['x'], el['y']])
 
-
+    # in teoria quando arriviamo quì è già stato effettuato il controllo su "posso arrivare"
+    # tra questi due agenti o no
     def update_in_queue_agents(self, station_name, agent_name):
         agent_arrival = len(self.token['agents_preemption'][agent_name])
 
+        if agent_name in self.token['charging_stations'][station_name]['in_queue']:
+            self.token['charging_stations'][station_name]['in_queue'].remove(agent_name)
+
+        index = -1
         for a in self.token['charging_stations'][station_name]['in_queue']:
+            if agent_arrival < len(self.token['agents_preemption'][a]):
+                index = (self.token['charging_stations'][station_name]['in_queue']).index(a)
+                (self.token['charging_stations'][station_name]['in_queue']).insert(index, agent_name)
+                break
+
+        if index == -1:
+            (self.token['charging_stations'][station_name]['in_queue']).append(agent_name)
 
     def handle_charging_stations_in_apply_path_preemption(self, agent_name, station_name):
 
         old_charger_agent = self.token['charging_stations'][station_name]['charger']
-        #ora è una lista ordinata di agenti che hanno prenotato la stazione
+        # ora è una lista ordinata di agenti che hanno prenotato la stazione
         old_in_queue_agents = self.token['charging_stations'][station_name]['in_queue']
 
         agents_in_queue_slots = self.set_of_agents_extra_slots(station_name)
@@ -493,26 +507,32 @@ class TokenPassing(object):
         elif not old_charger_agent == agent_name and is_limit_not_reached:
 
             # se arrivo prima di quello che è charger, divento io charger
-            if len(self.token['agents_preemption'][agent_name]) < len(
-                    self.token['agents_preemption'][old_charger_agent]):
+            if len(self.token['agents_preemption'][agent_name]) < len(self.token['agents_preemption'][old_charger_agent]):
                 self.token['charging_stations'][station_name]['charger'] = agent_name
-                self.token['charging_stations'][station_name]['in_queue'] = old_charger_agent
+                if agent_name in self.token['charging_stations'][station_name]['in_queue']:
+                    self.token['charging_stations'][station_name]['in_queue'].remove(agent_name)
+
+                self.update_in_queue_agents(station_name, old_charger_agent)
+
             else:
-                self.token['charging_stations'][station_name]['in_queue'] = agent_name
+                self.update_in_queue_agents(station_name, agent_name)
                 # considero che se fossero occupati entrambi non avrei scelto la stazione (quindi io ero in_queue)
 
-        elif old_charger_agent == agent_name and old_in_queue_agent is not None:
+        elif old_charger_agent == agent_name and len(self.token['charging_stations'][station_name]['in_queue']) > 0:
             # se risulto come charger vuol dire che sto andando a fare un task e riprenoto la stessa stazione
-            # se arrivo dopo l'agente in queue inverto
+            # se arrivo dopo il primo agente in queue inverto
+            first_agent_in_queue = self.token['charging_stations'][station_name]['in_queue'][0]
             if len(self.token['agents_preemption'][agent_name]) > len(
-                    self.token['agents_preemption'][old_in_queue_agent]):
-                self.token['charging_stations'][station_name]['charger'] = old_in_queue_agent
-                self.token['charging_stations'][station_name]['in_queue'] = agent_name
+                    self.token['agents_preemption'][first_agent_in_queue]):
+                self.token['charging_stations'][station_name]['charger'] = first_agent_in_queue
+                self.token['charging_stations'][station_name]['in_queue'].remove(first_agent_in_queue)
+
+                self.update_in_queue_agents(station_name, agent_name)
 
                 # se l'altro agente sta già andando segno lui come occupied
-                if old_in_queue_agent in self.token['agents_to_tasks'] and \
-                        self.token['agents_to_tasks'][old_in_queue_agent]['task_name'] == station_name:
-                    self.token['occupied_charging_stations'][old_in_queue_agent] = station_name
+                if first_agent_in_queue in self.token['agents_to_tasks'] and \
+                        self.token['agents_to_tasks'][first_agent_in_queue]['task_name'] == station_name:
+                    self.token['occupied_charging_stations'][first_agent_in_queue] = station_name
 
                 # gestione occupied charging stations in teoria altrove
 
@@ -520,18 +540,19 @@ class TokenPassing(object):
         # modifico la vecchia stazione dov'ero prenotato
         for s in self.charging_stations:
             if s['name'] != station_name:
-                if self.token['charging_stations'][s['name']]['in_queue'] == agent_name:
-                    self.token['charging_stations'][s['name']]['in_queue'] = None
+                if agent_name in self.token['charging_stations'][s['name']]['in_queue']:
+                    self.token['charging_stations'][s['name']]['in_queue'].remove(agent_name)
                     break
                 elif self.token['charging_stations'][s['name']]['charger'] == agent_name and \
-                        self.token['charging_stations'][s['name']]['in_queue'] is None:
+                        len(self.token['charging_stations'][s['name']]['in_queue']) == 0:
                     self.token['charging_stations'][s['name']]['charger'] = 'free'
                     break
                 elif self.token['charging_stations'][s['name']]['charger'] == agent_name and \
-                        self.token['charging_stations'][s['name']]['in_queue'] is not None:
+                        len(self.token['charging_stations'][s['name']]['in_queue']) > 0:
+
                     self.token['charging_stations'][s['name']]['charger'] = \
-                        self.token['charging_stations'][s['name']]['in_queue']
-                    self.token['charging_stations'][s['name']]['in_queue'] = None
+                        self.token['charging_stations'][s['name']]['in_queue'][0]
+                    del self.token['charging_stations'][s['name']]['in_queue'][0]
 
                     station_pos = self.token['charging_stations'][s['name']]['pos']
                     new_charger_agent = self.token['charging_stations'][s['name']]['charger']

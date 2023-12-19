@@ -1,0 +1,64 @@
+
+
+0 VersioneQueue 77440
+('Number of completed tasks: ', 6000, '/', 6000)
+('Number of dead agents: ', 0)
+('Makespan: ', 14747)
+('Average service time: ', 6301.096666666666)
+('Standard deviation: ', 4272.816424949973)
+('Chiamate a CBS per stazioni di ricarica: ', 28435)
+('Chiamate a CBS: ', 40470)
+
+1 VersioneQueue 7986
+('Number of completed tasks: ', 6000, '/', 6000)
+('Number of dead agents: ', 0)
+('Makespan: ', 14159)
+('Average service time: ', 6364.281166666667)
+('Standard deviation: ', 4310.711860908665)
+('Chiamate a CBS per stazioni di ricarica: ', 11665)
+('Chiamate a CBS: ', 23686)
+
+2 VersioneQueue 21251
+('Number of completed tasks: ', 6000, '/', 6000)
+('Number of dead agents: ', 0)
+('Makespan: ', 14339)
+('Average service time: ', 6355.2985)
+('Standard deviation: ', 4316.804125669565)
+('Chiamate a CBS per stazioni di ricarica: ', 15344)
+('Chiamate a CBS: ', 27381)
+
+3 VersioneQueue 75067
+('Number of completed tasks: ', 6000, '/', 6000)
+('Number of dead agents: ', 0)
+('Makespan: ', 14044)
+('Average service time: ', 6306.113333333334)
+('Standard deviation: ', 4290.4557357568465)
+('Chiamate a CBS per stazioni di ricarica: ', 9982)
+('Chiamate a CBS: ', 22007)
+
+4 VersioneQueue 82657
+('Number of completed tasks: ', 6000, '/', 6000)
+('Number of dead agents: ', 0)
+('Makespan: ', 14410)
+('Average service time: ', 6325.2395)
+('Standard deviation: ', 4287.901935695326)
+('Chiamate a CBS per stazioni di ricarica: ', 19347)
+('Chiamate a CBS: ', 31392)
+
+5 VersioneQueue 77820
+('Number of completed tasks: ', 6000, '/', 6000)
+('Number of dead agents: ', 0)
+('Makespan: ', 14125)
+('Average service time: ', 6296.1213333333335)
+('Standard deviation: ', 4267.16858181295)
+('Chiamate a CBS per stazioni di ricarica: ', 13515)
+('Chiamate a CBS: ', 25553)
+
+6 VersioneQueue 32454
+('Number of completed tasks: ', 6000, '/', 6000)
+('Number of dead agents: ', 0)
+('Makespan: ', 14108)
+('Average service time: ', 6288.216)
+('Standard deviation: ', 4306.243426933817)
+('Chiamate a CBS per stazioni di ricarica: ', 12363)
+('Chiamate a CBS: ', 24384)

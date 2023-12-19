@@ -4,12 +4,13 @@ import json
 import os
 #from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
 #from Simulation.Versione_Change.simulation_Change2 import Simulation
-from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
-from Simulation.Versione_Preemption.simulation_Preem import Simulation
+#from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
+#from Simulation.Versione_Preemption.simulation_Preem import Simulation
 #from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
 #from Simulation.Versione_Queue.simulation_Queue import Simulation
-#from Simulation.TP_battery_Queue_Long import TokenPassing
-#from Simulation.simulation_Queue_Long import Simulation
+from Simulation.TP_battery_Queue_Long import TokenPassing
+from Simulation.simulation_Queue_Long import Simulation
+
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
 
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
 
     args = parser.parse_args()
-    with open(os.path.join(RoothPath.get_root(), 'config.json'), 'r') as json_file:
+    with open(os.path.join(RoothPath.get_root(), 'config_demo.json'), 'r') as json_file:
         config = json.load(json_file)
     args.param = os.path.join(RoothPath.get_root(), os.path.join(config['input_path'], config['input_name']))
     args.output = os.path.join(RoothPath.get_root(), 'output.yaml')
