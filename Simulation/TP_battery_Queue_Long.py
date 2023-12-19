@@ -507,7 +507,8 @@ class TokenPassing(object):
         elif not old_charger_agent == agent_name and is_limit_not_reached:
 
             # se arrivo prima di quello che è charger, divento io charger
-            if len(self.token['agents_preemption'][agent_name]) < len(self.token['agents_preemption'][old_charger_agent]):
+            if len(self.token['agents_preemption'][agent_name]) < len(
+                    self.token['agents_preemption'][old_charger_agent]):
                 self.token['charging_stations'][station_name]['charger'] = agent_name
                 if agent_name in self.token['charging_stations'][station_name]['in_queue']:
                     self.token['charging_stations'][station_name]['in_queue'].remove(agent_name)
@@ -625,6 +626,7 @@ class TokenPassing(object):
 
     def compute_real_path(self, agent_name, agent_pos, closest_task, all_idle_agents,
                           predicted_consumption_to_station):
+
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents_preemption'], 0, agent_name)
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents, 0, agent_name)
         idle_obstacles_agents |= set(self.non_task_endpoints)
@@ -633,16 +635,19 @@ class TokenPassing(object):
         if agent_name in self.token['occupied_charging_stations'] and self.token['agents'][agent_name][0] == \
                 self.token['charging_stations'][self.token['occupied_charging_stations'][agent_name]]['pos']:
             station_name = self.token['occupied_charging_stations'][agent_name]
-            idle_obstacles_agents.remove(tuple(self.token['charging_stations'][station_name]['queue_pos']))
-            # idle_obstacles_agents.add(tuple(self.token['charging_stations'][station_name]['pos']))
 
-            in_queue_agent = self.token['charging_stations'][station_name]['in_queue']
-            if in_queue_agent is not None and not self.token['agents_preemption'][in_queue_agent][0] == \
-                                                  self.token['charging_stations'][station_name]['queue_pos']:
-                index_last_el = len(self.token['agents_preemption'][in_queue_agent]) - 1
-                last_el = self.token['agents_preemption'][in_queue_agent][index_last_el]
-                del moving_obstacles_agents[(last_el[0], last_el[1], -index_last_el)]
-                del moving_obstacles_agents[(last_el[0], last_el[1], index_last_el)]
+            for q in self.token['charging_stations'][station_name]['queue_pos']:
+                idle_obstacles_agents.remove(tuple(q))
+
+            if len(self.token['charging_stations'][station_name]['in_queue']) > 0:
+
+                for a in self.token['charging_stations'][station_name]['in_queue']:
+                    if not self.token['agents_preemption'][a][0] in self.token['charging_stations'][station_name][
+                        'queue_pos']:
+                        index_last_el = len(self.token['agents_preemption'][a]) - 1
+                        last_el = self.token['agents_preemption'][a][index_last_el]
+                        del moving_obstacles_agents[(last_el[0], last_el[1], -index_last_el)]
+                        del moving_obstacles_agents[(last_el[0], last_el[1], index_last_el)]
 
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
@@ -731,17 +736,19 @@ class TokenPassing(object):
         if agent_name in self.token['occupied_charging_stations'] and self.token['agents'][agent_name][0] == \
                 self.token['charging_stations'][self.token['occupied_charging_stations'][agent_name]]['pos']:
             station_name = self.token['occupied_charging_stations'][agent_name]
-            idle_obstacles_agents.remove(tuple(self.token['charging_stations'][station_name]['queue_pos']))
-            # idle_obstacles_agents.add(tuple(self.token['charging_stations'][station_name]['pos']))
 
-            in_queue_agent = self.token['charging_stations'][station_name]['in_queue']
-            # se l'agente in coda non è nell'extra slot
-            if in_queue_agent is not None and not self.token['agents_preemption'][in_queue_agent][0] == \
-                                                  self.token['charging_stations'][station_name]['queue_pos']:
-                index_last_el = len(self.token['agents_preemption'][in_queue_agent]) - 1
-                last_el = self.token['agents_preemption'][in_queue_agent][index_last_el]
-                del moving_obstacles_agents[(last_el[0], last_el[1], -index_last_el)]
-                del moving_obstacles_agents[(last_el[0], last_el[1], index_last_el)]
+            for q in self.token['charging_stations'][station_name]['queue_pos']:
+                idle_obstacles_agents.remove(tuple(q))
+
+            if len(self.token['charging_stations'][station_name]['in_queue']) > 0:
+
+                for a in self.token['charging_stations'][station_name]['in_queue']:
+                    if not self.token['agents_preemption'][a][0] in self.token['charging_stations'][station_name][
+                        'queue_pos']:
+                        index_last_el = len(self.token['agents_preemption'][a]) - 1
+                        last_el = self.token['agents_preemption'][a][index_last_el]
+                        del moving_obstacles_agents[(last_el[0], last_el[1], -index_last_el)]
+                        del moving_obstacles_agents[(last_el[0], last_el[1], index_last_el)]
 
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_endpoint}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, moving_obstacles_agents,
@@ -891,19 +898,25 @@ class TokenPassing(object):
                 if not changed:
                     self.use_preempted_path_to_station(agent_name)
 
+    def check_overlapping(self, arrival_time, estimated_time_to_recharge, agent_in_queue, station_pos):
+        for i in range(arrival_time, min(arrival_time + estimated_time_to_recharge + 1,
+                                         len(self.token['agents_preemption'][agent_in_queue]))):
+            if station_pos == self.token['agents_preemption'][agent_in_queue][i]:
+                return False
+        return True
+
     def early_arrival_control(self, nearest_station, arrival_time, estimated_time_to_recharge, agent_name):
 
         if not self.token['charging_stations'][nearest_station]['charger'] == 'free':
             # controllo se sono io charger
             if self.token['charging_stations'][nearest_station]['charger'] == agent_name:
                 # se sono io charger controllo se mi sovrappongo con quello in queue
-                if self.token['charging_stations'][nearest_station]['in_queue'] is not None:
-                    agent_in_queue = self.token['charging_stations'][nearest_station]['in_queue']
+                if len(self.token['charging_stations'][nearest_station]['in_queue']) > 0:
                     station_pos = self.token['charging_stations'][nearest_station]['pos']
-                    for i in range(arrival_time, min(arrival_time + estimated_time_to_recharge + 1,
-                                                     len(self.token['agents_preemption'][agent_in_queue]))):
-                        if station_pos == self.token['agents_preemption'][agent_in_queue][i]:
+                    for a in self.token['charging_stations'][nearest_station]['in_queue']:
+                        if not self.check_overlapping(arrival_time, estimated_time_to_recharge, a, station_pos):
                             return False
+
             # se non sono io charger vuol dire che o sono io quello in coda o non esiste
             else:
                 agent_charger = self.token['charging_stations'][nearest_station]['charger']
@@ -914,6 +927,14 @@ class TokenPassing(object):
                                                  len(self.token['agents_preemption'][agent_charger]))):
                     if station_pos == self.token['agents_preemption'][agent_charger][i]:
                         return False
+
+                # mi devo confrontare con gli altri agenti in coda
+                if len(self.token['charging_stations'][nearest_station]['in_queue']) > 0:
+                    station_pos = self.token['charging_stations'][nearest_station]['pos']
+                    for a in self.token['charging_stations'][nearest_station]['in_queue']:
+                        if a != agent_name and not self.check_overlapping(arrival_time, estimated_time_to_recharge, a,
+                                                                          station_pos):
+                            return False
 
         return True
 

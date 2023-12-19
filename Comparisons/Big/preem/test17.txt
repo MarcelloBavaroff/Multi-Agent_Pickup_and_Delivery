@@ -44,3 +44,12 @@
 ('Standard deviation: ', 77.30557157152376)
 ('Chiamate a CBS per stazioni di ricarica: ', 36652)
 ('Chiamate a CBS: ', 40829)
+
+1 VersioneQueue 7986
+('Number of completed tasks: ', 2000, '/', 2000)
+('Number of dead agents: ', 0)
+('Makespan: ', 6650)
+('Average service time: ', 104.0665)
+('Standard deviation: ', 91.39505499615386)
+('Chiamate a CBS per stazioni di ricarica: ', 29852)
+('Chiamate a CBS: ', 34013)

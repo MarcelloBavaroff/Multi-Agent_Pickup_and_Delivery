@@ -972,6 +972,6 @@ map:
         - pos: [ 20, 39 ]
           name: station24
 
-n_tasks: 6000
-task_freq: 5
+n_tasks: 2000
+task_freq: 0.3
 #n_delays_per_agent: 10
