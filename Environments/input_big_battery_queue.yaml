@@ -921,57 +921,47 @@ map:
     charging_stations:
         - pos: [ 0, 15 ]
           name: station0
-        - pos: [ 0, 16 ]
-          name: station1
+          queue: [ 0, 16 ]
         - pos: [ 0, 17 ]
           name: station2
-        - pos: [ 0, 18 ]
-          name: station3
+          queue: [ 0, 18 ]
         - pos: [ 0, 19 ]
           name: station4
-        - pos: [ 0, 20 ]
-          name: station5
+          queue: [ 0, 20 ]
         - pos: [ 0, 21 ]
           name: station6
-        - pos: [ 0, 22 ]
-          name: station7
+          queue: [ 0, 22 ]
         - pos: [ 0, 23 ]
           name: station8
-        - pos: [ 0, 24 ]
-          name: station9
+          queue: [ 0, 24 ]
 
         - pos: [ 39, 15 ]
           name: station10
-        - pos: [ 39, 16 ]
-          name: station11
+          queue: [ 39, 16 ]
         - pos: [ 39, 17 ]
           name: station12
-        - pos: [ 39, 18 ]
-          name: station13
+          queue: [ 39, 18 ]
         - pos: [ 39, 19 ]
           name: station14
-        - pos: [ 39, 20 ]
-          name: station15
+          queue: [ 39, 20 ]
         - pos: [ 39, 21 ]
           name: station16
-        - pos: [ 39, 22 ]
-          name: station17
+          queue: [ 39, 22 ]
         - pos: [ 39, 23 ]
           name: station18
-        - pos: [ 39, 24 ]
-          name: station19
+          queue: [ 39, 24 ]
 
-        - pos: [ 18, 0 ]
-          name: station20
+
         - pos: [ 19, 0 ]
           name: station21
-        - pos: [ 20, 0 ]
-          name: station22
-        - pos: [ 19, 39 ]
-          name: station23
+          queue: [ 20, 0 ]
         - pos: [ 20, 39 ]
           name: station24
+          queue: [ 19, 39 ]
+        - pos: [ 17, 0 ]
+          name: station25
+          queue: [ 18, 0 ]
 
 n_tasks: 2000
-task_freq: 0.3
+task_freq: 5
 #n_delays_per_agent: 10
