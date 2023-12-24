@@ -469,12 +469,12 @@ class TokenPassing(object):
             if s['name'] not in self.token['agents_to_tasks'] and (
                     self.token['charging_stations'][s['name']]['free'] == 'free'
                     or self.token['charging_stations'][s['name']]['free'] == agent_name):
-                estimated_station_cost = self.admissible_heuristic(task_final_pos, s['pos'])
-                estimated_arrival_cost = task_cost + estimated_station_cost
-                estimated_arrival_time = estimated_arrival_cost + self.simulation.get_time()
+                estimated_station_cost = round(self.admissible_heuristic(task_final_pos, s['pos']), 2)
+                estimated_arrival_cost = round(task_cost + estimated_station_cost, 2)
+                #estimated_arrival_time = estimated_arrival_cost + self.simulation.get_time()
 
-                # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
-                if estimated_arrival_cost * self.move_consumption < self.simulation.get_batteries_level()[
+                #Mi basta la batteria per arrivarci?
+                if round(estimated_arrival_cost * self.move_consumption, 2) < self.simulation.get_batteries_level()[
                     agent_name]:
                     if dist_min == -1:
                         dist_min = estimated_station_cost
@@ -484,7 +484,7 @@ class TokenPassing(object):
                         dist_min = estimated_station_cost
                         closest_station_name = s['name']
         # se restituisco estimated_station_cost * self.move_consumption considero sempre l'ultimo calcolato
-        return closest_station_name, dist_min * self.move_consumption
+        return closest_station_name, round(dist_min * self.move_consumption, 2)
 
     def search_nearest_available_station_to_agent(self, agent_pos, agent_name, discarded_stations):
 
@@ -502,7 +502,7 @@ class TokenPassing(object):
                     and (self.token['charging_stations'][s['name']]['free'] == 'free'
                          or self.token['charging_stations'][s['name']]['free'] == agent_name)):
 
-                estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
+                estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']), 2)
                 # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
                 if estimated_station_cost * self.move_consumption < self.simulation.get_batteries_level()[
                     agent_name]:
@@ -518,21 +518,21 @@ class TokenPassing(object):
         if closest_station_name is None:
             return None, None
         else:
-            return closest_station_name, dist_min * self.move_consumption
+            return closest_station_name, round(dist_min * self.move_consumption, 2)
 
     def check_if_dead(self, agent_pos, agent_name):
         dist_min = -1
         estimated_station_cost = None
 
         for s in self.charging_stations:
-            estimated_station_cost = self.admissible_heuristic(agent_pos, s['pos'])
+            estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']), 2)
             if dist_min == -1:
                 dist_min = estimated_station_cost
 
             elif estimated_station_cost < dist_min:
                 dist_min = estimated_station_cost
 
-        if dist_min * self.move_consumption > self.simulation.get_batteries_level()[
+        if round(dist_min * self.move_consumption, 2) > self.simulation.get_batteries_level()[
             agent_name]:
             self.token['dead_agents'].add(agent_name)
             print(agent_name, 'is dead in position ', agent_pos, 'al timestep', self.simulation.get_time())
@@ -845,7 +845,7 @@ class TokenPassing(object):
 
             task_total_cost = self.admissible_heuristic(closest_task[0], agent_pos)
             task_total_cost += self.admissible_heuristic(closest_task[1], closest_task[0])
-            task_total_consumption = task_total_cost * self.move_consumption
+            task_total_consumption = round(task_total_cost * self.move_consumption, 2)
 
             if task_total_consumption < self.simulation.get_batteries_level()[
                 agent_name] and closest_task_name != 'safe_idle':

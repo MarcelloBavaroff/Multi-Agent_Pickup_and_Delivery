@@ -323,7 +323,7 @@ class TokenPassing(object):
                     and (self.token['charging_stations'][s['name']]['free'] == 'free'
                          or self.token['charging_stations'][s['name']]['free'] == agent_name):
 
-                estimated_to_station_duration = round(self.admissible_heuristic(task_final_pos, s['pos']),2)
+                estimated_to_station_duration = round(self.admissible_heuristic(task_final_pos, s['pos']), 2)
                 estimated_total_duration = task_duration + estimated_to_station_duration
                 # estimated_arrival_time = estimated_total_duration + self.simulation.get_time()
 
@@ -376,7 +376,7 @@ class TokenPassing(object):
         if closest_station_name is None:
             return None, None
         else:
-            return closest_station_name, round(dist_min * self.move_consumption,2)
+            return closest_station_name, round(dist_min * self.move_consumption, 2)
 
     def check_if_dead(self, agent_pos, agent_name):
         dist_min = -1
@@ -598,15 +598,15 @@ class TokenPassing(object):
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
-                    consumption += self.wait_consumption
+                    consumption = round(consumption + self.wait_consumption, 2)
                 else:
-                    consumption += self.move_consumption
+                    consumption = round(consumption + self.move_consumption, 2)
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
-                    consumption += self.wait_consumption
+                    consumption = round(consumption + self.wait_consumption, 2)
                 else:
-                    consumption += self.move_consumption
+                    consumption = round(consumption + self.move_consumption, 2)
 
         return round(consumption, 2)
 
