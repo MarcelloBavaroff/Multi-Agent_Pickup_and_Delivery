@@ -976,5 +976,5 @@ map:
           name: station24
 
 n_tasks: 2000
-task_freq: 0.3
+task_freq: 5
 #n_delays_per_agent: 10
