@@ -5,7 +5,7 @@ from Simulation.tasks_and_delays_maker import *
 class Simulation(object):
     def __init__(self, tasks, agents, autonomies, charging_stations, move_consumption=1, wait_consumption=0.05,
                  move_heavy_consumption=1):
-        random.seed(5)
+        random.seed(3)
         self.tasks = tasks
         self.agents = agents
         self.time = 0
@@ -21,6 +21,7 @@ class Simulation(object):
         self.move_consumption = move_consumption
         self.wait_consumption = wait_consumption
         self.move_heavy_consumption = move_heavy_consumption
+        self.round = 3
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]
@@ -54,10 +55,10 @@ class Simulation(object):
                 self.actual_paths[agent['name']][self.time - 1]['y']:
 
             self.batteries_level[agent['name']] = round(
-                self.batteries_level[agent['name']] - self.wait_consumption, 2)
+                self.batteries_level[agent['name']] - self.wait_consumption, self.round)
         else:
             self.batteries_level[agent['name']] = round(
-                self.batteries_level[agent['name']] - effective_move_consumption, 2)
+                self.batteries_level[agent['name']] - effective_move_consumption, self.round)
 
             if update_actuale_path:
                 if agent['name'] in algorithm.get_occupied_stations():
@@ -99,7 +100,7 @@ class Simulation(object):
                 algorithm.get_token()['agents_preemption'][agent['name']] = algorithm.get_token()['agents_preemption'][
                                                                                 agent['name']][1:]
 
-                self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + 10, 2)
+                self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + 10, self.round)
 
                 # se carica completa lo metto in idle?
                 if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:

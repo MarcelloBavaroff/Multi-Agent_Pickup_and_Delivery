@@ -52,7 +52,7 @@ def parameters(seed):
     else:
         # Generate random tasks and delays
         #tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'],param['n_tasks'], param['task_freq'], random_seed)
-        tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'], 4000, 0.3, random_seed)
+        tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'], 2000, 0.3, random_seed)
 
     # batteria casuale tra 80 e 100
     autonomies = []
@@ -68,6 +68,7 @@ def parameters(seed):
 
     return tasks, agents, autonomies, charging_stations, dimensions, obstacles, non_task_endpoints, param['map'][
         'goal_locations'], args.a_star_max_iter
+
 
 def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev,cbs_calls,
                      index_run, cbs_calls_recharge, random_seed=1234, file_name='Comparisons/Comp1/test3.txt'):
@@ -95,7 +96,7 @@ def single_run(index_run, random_seed, file_name, move_consumption=1.0, move_hea
                             move_heavy_consumption)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       goal_locations, a_star_max_iter=max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 30000:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 20000:
         simulation.time_forward(tp)
 
     completed_tasks = tp.get_completed_tasks()
@@ -132,10 +133,10 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/BigSeparate/change/test28.txt'
-    move_consumption = 0.02
+    file_name = 'Comparisons/Big/change/test21.txt'
+    move_consumption = 0.001
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.01
+    wait_consumption = 0.001
 
     with open('Comparisons/seeds2.txt', 'r') as file:
         # inserisci ogni riga in una lista
@@ -176,11 +177,7 @@ if __name__ == '__main__':
     except:
         print("0 run completate")
 
-
     with open(file_name, 'a') as file:
-        file.write("\n\n" + "move_consumption: " + str(move_consumption) + "\n")
-        file.write("move_heavy_consumption: " + str(move_heavy_consumption) + "\n")
-        file.write("wait_consumption: " + str(wait_consumption) + "\n")
         file.write("\n\n" + "Numero di run completate: " + str(run_complete1) + "\n")
         file.write("Numero medio di task completati: " + str(sum_completed_tasks1 / 20) + "\n")
         file.write("Numero medio di agenti morti: " + str(sum_dead_agents1 / 20) + "\n")

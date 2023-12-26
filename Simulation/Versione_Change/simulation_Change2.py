@@ -21,6 +21,7 @@ class Simulation(object):
         self.move_consumption = move_consumption
         self.wait_consumption = wait_consumption
         self.move_heavy_consumption = move_heavy_consumption
+        self.round = 3
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]
@@ -54,10 +55,10 @@ class Simulation(object):
                 self.actual_paths[agent['name']][self.time - 1]['y']:
 
             self.batteries_level[agent['name']] = round(
-                self.batteries_level[agent['name']] - self.wait_consumption, 2)
+                self.batteries_level[agent['name']] - self.wait_consumption, self.round)
         else:
             self.batteries_level[agent['name']] = round(
-                self.batteries_level[agent['name']] - effective_move_consumption, 2)
+                self.batteries_level[agent['name']] - effective_move_consumption, self.round)
 
             if update_actuale_path:
                 if agent['name'] in algorithm.get_occupied_stations():
@@ -93,7 +94,7 @@ class Simulation(object):
                                                                  1:]
 
                 # self.batteries_level[agent['name']] += 10
-                self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + 10, 2)
+                self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + 10, self.round)
 
                 # se carica completa lo metto in idle?
                 if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:

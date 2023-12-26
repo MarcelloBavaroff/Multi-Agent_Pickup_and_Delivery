@@ -34,6 +34,7 @@ class TokenPassing(object):
         self.chiamateCBS = 0
         self.chiamateCBS_recharge = 0
         self.init_token()
+        self.round = 3
         # vedi sotto
 
     def init_token(self):
@@ -339,7 +340,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name]) / 10
-                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, 4)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
@@ -469,12 +470,12 @@ class TokenPassing(object):
             if s['name'] not in self.token['agents_to_tasks'] and (
                     self.token['charging_stations'][s['name']]['free'] == 'free'
                     or self.token['charging_stations'][s['name']]['free'] == agent_name):
-                estimated_station_cost = round(self.admissible_heuristic(task_final_pos, s['pos']), 2)
-                estimated_arrival_cost = round(task_cost + estimated_station_cost, 2)
+                estimated_station_cost = round(self.admissible_heuristic(task_final_pos, s['pos']), self.round)
+                estimated_arrival_cost = round(task_cost + estimated_station_cost, self.round)
                 #estimated_arrival_time = estimated_arrival_cost + self.simulation.get_time()
 
                 #Mi basta la batteria per arrivarci?
-                if round(estimated_arrival_cost * self.move_consumption, 2) < self.simulation.get_batteries_level()[
+                if round(estimated_arrival_cost * self.move_consumption, self.round) < self.simulation.get_batteries_level()[
                     agent_name]:
                     if dist_min == -1:
                         dist_min = estimated_station_cost
@@ -484,7 +485,7 @@ class TokenPassing(object):
                         dist_min = estimated_station_cost
                         closest_station_name = s['name']
         # se restituisco estimated_station_cost * self.move_consumption considero sempre l'ultimo calcolato
-        return closest_station_name, round(dist_min * self.move_consumption, 2)
+        return closest_station_name, round(dist_min * self.move_consumption, self.round)
 
     def search_nearest_available_station_to_agent(self, agent_pos, agent_name, discarded_stations):
 
@@ -502,7 +503,7 @@ class TokenPassing(object):
                     and (self.token['charging_stations'][s['name']]['free'] == 'free'
                          or self.token['charging_stations'][s['name']]['free'] == agent_name)):
 
-                estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']), 2)
+                estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']), self.round)
                 # quando arrivo trovo la stazione libera? Mi basta la batteria per arrivarci?
                 if estimated_station_cost * self.move_consumption < self.simulation.get_batteries_level()[
                     agent_name]:
@@ -518,21 +519,21 @@ class TokenPassing(object):
         if closest_station_name is None:
             return None, None
         else:
-            return closest_station_name, round(dist_min * self.move_consumption, 2)
+            return closest_station_name, round(dist_min * self.move_consumption, self.round)
 
     def check_if_dead(self, agent_pos, agent_name):
         dist_min = -1
         estimated_station_cost = None
 
         for s in self.charging_stations:
-            estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']), 2)
+            estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']), self.round)
             if dist_min == -1:
                 dist_min = estimated_station_cost
 
             elif estimated_station_cost < dist_min:
                 dist_min = estimated_station_cost
 
-        if round(dist_min * self.move_consumption, 2) > self.simulation.get_batteries_level()[
+        if round(dist_min * self.move_consumption, self.round) > self.simulation.get_batteries_level()[
             agent_name]:
             self.token['dead_agents'].add(agent_name)
             print(agent_name, 'is dead in position ', agent_pos, 'al timestep', self.simulation.get_time())
@@ -750,9 +751,9 @@ class TokenPassing(object):
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.move_consumption, 2)
+                    consumption = round(consumption + self.move_consumption, self.round)
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
@@ -760,7 +761,7 @@ class TokenPassing(object):
                 else:
                     consumption = round(consumption + self.move_consumption, 2)
 
-        return round(consumption, 2)
+        return round(consumption, self.round)
 
     def predicted_consumption_heavy(self, path):
 
@@ -769,17 +770,17 @@ class TokenPassing(object):
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.heavy_consumption, 2)
+                    consumption = round(consumption + self.heavy_consumption, self.round)
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.heavy_consumption, 2)
+                    consumption = round(consumption + self.heavy_consumption, self.round)
 
-        return round(consumption, 2)
+        return round(consumption, self.round)
 
     # restituisco 2 insiemi di agenti con cui ho conflitti: agenti intoccabili (caricano o già pickup)
     # agenti eliminabili (non vanno a caricare)
@@ -845,7 +846,7 @@ class TokenPassing(object):
 
             task_total_cost = self.admissible_heuristic(closest_task[0], agent_pos)
             task_total_cost += self.admissible_heuristic(closest_task[1], closest_task[0])
-            task_total_consumption = round(task_total_cost * self.move_consumption, 2)
+            task_total_consumption = round(task_total_cost * self.move_consumption, self.round)
 
             if task_total_consumption < self.simulation.get_batteries_level()[
                 agent_name] and closest_task_name != 'safe_idle':

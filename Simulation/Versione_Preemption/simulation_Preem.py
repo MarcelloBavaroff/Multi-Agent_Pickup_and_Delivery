@@ -20,6 +20,7 @@ class Simulation(object):
         self.move_consumption = move_consumption
         self.wait_consumption = wait_consumption
         self.move_heavy_consumption = move_heavy_consumption
+        self.round = 3
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]
@@ -53,10 +54,10 @@ class Simulation(object):
                 self.actual_paths[agent['name']][self.time - 1]['y']:
 
             self.batteries_level[agent['name']] = round(
-                self.batteries_level[agent['name']] - self.wait_consumption, 2)
+                self.batteries_level[agent['name']] - self.wait_consumption, self.round)
         else:
             self.batteries_level[agent['name']] = round(
-                self.batteries_level[agent['name']] - effective_move_consumption, 2)
+                self.batteries_level[agent['name']] - effective_move_consumption, self.round)
 
             if update_actuale_path:
                 if agent['name'] in algorithm.get_occupied_stations():
@@ -94,7 +95,7 @@ class Simulation(object):
                                                                                 agent['name']][1:]
 
                 # self.batteries_level[agent['name']] += 10
-                self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + 10, 2)
+                self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + 10, self.round)
 
                 # se carica completa lo metto in idle?
                 if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
@@ -107,34 +108,6 @@ class Simulation(object):
                 self.actual_paths[agent['name']].append(
                     {'t': self.time, 'x': current_agent_pos['x'], 'y': current_agent_pos['y']})
 
-                # # if agent['name'] in algorithm.get_token()['agents_to_tasks']:
-                # #     task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
-                # # else:
-                # #     task_name = None
-                # task_name = 'mabel'
-                #
-                # if task_name in algorithm.get_token()['start_tasks_times'] \
-                #         and algorithm.get_token()['agents_to_tasks'][agent['name']]['start'] not in \
-                #         algorithm.get_token()['agents'][agent['name']]:
-                #     self.batteries_level[agent['name']] = round(
-                #         self.batteries_level[agent['name']] - self.move_heavy_consumption, 2)
-                #
-                # # abbasso livello di batteria
-                # elif self.actual_paths[agent['name']][self.time]['x'] == \
-                #         self.actual_paths[agent['name']][self.time - 1]['x'] and \
-                #         self.actual_paths[agent['name']][self.time]['y'] == \
-                #         self.actual_paths[agent['name']][self.time - 1]['y']:
-                #
-                #     # self.batteries_level[agent['name']] -= self.wait_consumption
-                #     self.batteries_level[agent['name']] = round(
-                #         self.batteries_level[agent['name']] - self.wait_consumption, 2)
-                # else:
-                #     # self.batteries_level[agent['name']] -= self.move_consumption
-                #     self.batteries_level[agent['name']] = round(
-                #         self.batteries_level[agent['name']] - self.move_consumption, 2)
-                #
-                # if self.batteries_level[agent['name']] <= 0:
-                #     print("Batteria negativa")
                 self.update_batteries(algorithm, agent, update_actuale_path=False)
                 algorithm.get_token()['agents_preemption'][agent['name']] = algorithm.get_token()['agents_preemption'][
                                                                                 agent['name']][1:]
@@ -154,42 +127,6 @@ class Simulation(object):
         self.actual_paths[agent['name']].append({'t': self.time, 'x': x_new, 'y': y_new})
 
         self.update_batteries(algorithm, agent, update_actuale_path=True)
-
-        # # if agent['name'] in algorithm.get_token()['agents_to_tasks']:
-        # #     task_name = algorithm.get_token()['agents_to_tasks'][agent['name']]['task_name']
-        # # else:
-        # #     task_name = None
-        # task_name = 'mabel'
-        # if task_name in algorithm.get_token()['start_tasks_times'] \
-        #         and algorithm.get_token()['agents_to_tasks'][agent['name']]['start'] not in algorithm.get_token()['agents'][agent['name']]:
-        #     self.batteries_level[agent['name']] = round(
-        #         self.batteries_level[agent['name']] - self.move_heavy_consumption, 2)
-        #
-        # elif self.actual_paths[agent['name']][self.time]['x'] == \
-        #         self.actual_paths[agent['name']][self.time - 1]['x'] and \
-        #         self.actual_paths[agent['name']][self.time]['y'] == \
-        #         self.actual_paths[agent['name']][self.time - 1]['y']:
-        #
-        #     # self.batteries_level[agent['name']] -= self.wait_consumption
-        #     self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] - self.wait_consumption, 2)
-        # else:
-        #     # self.batteries_level[agent['name']] -= self.move_consumption
-        #     self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] - self.move_consumption, 2)
-        #
-        #     # controllo che vado via dalla stazione di ricarica
-        #     if agent['name'] in algorithm.get_occupied_stations():
-        #
-        #         station_name = algorithm.get_occupied_stations()[agent['name']]
-        #         station_pos = tuple(algorithm.get_token()['charging_stations'][station_name]['pos'])
-        #         agent_old_pos = tuple((self.actual_paths[agent['name']][self.time - 1]['x'],
-        #                                self.actual_paths[agent['name']][self.time - 1]['y']))
-        #
-        #         if agent_old_pos == station_pos:
-        #             algorithm.set_free_station(algorithm.get_occupied_stations()[agent['name']])
-        #             algorithm.remove_occupied_station(agent['name'])
-        #
-        # if self.batteries_level[agent['name']] <= 0:
-        #     print("errore(agent path tolto)")
 
     def handle_loops(self, agents_to_move, algorithm):
 

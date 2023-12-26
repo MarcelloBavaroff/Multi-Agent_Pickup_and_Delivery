@@ -35,6 +35,7 @@ class TokenPassing(object):
         self.chiamateCBS = 0
         self.chiamateCBS_recharge = 0
         self.init_token()
+        self.round = 3
         # vedi sotto
 
     def init_token(self):
@@ -262,7 +263,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name]) / 10
-                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
@@ -323,7 +324,7 @@ class TokenPassing(object):
                     and (self.token['charging_stations'][s['name']]['free'] == 'free'
                          or self.token['charging_stations'][s['name']]['free'] == agent_name):
 
-                estimated_to_station_duration = round(self.admissible_heuristic(task_final_pos, s['pos']), 2)
+                estimated_to_station_duration = round(self.admissible_heuristic(task_final_pos, s['pos']), self.round)
                 estimated_total_duration = task_duration + estimated_to_station_duration
                 # estimated_arrival_time = estimated_total_duration + self.simulation.get_time()
 
@@ -341,7 +342,7 @@ class TokenPassing(object):
                         dist_min = estimated_to_station_duration
                         closest_station_name = s['name']
 
-        return closest_station_name, round(dist_min * self.move_consumption, 2)
+        return closest_station_name, round(dist_min * self.move_consumption, self.round)
 
     def search_nearest_available_station_to_agent(self, agent_pos, agent_name, discarded_stations):
 
@@ -358,7 +359,7 @@ class TokenPassing(object):
             if s['name'] not in ongoing_tasks and s['name'] not in discarded_stations and (
                     self.token['charging_stations'][s['name']]['free'] == 'free'
                     or self.token['charging_stations'][s['name']]['free'] == agent_name):
-                estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']),2)
+                estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']),self.round)
 
                 if ((self.token['charging_stations'][s['name']]['booked'] is False or
                      self.token['charging_stations'][s['name']]['booked'] == agent_name) and
@@ -376,21 +377,21 @@ class TokenPassing(object):
         if closest_station_name is None:
             return None, None
         else:
-            return closest_station_name, round(dist_min * self.move_consumption, 2)
+            return closest_station_name, round(dist_min * self.move_consumption, self.round)
 
     def check_if_dead(self, agent_pos, agent_name):
         dist_min = -1
         estimated_station_cost = None
 
         for s in self.charging_stations:
-            estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']), 2)
+            estimated_station_cost = round(self.admissible_heuristic(agent_pos, s['pos']), self.round)
             if dist_min == -1:
                 dist_min = estimated_station_cost
 
             elif estimated_station_cost < dist_min:
                 dist_min = estimated_station_cost
 
-        if round(dist_min * self.move_consumption, 2) > self.simulation.get_batteries_level()[
+        if round(dist_min * self.move_consumption, self.round) > self.simulation.get_batteries_level()[
             agent_name]:
             self.token['dead_agents'].add(agent_name)
             print(agent_name, 'is dead in position ', agent_pos, 'al timestep', self.simulation.get_time())
@@ -598,17 +599,17 @@ class TokenPassing(object):
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.move_consumption, 2)
+                    consumption = round(consumption + self.move_consumption, self.round)
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.move_consumption, 2)
+                    consumption = round(consumption + self.move_consumption, self.round)
 
-        return round(consumption, 2)
+        return round(consumption, self.round)
 
     def predicted_consumption_heavy(self, path):
 
@@ -617,17 +618,17 @@ class TokenPassing(object):
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.heavy_consumption, 2)
+                    consumption = round(consumption + self.heavy_consumption, self.round)
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.heavy_consumption, 2)
+                    consumption = round(consumption + self.heavy_consumption, self.round)
 
-        return round(consumption, 2)
+        return round(consumption, self.round)
 
 
     # se hai un percorso di ricarica, ma non hai la batteria uguale al minimo per andarci controlli
@@ -679,7 +680,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name] + total_real_consumption) / 10
-                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # tra quanti timestep dovrei caricarmi
@@ -790,15 +791,13 @@ class TokenPassing(object):
                                 # se effettivamente ho un percorso per la stazione calcolato col consumo reale, allora
                                 # posso controllare gli endpoint
                                 if path_station is not False:
-                                    # discarded_endpoints2 = set()
-                                    # assigned = False
                                     assigned = True
                                     #total_real_consumption = endpoint_consumption + to_station_consumption
                                     estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                                   self.simulation.get_batteries_level()[
                                                                       agent_name] + total_real_consumption) / 10
 
-                                    estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                                    estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                                     estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                                     self.apply_path(agent_name, agent_pos, None, path_endpoint[agent_name], 'safe_idle',
@@ -888,7 +887,7 @@ class TokenPassing(object):
                                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                               self.simulation.get_batteries_level()[
                                                                   agent_name] + total_real_consumption) / 10
-                                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
                                 # tra quanti timestep dovrei caricarmi
                                 # total_real_duration = total_real_duration + estimated_time_to_recharge + to_station_duration - 1
