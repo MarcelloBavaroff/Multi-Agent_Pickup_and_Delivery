@@ -21,7 +21,13 @@ class Simulation(object):
         self.move_consumption = move_consumption
         self.wait_consumption = wait_consumption
         self.move_heavy_consumption = move_heavy_consumption
-        self.round = 3
+
+        if move_consumption < 0.01 or wait_consumption < 0.01:
+            self.round = 3
+        else:
+            self.round = 2
+
+
 
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]

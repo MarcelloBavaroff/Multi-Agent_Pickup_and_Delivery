@@ -34,7 +34,11 @@ class TokenPassing(object):
         self.chiamateCBS = 0
         self.chiamateCBS_recharge = 0
         self.init_token()
-        self.round = 3
+
+        if self.move_consumption < 0.01 or self.wait_consumption < 0.01:
+            self.round = 3
+        else:
+            self.round = 2
         # vedi sotto
 
     def init_token(self):
@@ -340,7 +344,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name]) / 10
-                estimated_time_to_recharge = round(estimated_time_to_recharge, 4)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
@@ -757,9 +761,9 @@ class TokenPassing(object):
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.move_consumption, 2)
+                    consumption = round(consumption + self.move_consumption, self.round)
 
         return round(consumption, self.round)
 
