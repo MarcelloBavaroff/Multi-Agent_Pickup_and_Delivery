@@ -960,6 +960,6 @@ map:
           name: station24
           queue: [ 38, 39 ]
 
-n_tasks: 2000
+n_tasks: 10
 task_freq: 5
 #n_delays_per_agent: 10

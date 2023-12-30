@@ -2,12 +2,12 @@ import argparse
 import yaml
 import json
 import os
-from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
-from Simulation.Versione_Change.simulation_Change2 import Simulation
+#from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
+#from Simulation.Versione_Change.simulation_Change2 import Simulation
 #from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
 #from Simulation.Versione_Preemption.simulation_Preem import Simulation
-#from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
-#from Simulation.Versione_Queue.simulation_Queue import Simulation
+from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
+from Simulation.Versione_Queue.simulation_Queue import Simulation
 #from Simulation.TP_battery_Queue_Long import TokenPassing
 #from Simulation.simulation_Queue_Long import Simulation
 
@@ -40,8 +40,8 @@ def read_tasks():
 
 if __name__ == '__main__':
     # random.seed(1234)
-    #seed = random.randint(0, 100000)
-    seed = 75067
+    seed = random.randint(0, 100000)
+    #seed = 75067
     random.seed(seed)
     print("Seed: ", seed)
     parser = argparse.ArgumentParser()
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     simulation = Simulation(tasks, agents, autonomies, charging_stations, 0.001, 0.001, 0.001)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
-    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 20000:
+    while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 200:
         simulation.time_forward(tp)
 
     print("Number of completed tasks: ", tp.get_completed_tasks(), "/", len(tasks))
