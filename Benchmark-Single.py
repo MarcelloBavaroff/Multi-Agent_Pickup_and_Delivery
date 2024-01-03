@@ -52,12 +52,12 @@ def parameters(seed):
     else:
         # Generate random tasks and delays
         #tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'],param['n_tasks'], param['task_freq'], random_seed)
-        tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'], 2000, 5, random_seed)
+        tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'], 2000, 0.3, random_seed)
 
     # batteria casuale tra 80 e 100
     autonomies = []
     for i in range(len(agents)):
-        autonomies.append(round(random.uniform(99, 100), 2))
+        autonomies.append(round(random.uniform(80, 100), 2))
 
     print(autonomies)
     param['autonomies'] = autonomies
@@ -133,10 +133,10 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/BigSpecial/preem/testEx13battery.txt'
+    file_name = 'Comparisons/BigSpecial/preem/S2.txt'
     move_consumption = 0.02
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.01
+    wait_consumption = 0.001
 
     with open('Comparisons/seeds2.txt', 'r') as file:
         # inserisci ogni riga in una lista

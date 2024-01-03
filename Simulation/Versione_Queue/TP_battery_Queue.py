@@ -35,7 +35,10 @@ class TokenPassing(object):
         self.chiamateCBS = 0
         self.chiamateCBS_recharge = 0
         self.init_token()
-        self.round = 3
+        if self.move_consumption < 0.01 or self.wait_consumption < 0.01:
+            self.round = 3
+        else:
+            self.round = 2
         # vedi sotto
 
     def init_token(self):
@@ -267,7 +270,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[agent_name]) / 10
 
-                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
@@ -788,7 +791,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name] + total_real_consumption) / 10
-                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # tra quanti timestep dovrei caricarmi
@@ -919,7 +922,7 @@ class TokenPassing(object):
                                     estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                                   self.simulation.get_batteries_level()[
                                                                       agent_name] + total_real_consumption) / 10
-                                    estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                                    estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                                     estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                                     if self.early_arrival_control(nearest_station, real_duration_endpoint - 2 + len(

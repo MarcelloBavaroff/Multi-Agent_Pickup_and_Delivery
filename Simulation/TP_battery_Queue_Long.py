@@ -14,7 +14,7 @@ States = ['safe_idle', 'recharging', 'charge_complete']
 class TokenPassing(object):
     def __init__(self, agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation, goal_endpoints,
                  a_star_max_iter=5000, new_recovery=False):
-        random.seed(5)
+        random.seed(3)
         self.agents = agents
         self.dimensions = dimensions
         self.obstacles = set(obstacles)
@@ -35,6 +35,10 @@ class TokenPassing(object):
         self.chiamateCBS = 0
         self.chiamateCBS_recharge = 0
         self.init_token()
+        if self.move_consumption < 0.01 or self.wait_consumption < 0.01:
+            self.round = 3
+        else:
+            self.round = 2
         # vedi sotto
 
     def init_token(self):
@@ -269,7 +273,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[agent_name]) / 10
 
-                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
@@ -585,8 +589,10 @@ class TokenPassing(object):
         el = path_preemption[-1]
         for i in range(estimated_time_to_recharge):
             self.token['agents_preemption'][agent_name].append([el['x'], el['y']])
-        # nel preemption metto sempre che poi va nell'extra slot
-        self.token['agents_preemption'][agent_name].append(self.token['charging_stations'][station_name]['queue_pos'])
+        # nel preemption metto sempre che poi va negli extra slot
+
+        for q in self.token['charging_stations'][station_name]['queue_pos']:
+            self.token['agents_preemption'][agent_name].append(q)
 
         self.handle_charging_stations_in_apply_path_preemption(agent_name, station_name)
 
@@ -771,17 +777,17 @@ class TokenPassing(object):
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.move_consumption, 2)
+                    consumption = round(consumption + self.move_consumption, self.round)
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.move_consumption, 2)
+                    consumption = round(consumption + self.move_consumption, self.round)
 
-        return round(consumption, 2)
+        return round(consumption, self.round)
 
     def predicted_consumption_heavy(self, path):
 
@@ -790,17 +796,17 @@ class TokenPassing(object):
         if type(path[0]) is dict:
             for i in range(len(path) - 1):
                 if path[i]['x'] == path[i + 1]['x'] and path[i]['y'] == path[i + 1]['y']:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.heavy_consumption, 2)
+                    consumption = round(consumption + self.heavy_consumption, self.round)
         else:
             for i in range(len(path) - 1):
                 if path[i][0] == path[i + 1][0] and path[i][1] == path[i + 1][1]:
-                    consumption = round(consumption + self.wait_consumption, 2)
+                    consumption = round(consumption + self.wait_consumption, self.round)
                 else:
-                    consumption = round(consumption + self.heavy_consumption, 2)
+                    consumption = round(consumption + self.heavy_consumption, self.round)
 
-        return round(consumption, 2)
+        return round(consumption, self.round)
 
     # se hai un percorso di ricarica, ma non hai la batteria uguale al minimo per andarci controlli
     # se anche al turno dopo avrai un percorso valido per andare. Se si cambi il preemption path con quello
@@ -846,7 +852,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name] + total_real_consumption) / 10
-                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # tra quanti timestep dovrei caricarmi
@@ -991,7 +997,7 @@ class TokenPassing(object):
                                     estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                                   self.simulation.get_batteries_level()[
                                                                       agent_name] + total_real_consumption) / 10
-                                    estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                                    estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                                     estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                                     if self.early_arrival_control(nearest_station, real_duration_endpoint - 2 + len(
@@ -1080,7 +1086,7 @@ class TokenPassing(object):
                                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                               self.simulation.get_batteries_level()[
                                                                   agent_name] + total_real_consumption) / 10
-                                estimated_time_to_recharge = round(estimated_time_to_recharge, 3)
+                                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
                                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
                                 # tra quanti timestep dovrei caricarmi
                                 # total_real_duration = total_real_duration + estimated_time_to_recharge + to_station_duration - 1
