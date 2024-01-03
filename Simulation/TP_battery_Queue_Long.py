@@ -638,6 +638,7 @@ class TokenPassing(object):
         idle_obstacles_agents |= set(self.non_task_endpoints)
         idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos), tuple(closest_task[1])}
 
+        # se l'agente è in una stazione di ricarica ed ha finito di ricaricarsi
         if agent_name in self.token['occupied_charging_stations'] and self.token['agents'][agent_name][0] == \
                 self.token['charging_stations'][self.token['occupied_charging_stations'][agent_name]]['pos']:
             station_name = self.token['occupied_charging_stations'][agent_name]
@@ -646,7 +647,7 @@ class TokenPassing(object):
                 idle_obstacles_agents.remove(tuple(q))
 
             if len(self.token['charging_stations'][station_name]['in_queue']) > 0:
-
+                #per opgni agente in queue se non è fisicamente li lo rimuovo
                 for a in self.token['charging_stations'][station_name]['in_queue']:
                     if not self.token['agents_preemption'][a][0] in self.token['charging_stations'][station_name][
                         'queue_pos']:
