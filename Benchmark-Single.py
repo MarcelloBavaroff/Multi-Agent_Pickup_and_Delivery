@@ -6,10 +6,10 @@ import os
 
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-#from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
-#from Simulation.Versione_Queue.simulation_Queue import Simulation
-from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
-from Simulation.Versione_Preemption.simulation_Preem import Simulation
+from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
+from Simulation.Versione_Queue.simulation_Queue import Simulation
+#from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
+#from Simulation.Versione_Preemption.simulation_Preem import Simulation
 #from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
 #from Simulation.Versione_Change.simulation_Change2 import Simulation
 
@@ -133,10 +133,10 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/BigSpecial/preem/S2.txt'
-    move_consumption = 0.02
+    file_name = 'Comparisons/BigSpecial/queue/R4.txt'
+    move_consumption = 0.1
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.001
+    wait_consumption = 0.1
 
     with open('Comparisons/seeds2.txt', 'r') as file:
         # inserisci ogni riga in una lista

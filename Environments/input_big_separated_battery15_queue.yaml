@@ -1,46 +1,27 @@
 agents:
--   start: [3, 4]
-    name: agent0
 -   start: [3, 8]
     name: agent1
 -   start: [3, 12]
     name: agent2
 -   start: [3, 16]
     name: agent3
--   start: [3, 17]
-    name: agent4
--   start: [3, 19]
-    name: agent5
 -   start: [3, 20]
     name: agent6
--   start: [3, 21]
-    name: agent7
--   start: [3, 23]
-    name: agent8
 -   start: [3, 24]
     name: agent9
 -   start: [3, 28]
     name: agent10
 -   start: [3, 32]
     name: agent11
--   start: [3, 36]
-    name: agent12
--   start: [36, 4]
-    name: agent13
+
 -   start: [36, 8]
     name: agent14
 -   start: [36, 12]
     name: agent15
 -   start: [36, 16]
     name: agent16
--   start: [36, 17]
-    name: agent17
--   start: [36, 19]
-    name: agent18
 -   start: [36, 20]
     name: agent19
--   start: [36, 21]
-    name: agent20
 -   start: [36, 23]
     name: agent21
 -   start: [36, 24]
@@ -632,28 +613,18 @@ map:
     - !!python/tuple [ 35, 36 ]
     - !!python/tuple [ 35, 37 ]
     non_task_endpoints:
-    - !!python/tuple [3, 4]
     - !!python/tuple [3, 8]
     - !!python/tuple [3, 12]
     - !!python/tuple [3, 16]
-    - !!python/tuple [3, 17]
-    - !!python/tuple [3, 19]
     - !!python/tuple [3, 20]
-    - !!python/tuple [3, 21]
-    - !!python/tuple [3, 23]
     - !!python/tuple [3, 24]
     - !!python/tuple [3, 28]
     - !!python/tuple [3, 32]
-    - !!python/tuple [3, 36]
 
-    - !!python/tuple [36, 4]
     - !!python/tuple [36, 8]
     - !!python/tuple [36, 12]
     - !!python/tuple [36, 16]
-    - !!python/tuple [36, 17]
-    - !!python/tuple [36, 19]
     - !!python/tuple [36, 20]
-    - !!python/tuple [36, 21]
     - !!python/tuple [36, 24]
     - !!python/tuple [36, 28]
     - !!python/tuple [36, 32]
@@ -919,59 +890,36 @@ map:
     - [39, 34]
     - [39, 35]
     charging_stations:
-        - pos: [ 0, 15 ]
+        - pos: [ 0, 0 ]
           name: station0
-        - pos: [ 0, 16 ]
-          name: station1
-        - pos: [ 0, 17 ]
-          name: station2
-        - pos: [ 0, 18 ]
-          name: station3
-        - pos: [ 0, 19 ]
-          name: station4
-        - pos: [ 0, 20 ]
-          name: station5
-        - pos: [ 0, 21 ]
-          name: station6
-        - pos: [ 0, 22 ]
-          name: station7
-        - pos: [ 0, 23 ]
-          name: station8
-        - pos: [ 0, 24 ]
-          name: station9
+          queue: [ 1, 0 ]
 
-        - pos: [ 39, 15 ]
-          name: station10
-        - pos: [ 39, 16 ]
-          name: station11
-        - pos: [ 39, 17 ]
-          name: station12
-        - pos: [ 39, 18 ]
-          name: station13
-        - pos: [ 39, 19 ]
-          name: station14
-        - pos: [ 39, 20 ]
-          name: station15
-        - pos: [ 39, 21 ]
-          name: station16
-        - pos: [ 39, 22 ]
-          name: station17
-        - pos: [ 39, 23 ]
-          name: station18
-        - pos: [ 39, 24 ]
-          name: station19
-
-        - pos: [ 18, 0 ]
-          name: station20
         - pos: [ 19, 0 ]
-          name: station21
-        - pos: [ 20, 0 ]
-          name: station22
-        - pos: [ 19, 39 ]
-          name: station23
-        - pos: [ 20, 39 ]
-          name: station24
+          name: station6
+          queue: [ 20, 0 ]
 
-n_tasks: 5000
+        - pos: [ 37, 0 ]
+          name: station10
+          queue: [ 36, 0 ]
+        - pos: [ 39, 0 ]
+          name: station11
+          queue: [ 38, 0 ]
+
+        - pos: [ 0, 39 ]
+          name: station13
+          queue: [ 1, 39 ]
+        - pos: [ 2, 39 ]
+          name: station15
+          queue: [ 3, 39 ]
+
+        - pos: [ 20, 39 ]
+          name: station19
+          queue: [ 19, 39 ]
+
+        - pos: [ 39, 39 ]
+          name: station24
+          queue: [ 38, 39 ]
+
+n_tasks: 2000
 task_freq: 5
 #n_delays_per_agent: 10

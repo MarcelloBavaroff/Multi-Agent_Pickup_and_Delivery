@@ -192,8 +192,7 @@ class TokenPassing(object):
 
         return False
 
-    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints,
-                                      preem_non_task_endpoint):  # old_non_task_endpoint,
+    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints,preem_non_task_endpoint):  # old_non_task_endpoint,
         dist = -1
         res = -1
         for endpoint in self.non_task_endpoints:
@@ -1197,6 +1196,16 @@ class TokenPassing(object):
                 else:
                     self.token['charging_stations'][station_name]['charger'] = 'free'
 
+    # controlla se l'agente è fisicamente in coda (tranne in ultima posizione), se lo è bisogna vedere se spostarlo o meno lungo la coda
+    def in_queue(self, agent_name):
+        agent_pos = self.token['agents'][agent_name][0]
+
+        for s in self.token['charging_stations']:
+            if agent_pos in self.token['charging_stations'][s]['queue_pos']:
+                return True
+
+        return False
+
     def time_forward(self):
 
         self.update_completed_tasks()
@@ -1225,8 +1234,8 @@ class TokenPassing(object):
                     # questo implica che in passato qualcuno ha già calcolato il mio path per andare a caricarmi
                     # self.decide_if_charge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
-                    if agent_name in self.token['occupied_charging_stations']:
-                        print(agent_name, ' is already charging')
+                    if agent_name in self.token['occupied_charging_stations'] or self.in_queue(agent_name):
+                        print(agent_name, ' is already charging or in queue')
                         if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):
                             print(agent_name, "non ha trovato un NON-T.E. appropriato")
                             self.move_to_extra_slot(agent_name)
@@ -1266,7 +1275,7 @@ class TokenPassing(object):
                     # se non ho un percorso per andarmi a caricare dopo che vado nel NON task endpoint, vado a caricarmi
                     if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):
 
-                        if agent_name in self.token['occupied_charging_stations']:
+                        if agent_name in self.token['occupied_charging_stations'] or self.in_queue(agent_name):
                             print(agent_name, ' is already charging')
                             self.move_to_extra_slot(agent_name)
                         else:
