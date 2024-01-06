@@ -78,6 +78,7 @@ class TokenPassing(object):
             self.token['charging_stations'][c['name']]['charger'] = 'free'
             # self.token['charging_stations'][c['name']]['extra_slot'] = 'free'
             # questa diventerà una lista ordinata di agenti che hanno prenotato la stazione
+            #prenotati, non fisicamente in coda
             self.token['charging_stations'][c['name']]['in_queue'] = []
             self.token['charging_stations'][c['name']]['queue_len'] = len(c['queue'])
 
@@ -330,6 +331,8 @@ class TokenPassing(object):
             if a[0] in self.token['charging_stations'][station_name]['queue_pos']:
                 agents.add(a)
         return agents
+
+
 
     def search_nearest_available_station(self, task_duration, task_final_pos, agent_name, discarded_stations):
 
@@ -1167,34 +1170,35 @@ class TokenPassing(object):
 
         if stazioni_occupate != len(self.token['occupied_charging_stations']):
             print("errore(agent path tolto)")
+    # versione molto diversa da quella con singolo slot, infatti imponendo che gli agenti devono sempre muoversi
+    # verso lo slot successivo (a meno che non sia occupato)
 
-    # sposta l'agente dalla stazione di ricarica alla coda, se questa è libera
+    # data una posizione in coda in una stazione dice che agente c'è
+    # t=0 sarebbe al tempo attuale
+    def agent_physically_in_queue_pos(self, station_name, pos_index, t):
+
+        for a in self.token['agents']:
+            if self.token['agents'][a][t] == self.token['charging_stations'][station_name]['queue_pos'][
+                pos_index]:
+                return a
+
+        return None
     def move_to_extra_slot(self, agent_name):
-        station_name = self.token['occupied_charging_stations'][agent_name]
-        queue_pos = self.token['charging_stations'][station_name]['queue_pos']
+        # devo controllare la mia posizione, quindi se sono nella stazione o in coda
+        # se sono nella stazione non mi muovo solo se la coda è piena
+        # se sono in coda mi muovo solo se non sono in ultima posizione e neppure se le posizioni
+        # dopo la mia sono occupate.
 
-        # se la coda è libera ci vado e segno che ora sono io ad occuparla
-        if self.token['charging_stations'][station_name]['extra_slot'] == 'free':
+        if agent_name in self.token['occupied_charging_stations']:
+            station_name = self.token['occupied_charging_stations'][agent_name]
+            #lista delle posizioni di coda
+            queue_pos = self.token['charging_stations'][station_name]['queue_pos']
 
-            free = True
-            for a in self.token['agents_preemption']:
-                if a != agent_name and len(self.token['agents_preemption'][a]) > 1 and \
-                        self.token['agents_preemption'][a][1] == queue_pos:
-                    free = False
-                    break
+            agent_in_first_pos = self.agent_physically_in_queue_pos(station_name, 0, 1)
+            if agent_in_first_pos is None:
+                # se non c'è nessuno nella prima posizione mi muovo
 
-            if free:
-                self.token['agents'][agent_name].append(queue_pos)
-                self.token['charging_stations'][station_name]['extra_slot'] = agent_name
-                del self.token['occupied_charging_stations'][agent_name]
 
-                if self.token['charging_stations'][station_name]['in_queue'] is not None:
-                    self.token['charging_stations'][station_name]['charger'] = \
-                        self.token['charging_stations'][station_name]['in_queue']
-                    self.token['charging_stations'][station_name]['in_queue'] = None
-
-                else:
-                    self.token['charging_stations'][station_name]['charger'] = 'free'
 
     # controlla se l'agente è fisicamente in coda (tranne in ultima posizione), se lo è bisogna vedere se spostarlo o meno lungo la coda
     def in_queue(self, agent_name):
@@ -1269,8 +1273,7 @@ class TokenPassing(object):
             # righe 15-16 alg
             else:
                 if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
-                        self.token['agents_preemption'][agent_name]) and len(
-                    self.token['agents_preemption'][agent_name]) != 0:
+                        self.token['agents_preemption'][agent_name]) and len(self.token['agents_preemption'][agent_name]) != 0:
 
                     # se non ho un percorso per andarmi a caricare dopo che vado nel NON task endpoint, vado a caricarmi
                     if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):
