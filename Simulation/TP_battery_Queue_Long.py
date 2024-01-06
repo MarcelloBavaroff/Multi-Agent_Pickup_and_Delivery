@@ -332,8 +332,6 @@ class TokenPassing(object):
                 agents.add(a)
         return agents
 
-
-
     def search_nearest_available_station(self, task_duration, task_final_pos, agent_name, discarded_stations):
 
         dist_min = -1
@@ -1176,20 +1174,29 @@ class TokenPassing(object):
     # data una posizione in coda in una stazione dice che agente c'è
     # t=0 sarebbe al tempo attuale
     def agent_physically_in_queue_pos(self, station_name, pos_index, t):
-
         for a in self.token['agents']:
-            if self.token['agents'][a][t] == self.token['charging_stations'][station_name]['queue_pos'][
-                pos_index]:
+            if self.token['agents'][a][t] == self.token['charging_stations'][station_name]['queue_pos'][pos_index]:
                 return a
 
         return None
-    def move_to_extra_slot(self, agent_name):
+
+    def in_queue(self, agent_name):
+        agent_pos = self.token['agents'][agent_name][0]
+
+        for s in self.token['charging_stations']:
+            if agent_pos in self.token['charging_stations'][s]['queue_pos']:
+                return s
+
+        return None
+    def move_to_extra_slot(self, agent_name, in_queue_station):
         # devo controllare la mia posizione, quindi se sono nella stazione o in coda
         # se sono nella stazione non mi muovo solo se la coda è piena
         # se sono in coda mi muovo solo se non sono in ultima posizione e neppure se le posizioni
         # dopo la mia sono occupate.
 
-        if agent_name in self.token['occupied_charging_stations']:
+        agent_pos = self.token['agents'][agent_name][0]
+
+        if in_queue_station is None:
             station_name = self.token['occupied_charging_stations'][agent_name]
             #lista delle posizioni di coda
             queue_pos = self.token['charging_stations'][station_name]['queue_pos']
@@ -1197,18 +1204,35 @@ class TokenPassing(object):
             agent_in_first_pos = self.agent_physically_in_queue_pos(station_name, 0, 1)
             if agent_in_first_pos is None:
                 # se non c'è nessuno nella prima posizione mi muovo
+                self.token['agents'][agent_name].append(queue_pos[0])
+                # in preemption dovrebbe già esserci
+            else:
+                # rimango fermo, aggiungo la posizione attuale in [agents] ed anche in [agents_preemption]
+                self.token['agents'][agent_name].append(agent_pos)
+                self.token['agents_preemption'][agent_name].insert(agent_pos, 0)
+        # se è in ultima posizione può solo fare wait
+        elif self.token['agents'][agent_name][0] == self.token['charging_stations'][in_queue_station]['queue_pos'][-1]:
+            self.token['agents'][agent_name].append(agent_pos)
+            self.token['agents_preemption'][agent_name].insert(agent_pos, 0)
+        # quindi è in coda, ma non in ultima posizione
+        else:
+            index_pos = self.token['charging_stations'][in_queue_station]['queue_pos'].index(agent_pos)
+            agent_adiacent = self.agent_physically_in_queue_pos(in_queue_station, index_pos + 1, 1)
+            if agent_adiacent is None:
+                self.token['agents'][agent_name].append(self.token['charging_stations'][in_queue_station]['queue_pos'][index_pos + 1])
+            else:
+                self.token['agents'][agent_name].append(agent_pos)
+                self.token['agents_preemption'][agent_name].insert(agent_pos, 0)
+
+
+
+
+
 
 
 
     # controlla se l'agente è fisicamente in coda (tranne in ultima posizione), se lo è bisogna vedere se spostarlo o meno lungo la coda
-    def in_queue(self, agent_name):
-        agent_pos = self.token['agents'][agent_name][0]
 
-        for s in self.token['charging_stations']:
-            if agent_pos in self.token['charging_stations'][s]['queue_pos']:
-                return True
-
-        return False
 
     def time_forward(self):
 
@@ -1237,12 +1261,12 @@ class TokenPassing(object):
                 if not assigned and len(available_tasks) > 0:
                     # questo implica che in passato qualcuno ha già calcolato il mio path per andare a caricarmi
                     # self.decide_if_charge(agent_name, agent_pos, all_idle_agents, idle_agents)
-
-                    if agent_name in self.token['occupied_charging_stations'] or self.in_queue(agent_name):
+                    in_queue_station = self.in_queue(agent_name)
+                    if agent_name in self.token['occupied_charging_stations'] or (in_queue_station is not None):
                         print(agent_name, ' is already charging or in queue')
                         if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):
                             print(agent_name, "non ha trovato un NON-T.E. appropriato")
-                            self.move_to_extra_slot(agent_name)
+                            self.move_to_extra_slot(agent_name, in_queue_station)
                     else:
                         if agent_name in self.token['agents_preemption'] and len(
                                 self.token['agents'][agent_name]) != len(
@@ -1277,10 +1301,10 @@ class TokenPassing(object):
 
                     # se non ho un percorso per andarmi a caricare dopo che vado nel NON task endpoint, vado a caricarmi
                     if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):
-
-                        if agent_name in self.token['occupied_charging_stations'] or self.in_queue(agent_name):
+                        in_queue_station = self.in_queue(agent_name)
+                        if agent_name in self.token['occupied_charging_stations'] or (in_queue_station is not None):
                             print(agent_name, ' is already charging')
-                            self.move_to_extra_slot(agent_name)
+                            self.move_to_extra_slot(agent_name, in_queue_station)
                         else:
                             self.use_preempted_path_to_station(agent_name)
 
