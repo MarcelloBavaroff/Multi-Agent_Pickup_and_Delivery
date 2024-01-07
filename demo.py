@@ -2,14 +2,14 @@ import argparse
 import yaml
 import json
 import os
-# from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
-# from Simulation.Versione_Change.simulation_Change2 import Simulation
+from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
+from Simulation.Versione_Change.simulation_Change2 import Simulation
 # from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
 # from Simulation.Versione_Preemption.simulation_Preem import Simulation
 # from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
 # from Simulation.Versione_Queue.simulation_Queue import Simulation
-from Simulation.TP_battery_Queue_Long import TokenPassing
-from Simulation.simulation_Queue_Long import Simulation
+#from Simulation.TP_battery_Queue_Long import TokenPassing
+#from Simulation.simulation_Queue_Long import Simulation
 
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     print("Seed: ", seed)
     parser = argparse.ArgumentParser()
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
-                        default=50000, type=int)
+                        default=5000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=3, type=int)  # default=1
     parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
 
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = Simulation(tasks, agents, autonomies, charging_stations, 1, 1, 1)
+    simulation = Simulation(tasks, agents, autonomies, charging_stations, 0.01, 0.01, 0.01)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 20000:
