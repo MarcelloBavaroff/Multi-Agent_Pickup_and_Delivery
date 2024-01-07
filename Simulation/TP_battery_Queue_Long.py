@@ -5,7 +5,7 @@ author: Giacomo Lodigiani (@Lodz97)
 import math
 from math import fabs
 import random
-from Simulation.CBS.cbs import CBS, Environment
+from Simulation.CBS.cbs2 import CBS, Environment
 
 # Praticamente aggiungo al set idle_obstacles_agents tutti i delivery che non sono il suo delivery o la sua posizione corrente
 States = ['safe_idle', 'recharging', 'charge_complete']
@@ -59,6 +59,7 @@ class TokenPassing(object):
         self.token['charging_stations'] = {}
         self.token['occupied_charging_stations'] = {}
         self.token['dead_agents'] = set()
+        self.token['extra_moving_obstacles'] = {}
 
         for a in self.agents:
             self.token['agents'][a['name']] = [a['start']]
@@ -78,7 +79,7 @@ class TokenPassing(object):
             self.token['charging_stations'][c['name']]['charger'] = 'free'
             # self.token['charging_stations'][c['name']]['extra_slot'] = 'free'
             # questa diventerà una lista ordinata di agenti che hanno prenotato la stazione
-            #prenotati, non fisicamente in coda
+            # prenotati, non fisicamente in coda
             self.token['charging_stations'][c['name']]['in_queue'] = []
             self.token['charging_stations'][c['name']]['queue_len'] = len(c['queue'])
 
@@ -193,7 +194,8 @@ class TokenPassing(object):
 
         return False
 
-    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints,preem_non_task_endpoint):  # old_non_task_endpoint,
+    def get_closest_non_task_endpoint(self, agent_pos, discarded_endpoints,
+                                      preem_non_task_endpoint):  # old_non_task_endpoint,
         dist = -1
         res = -1
         for endpoint in self.non_task_endpoints:
@@ -273,7 +275,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[agent_name]) / 10
 
-                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round + 1)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # aggiungo al path dell'agente la posizione corrente fino a quando non finirà di caricarsi
@@ -346,7 +348,9 @@ class TokenPassing(object):
                 mixed_queue_agents = agents_in_queue_slots.union(
                     set(self.token['charging_stations'][s['name']]['in_queue']))
                 is_agent_in_queue = agent_name in mixed_queue_agents
-                is_limit_not_reached = len(agents_in_queue_slots) < self.token['charging_stations'][s['name']][
+                # unione tra quelli in già in coda a cui potrebbe servire prima di te + quelli che sono già fisicamente in coda
+                # < perché uno slot in teoria lo occupa il charger prima di te
+                is_limit_not_reached = len(mixed_queue_agents) < self.token['charging_stations'][s['name']][
                     'queue_len']
 
                 # opzione 1: charger free o prenotato da me
@@ -389,7 +393,8 @@ class TokenPassing(object):
                 mixed_queue_agents = agents_in_queue_slots.union(
                     set(self.token['charging_stations'][s['name']]['in_queue']))
                 is_agent_in_queue = agent_name in mixed_queue_agents
-                is_limit_not_reached = len(agents_in_queue_slots) < self.token['charging_stations'][s['name']][
+                # < perché uno slot in teoria lo occupa il charger prima di te
+                is_limit_not_reached = len(mixed_queue_agents) < self.token['charging_stations'][s['name']][
                     'queue_len']
 
                 # opzione 1: charger free o prenotato da me
@@ -647,7 +652,7 @@ class TokenPassing(object):
                 idle_obstacles_agents.remove(tuple(q))
 
             if len(self.token['charging_stations'][station_name]['in_queue']) > 0:
-                #per opgni agente in queue se non è fisicamente li lo rimuovo
+                # per opgni agente in queue se non è fisicamente li lo rimuovo
                 for a in self.token['charging_stations'][station_name]['in_queue']:
                     if not self.token['agents_preemption'][a][0] in self.token['charging_stations'][station_name][
                         'queue_pos']:
@@ -703,6 +708,11 @@ class TokenPassing(object):
 
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents_preemption'], time_start,
                                                                    agent_name)
+        for e in self.token['extra_moving_obstacles']:
+            moving_obstacles_agents[(e[0], e[1], e[2]-time_start)] = 'place holder'
+
+        #moving_obstacles_agents.update(self.token['extra_moving_obstacles'])
+
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents, time_start, agent_name)
         idle_obstacles_agents |= set(self.non_task_endpoints)
         idle_obstacles_agents = idle_obstacles_agents - {tuple(agent_pos),
@@ -853,7 +863,7 @@ class TokenPassing(object):
                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                               self.simulation.get_batteries_level()[
                                                   agent_name] + total_real_consumption) / 10
-                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
+                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round + 1)
                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                 # tra quanti timestep dovrei caricarmi
@@ -870,11 +880,15 @@ class TokenPassing(object):
                                                    path_station[agent_name], estimated_time_to_recharge,
                                                    nearest_station)
                 else:
-                    discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
-                    nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
-                        agent_pos, agent_name, discarded_stations)
+                    # l'idea qui è che non scarti la stazione, ma la lasci disponibile per il prossimo controllo, ma questa volta
+                    # vengono aggiunti i nuovi extra moving obstacles
+
+                    #discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
+                    #nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
+                    #    agent_pos, agent_name, discarded_stations)
                     path_station = False
 
+        self.token['extra_moving_obstacles'] = {}
         return assigned
 
     def decide_if_charge(self, agent_name, agent_pos, all_idle_agents, idle_agents):
@@ -905,10 +919,15 @@ class TokenPassing(object):
                 if not changed:
                     self.use_preempted_path_to_station(agent_name)
 
+    def create_extra_moving_obstacles(self, start_t, end_t, pos):
+        for i in range(start_t, end_t + 1):
+            self.token['extra_moving_obstacles'][(pos[0], pos[1], i)] = "place holder"
+
     def check_overlapping(self, arrival_time, estimated_time_to_recharge, agent_in_queue, station_pos):
         for i in range(arrival_time, min(arrival_time + estimated_time_to_recharge + 1,
                                          len(self.token['agents_preemption'][agent_in_queue]))):
             if station_pos == self.token['agents_preemption'][agent_in_queue][i]:
+                self.create_extra_moving_obstacles(arrival_time, i, station_pos)
                 return False
         return True
 
@@ -933,12 +952,14 @@ class TokenPassing(object):
                 for i in range(arrival_time, min(arrival_time + estimated_time_to_recharge + 1,
                                                  len(self.token['agents_preemption'][agent_charger]))):
                     if station_pos == self.token['agents_preemption'][agent_charger][i]:
+                        self.create_extra_moving_obstacles(arrival_time, i, station_pos)
                         return False
 
                 # mi devo confrontare con gli altri agenti in coda
                 if len(self.token['charging_stations'][nearest_station]['in_queue']) > 0:
-                    station_pos = self.token['charging_stations'][nearest_station]['pos']
+                    # station_pos = self.token['charging_stations'][nearest_station]['pos']
                     for a in self.token['charging_stations'][nearest_station]['in_queue']:
+                        # self check restituisce true se va tutto bene
                         if a != agent_name and not self.check_overlapping(arrival_time, estimated_time_to_recharge, a,
                                                                           station_pos):
                             return False
@@ -998,7 +1019,7 @@ class TokenPassing(object):
                                     estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                                   self.simulation.get_batteries_level()[
                                                                       agent_name] + total_real_consumption) / 10
-                                    estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
+                                    estimated_time_to_recharge = round(estimated_time_to_recharge, self.round + 1)
                                     estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
 
                                     if self.early_arrival_control(nearest_station, real_duration_endpoint - 2 + len(
@@ -1017,11 +1038,11 @@ class TokenPassing(object):
                                         print(agent_name, " si dirige verso il NON task endpoint",
                                               closest_non_task_endpoint)
 
-                                    else:
-                                        discarded_stations.add(nearest_station)
-                                        nearest_station, consumption_to_station_heuristic = self.search_nearest_available_station(
-                                            endpoint_duration, closest_non_task_endpoint, agent_name,
-                                            discarded_stations)
+                                    # else:
+                                    #     discarded_stations.add(nearest_station)
+                                    #     nearest_station, consumption_to_station_heuristic = self.search_nearest_available_station(
+                                    #         endpoint_duration, closest_non_task_endpoint, agent_name,
+                                    #         discarded_stations)
 
                                 else:
                                     discarded_stations.add(nearest_station)
@@ -1039,7 +1060,7 @@ class TokenPassing(object):
                         break
                 else:
                     break
-
+        self.token['extra_moving_obstacles'] = {}
         return assigned
 
     def choose_task_and_station(self, agent_name, agent_pos, all_idle_agents, available_tasks):
@@ -1087,7 +1108,7 @@ class TokenPassing(object):
                                 estimated_time_to_recharge = (self.simulation.get_max_autonomies()[agent_name] -
                                                               self.simulation.get_batteries_level()[
                                                                   agent_name] + total_real_consumption) / 10
-                                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round+1)
+                                estimated_time_to_recharge = round(estimated_time_to_recharge, self.round + 1)
                                 estimated_time_to_recharge = math.ceil(estimated_time_to_recharge)
                                 # tra quanti timestep dovrei caricarmi
                                 # total_real_duration = total_real_duration + estimated_time_to_recharge + to_station_duration - 1
@@ -1109,8 +1130,8 @@ class TokenPassing(object):
                                                                path_station[agent_name], estimated_time_to_recharge,
                                                                nearest_station)
 
-                                else:
-                                    discarded_stations.add(nearest_station)
+                                # else:
+                                #     discarded_stations.add(nearest_station)
                             else:
                                 discarded_stations.add(nearest_station)
 
@@ -1129,7 +1150,7 @@ class TokenPassing(object):
                     break
             else:
                 break
-
+        self.token['extra_moving_obstacles'] = {}
         return assigned
 
     def compute_consumption_to_station(self, agent_name):
@@ -1168,6 +1189,7 @@ class TokenPassing(object):
 
         if stazioni_occupate != len(self.token['occupied_charging_stations']):
             print("errore(agent path tolto)")
+
     # versione molto diversa da quella con singolo slot, infatti imponendo che gli agenti devono sempre muoversi
     # verso lo slot successivo (a meno che non sia occupato)
 
@@ -1175,7 +1197,8 @@ class TokenPassing(object):
     # t=0 sarebbe al tempo attuale
     def agent_physically_in_queue_pos(self, station_name, pos_index, t):
         for a in self.token['agents']:
-            if self.token['agents'][a][t] == self.token['charging_stations'][station_name]['queue_pos'][pos_index]:
+            if len(self.token['agents'][a]) > 1 and self.token['agents'][a][t] == \
+                    self.token['charging_stations'][station_name]['queue_pos'][pos_index]:
                 return a
 
         return None
@@ -1188,6 +1211,7 @@ class TokenPassing(object):
                 return s
 
         return None
+
     def move_to_extra_slot(self, agent_name, in_queue_station):
         # devo controllare la mia posizione, quindi se sono nella stazione o in coda
         # se sono nella stazione non mi muovo solo se la coda è piena
@@ -1198,7 +1222,7 @@ class TokenPassing(object):
 
         if in_queue_station is None:
             station_name = self.token['occupied_charging_stations'][agent_name]
-            #lista delle posizioni di coda
+            # lista delle posizioni di coda
             queue_pos = self.token['charging_stations'][station_name]['queue_pos']
 
             agent_in_first_pos = self.agent_physically_in_queue_pos(station_name, 0, 1)
@@ -1219,20 +1243,13 @@ class TokenPassing(object):
             index_pos = self.token['charging_stations'][in_queue_station]['queue_pos'].index(agent_pos)
             agent_adiacent = self.agent_physically_in_queue_pos(in_queue_station, index_pos + 1, 1)
             if agent_adiacent is None:
-                self.token['agents'][agent_name].append(self.token['charging_stations'][in_queue_station]['queue_pos'][index_pos + 1])
+                self.token['agents'][agent_name].append(
+                    self.token['charging_stations'][in_queue_station]['queue_pos'][index_pos + 1])
             else:
                 self.token['agents'][agent_name].append(agent_pos)
                 self.token['agents_preemption'][agent_name].insert(agent_pos, 0)
 
-
-
-
-
-
-
-
     # controlla se l'agente è fisicamente in coda (tranne in ultima posizione), se lo è bisogna vedere se spostarlo o meno lungo la coda
-
 
     def time_forward(self):
 
@@ -1297,7 +1314,8 @@ class TokenPassing(object):
             # righe 15-16 alg
             else:
                 if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
-                        self.token['agents_preemption'][agent_name]) and len(self.token['agents_preemption'][agent_name]) != 0:
+                        self.token['agents_preemption'][agent_name]) and len(
+                    self.token['agents_preemption'][agent_name]) != 0:
 
                     # se non ho un percorso per andarmi a caricare dopo che vado nel NON task endpoint, vado a caricarmi
                     if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):
