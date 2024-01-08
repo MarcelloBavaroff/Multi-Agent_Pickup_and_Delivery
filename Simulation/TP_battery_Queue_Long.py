@@ -343,7 +343,8 @@ class TokenPassing(object):
         for s in self.charging_stations:
             # stazione non assegnata a un altro agente
 
-            if s['name'] not in self.token['agents_to_tasks'] and s['name'] not in discarded_stations:
+            #if s['name'] not in self.token['agents_to_tasks'] and s['name'] not in discarded_stations:
+            if s['name'] not in discarded_stations:
                 agents_in_queue_slots = self.set_of_agents_extra_slots(s['name'])
                 mixed_queue_agents = agents_in_queue_slots.union(
                     set(self.token['charging_stations'][s['name']]['in_queue']))
@@ -383,8 +384,8 @@ class TokenPassing(object):
         estimated_station_cost = None
         ongoing_tasks = []
 
-        for a in self.token['agents_to_tasks']:
-            ongoing_tasks.append(self.token['agents_to_tasks'][a]['task_name'])
+        # for a in self.token['agents_to_tasks']:
+        #     ongoing_tasks.append(self.token['agents_to_tasks'][a]['task_name'])
 
         for s in self.charging_stations:
             # stazione non assegnata a un altro agente
