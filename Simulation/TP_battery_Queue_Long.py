@@ -709,9 +709,9 @@ class TokenPassing(object):
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents_preemption'], time_start,
                                                                    agent_name)
         for e in self.token['extra_moving_obstacles']:
-            moving_obstacles_agents[(e[0], e[1], e[2]-time_start)] = 'place holder'
+            moving_obstacles_agents[(e[0], e[1], e[2] - time_start)] = 'place holder'
 
-        #moving_obstacles_agents.update(self.token['extra_moving_obstacles'])
+        # moving_obstacles_agents.update(self.token['extra_moving_obstacles'])
 
         idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents, time_start, agent_name)
         idle_obstacles_agents |= set(self.non_task_endpoints)
@@ -760,8 +760,8 @@ class TokenPassing(object):
             if len(self.token['charging_stations'][station_name]['in_queue']) > 0:
 
                 for a in self.token['charging_stations'][station_name]['in_queue']:
-                    if not self.token['agents_preemption'][a][0] in self.token['charging_stations'][station_name][
-                        'queue_pos']:
+                    if not self.token['agents_preemption'][a][0] in self.token['charging_stations'][station_name]['queue_pos']:
+
                         index_last_el = len(self.token['agents_preemption'][a]) - 1
                         last_el = self.token['agents_preemption'][a][index_last_el]
                         del moving_obstacles_agents[(last_el[0], last_el[1], -index_last_el)]
@@ -883,8 +883,8 @@ class TokenPassing(object):
                     # l'idea qui è che non scarti la stazione, ma la lasci disponibile per il prossimo controllo, ma questa volta
                     # vengono aggiunti i nuovi extra moving obstacles
 
-                    #discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
-                    #nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
+                    # discarded_stations[nearest_station] = self.token['charging_stations'][nearest_station]
+                    # nearest_station, consumption_to_station = self.search_nearest_available_station_to_agent(
                     #    agent_pos, agent_name, discarded_stations)
                     path_station = False
 
