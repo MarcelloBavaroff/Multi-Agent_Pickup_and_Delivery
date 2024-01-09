@@ -1238,7 +1238,7 @@ class TokenPassing(object):
         # se è in ultima posizione può solo fare wait
         elif self.token['agents'][agent_name][0] == self.token['charging_stations'][in_queue_station]['queue_pos'][-1]:
             self.token['agents'][agent_name].append(agent_pos)
-            self.token['agents_preemption'][agent_name].insert(agent_pos, 0)
+            self.token['agents_preemption'][agent_name].insert((agent_pos), 0)
         # quindi è in coda, ma non in ultima posizione
         else:
             index_pos = self.token['charging_stations'][in_queue_station]['queue_pos'].index(agent_pos)

@@ -46,7 +46,7 @@ if __name__ == '__main__':
     print("Seed: ", seed)
     parser = argparse.ArgumentParser()
     parser.add_argument('-a_star_max_iter', help='Maximum number of states explored by the low-level algorithm',
-                        default=5000, type=int)
+                        default=15000, type=int)
     parser.add_argument('-slow_factor', help='Slow factor of visualization', default=5, type=int)  # default=1
     parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true', default=False)
 
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = Simulation(tasks, agents, autonomies, charging_stations, 0.01, 0.01, 0.01)
+    simulation = Simulation(tasks, agents, autonomies, charging_stations, 1, 0.1, 1)
     tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, charging_stations, simulation,
                       param['map']['goal_locations'], a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks) and simulation.get_time() < 20000:
@@ -124,10 +124,10 @@ if __name__ == '__main__':
     #       tp.get_totalePassiTasks() / len(tp.get_token()['completed_tasks_times']))
 
     # print all delta times
-    i = 0
-    for a in tp.get_token()['completed_tasks_times']:
-        print(str(tp.get_token()['completed_tasks_times'][a]) + '-' + str(delta_times[i]))
-        i += 1
+    # i = 0
+    # for a in tp.get_token()['completed_tasks_times']:
+    #     print(str(tp.get_token()['completed_tasks_times'][a]) + '-' + str(delta_times[i]))
+    #     i += 1
 
     cost = 0
     for path in simulation.actual_paths.values():
