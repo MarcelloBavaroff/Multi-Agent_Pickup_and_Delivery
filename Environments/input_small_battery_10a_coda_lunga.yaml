@@ -1,4 +1,7 @@
 agents:
+
+-   start: [0, 12]
+    name: agent2
 -   start: [0, 11]
     name: agent3
 -   start: [0, 10]
@@ -7,10 +10,7 @@ agents:
     name: agent5
 -   start: [0, 3]
     name: agent6
--   start: [0, 2]
-    name: agent7
--   start: [14, 12]
-    name: agent12
+
 -   start: [14, 11]
     name: agent13
 -   start: [14, 10]
@@ -19,6 +19,9 @@ agents:
     name: agent15
 -   start: [14, 3]
     name: agent16
+-   start: [14, 2]
+    name: agent17
+
 map:
     dimensions: [15, 15]
     obstacles:
@@ -80,16 +83,18 @@ map:
     - !!python/tuple [9, 12]
     - !!python/tuple [11, 12]
     non_task_endpoints:
-    - !!python/tuple [0, 11]
-    - !!python/tuple [0, 10]
-    - !!python/tuple [0, 4]
-    - !!python/tuple [0, 3]
-    - !!python/tuple [0, 2]
-    - !!python/tuple [14, 12]
-    - !!python/tuple [14, 11]
-    - !!python/tuple [14, 10]
-    - !!python/tuple [14, 4]
-    - !!python/tuple [14, 3]
+        - !!python/tuple [ 0, 12 ]
+        - !!python/tuple [ 0, 11 ]
+        - !!python/tuple [ 0, 10 ]
+        - !!python/tuple [ 0, 4 ]
+        - !!python/tuple [ 0, 3 ]
+
+        - !!python/tuple [ 14, 11 ]
+        - !!python/tuple [ 14, 10 ]
+        - !!python/tuple [ 14, 4 ]
+        - !!python/tuple [ 14, 3 ]
+        - !!python/tuple [ 14, 2 ]
+
     start_locations:
     -   [4, 2]
     -   [6, 2]
@@ -127,25 +132,21 @@ map:
     -   [14, 6]
     -   [14, 5]
     charging_stations:
-        - pos: [ 2, 14 ]
+        - pos: [ 5, 14 ]
           name: station0
-        - pos: [ 3, 14 ]
-          name: station1
-        - pos: [ 4, 14 ]
-          name: station2
-        - pos: [ 10, 14 ]
-          name: station8
-        - pos: [ 11, 14 ]
-          name: station9
-        - pos: [ 3, 0 ]
-          name: station10
-        - pos: [ 4, 0 ]
-          name: station11
-        - pos: [ 10, 0 ]
-          name: station17
-        - pos: [ 11, 0 ]
-          name: station18
-        - pos: [ 12, 0 ]
-          name: station19
+          queue:
+          - [ 6, 14 ]
+          - [ 7, 14 ]
+          - [ 8, 14 ]
+          - [ 9, 14 ]
+
+        - pos: [ 9, 0 ]
+          name: station5
+          queue:
+          - [ 8, 0 ]
+          - [ 7, 0 ]
+          - [ 6, 0 ]
+          - [ 5, 0 ]
+
 n_tasks: 2000
-task_freq: 0.3
+task_freq: 5

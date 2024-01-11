@@ -2,8 +2,8 @@ import argparse
 import yaml
 import json
 import os
-# from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
-# from Simulation.Versione_Change.simulation_Change2 import Simulation
+#from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
+#from Simulation.Versione_Change.simulation_Change2 import Simulation
 # from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
 # from Simulation.Versione_Preemption.simulation_Preem import Simulation
 # from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
@@ -40,8 +40,8 @@ def read_tasks():
 
 if __name__ == '__main__':
     # random.seed(1234)
-    #seed = random.randint(0, 100000)
-    seed = 75067
+    seed = random.randint(0, 100000)
+    #seed = 75067
     random.seed(seed)
     print("Seed: ", seed)
     parser = argparse.ArgumentParser()
