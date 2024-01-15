@@ -1,0 +1,19 @@
+
+
+0 VersioneQueue 77440
+('Number of completed tasks: ', 2000, '/', 2000)
+('Number of dead agents: ', 0)
+('Makespan: ', 8173)
+('Average service time: ', 3822.262)
+('Standard deviation: ', 2452.7655371755345)
+('Chiamate a CBS per stazioni di ricarica: ', 2994)
+('Chiamate a CBS: ', 12342)
+
+1 VersioneQueue 7986
+('Number of completed tasks: ', 2000, '/', 2000)
+('Number of dead agents: ', 0)
+('Makespan: ', 8153)
+('Average service time: ', 3850.286)
+('Standard deviation: ', 2428.306515496756)
+('Chiamate a CBS per stazioni di ricarica: ', 3561)
+('Chiamate a CBS: ', 12515)
