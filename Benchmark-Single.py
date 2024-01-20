@@ -135,10 +135,10 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/ForLong/Queue/10.txt'
-    move_consumption = 1
+    file_name = 'Comparisons/ForLong/Queue/8.txt'
+    move_consumption = 0.1
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.01
+    wait_consumption = 0.1
 
     with open('Comparisons/seeds2.txt', 'r') as file:
         # inserisci ogni riga in una lista
