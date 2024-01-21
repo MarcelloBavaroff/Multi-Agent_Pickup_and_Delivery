@@ -1,20 +1,16 @@
 agents:
-
 -   start: [0, 5]
     name: agent2
 -   start: [0, 9]
     name: agent3
 -   start: [0, 10]
     name: agent4
-
 -   start: [14, 9]
     name: agent13
 -   start: [14, 10]
     name: agent14
 -   start: [14, 5]
     name: agent15
-
-
 map:
     dimensions: [15, 15]
     obstacles:
@@ -82,7 +78,6 @@ map:
         - !!python/tuple [ 14, 9 ]
         - !!python/tuple [ 14, 10 ]
         - !!python/tuple [ 14, 5 ]
-
     start_locations:
     -   [4, 2]
     -   [6, 2]
@@ -118,12 +113,17 @@ map:
     charging_stations:
         - pos: [ 4, 14 ]
           name: station0
-          queue:
-          - [ 5, 14 ]
-          - [ 6, 14 ]
-          - [ 7, 14 ]
-          - [ 8, 14 ]
-          - [ 9, 14 ]
+        - pos: [ 5, 14 ]
+          name: station1
+        - pos: [ 6, 14 ]
+          name: station2
+        - pos: [ 7, 14 ]
+          name: station8
+        - pos: [ 8, 14 ]
+          name: station9
+        - pos: [ 9, 14 ]
+          name: station10
 
-n_tasks: 1000
+
+n_tasks: 2000
 task_freq: 5

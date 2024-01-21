@@ -2,14 +2,14 @@ import argparse
 import yaml
 import json
 import os
-#from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
-#from Simulation.Versione_Change.simulation_Change2 import Simulation
+from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
+from Simulation.Versione_Change.simulation_Change2 import Simulation
 # from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
 # from Simulation.Versione_Preemption.simulation_Preem import Simulation
 #from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
 #from Simulation.Versione_Queue.simulation_Queue import Simulation
-from Simulation.TP_battery_Queue_Long import TokenPassing
-from Simulation.simulation_Queue_Long import Simulation
+#from Simulation.TP_battery_Queue_Long import TokenPassing
+#from Simulation.simulation_Queue_Long import Simulation
 
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
