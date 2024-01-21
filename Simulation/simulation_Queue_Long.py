@@ -21,6 +21,7 @@ class Simulation(object):
         self.move_consumption = move_consumption
         self.wait_consumption = wait_consumption
         self.move_heavy_consumption = move_heavy_consumption
+        self.ricarica = 10
         if self.move_consumption < 0.01 or self.wait_consumption < 0.01:
             self.round = 3
         else:
@@ -103,7 +104,7 @@ class Simulation(object):
                 algorithm.get_token()['agents_preemption'][agent['name']] = algorithm.get_token()['agents_preemption'][
                                                                                 agent['name']][1:]
 
-                self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + 10, self.round)
+                self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + self.ricarica, self.round)
 
                 # se carica completa lo metto in idle?
                 if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:

@@ -6,14 +6,14 @@ import os
 
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
-from Simulation.Versione_Queue.simulation_Queue import Simulation
+#from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
+#from Simulation.Versione_Queue.simulation_Queue import Simulation
 #from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
 #from Simulation.Versione_Preemption.simulation_Preem import Simulation
 #from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
 #from Simulation.Versione_Change.simulation_Change2 import Simulation
-#from Simulation.TP_battery_Queue_Long import TokenPassing
-#from Simulation.simulation_Queue_Long import Simulation
+from Simulation.TP_battery_Queue_Long import TokenPassing
+from Simulation.simulation_Queue_Long import Simulation
 
 
 def parameters(seed):
@@ -54,7 +54,7 @@ def parameters(seed):
     else:
         # Generate random tasks and delays
         #tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'],param['n_tasks'], param['task_freq'], random_seed)
-        tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'], 2000, 0.3, random_seed)
+        tasks = gen_tasks(param['map']['start_locations'], param['map']['goal_locations'], 1000, 5, random_seed)
 
     # batteria casuale tra 80 e 100
     autonomies = []
@@ -135,10 +135,10 @@ if __name__ == '__main__':
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
 
-    file_name = 'Comparisons/ForLong/Queue/8.txt'
-    move_consumption = 0.1
+    file_name = 'Comparisons/ForLong6/QueueLong/9.txt'
+    move_consumption = 1
     move_heavy_consumption = move_consumption
-    wait_consumption = 0.1
+    wait_consumption = 0.01
 
     with open('Comparisons/seeds2.txt', 'r') as file:
         # inserisci ogni riga in una lista
