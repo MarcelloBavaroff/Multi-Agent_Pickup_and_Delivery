@@ -125,5 +125,5 @@ map:
           name: station10
 
 
-n_tasks: 2000
-task_freq: 5
+n_tasks: 1000
+task_freq: 0.12
