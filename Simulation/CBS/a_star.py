@@ -50,12 +50,12 @@ class AStar:
             self.iter = self.iter + 1
             if self.iter == self.max_iter:
                 print('Low level A* - Maximum iteration reached')
-            #temp_dict = {open_item: f_score.setdefault(open_item, float("inf")) for open_item in open_set}
-            #current = min(temp_dict, key=temp_dict.get)
+            # temp_dict = {open_item: f_score.setdefault(open_item, float("inf")) for open_item in open_set}
+            # current = min(temp_dict, key=temp_dict.get)
             current = heapq.heappop(heap)[3]
 
             if self.is_at_goal(current, agent_name):
-                return self.reconstruct_path(came_from, current)
+                return self.reconstruct_path(came_from, current), self.iter
 
             open_set -= {current}
             closed_set |= {current}
@@ -79,4 +79,4 @@ class AStar:
                 h_score = self.admissible_heuristic(neighbor, agent_name)
                 f_score[neighbor] = g_score[neighbor] + h_score
                 heapq.heappush(heap, (f_score[neighbor], h_score, next(index), neighbor))
-        return False
+        return False, self.iter

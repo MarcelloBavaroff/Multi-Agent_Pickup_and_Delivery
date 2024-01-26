@@ -33,6 +33,7 @@ class TokenPassing(object):
         self.heavy_consumption = self.simulation.get_heavy_consumption()
         self.chiamateCBS = 0
         self.chiamateCBS_recharge = 0
+        self.sommaEspansioniA = 0
         #somma di tutti i len(path) degli agenti che svolgono un task
         self.totaleStepTasks = 0
         self.init_token()
@@ -233,8 +234,9 @@ class TokenPassing(object):
 
     def search(self, cbs):
 
-        path = cbs.search()
+        path, espansioniA = cbs.search()
         self.chiamateCBS += 1
+        self.sommaEspansioniA += espansioniA
         return path
 
     def go_to_closest_non_task_endpoint(self, agent_name, agent_pos, all_idle_agents, time_start):
