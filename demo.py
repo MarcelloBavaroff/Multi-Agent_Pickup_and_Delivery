@@ -120,9 +120,9 @@ if __name__ == '__main__':
 
     print("Chiamate a CBS per ricaricarsi: ", tp.get_chiamateCBS_recharge())
     print("Chiamate a CBS: ", tp.get_chiamateCBS())
-    print("", tp.get_avg_espansioniA())
-    # print("Numero medio passi/steps per task: ",
-    #       tp.get_totalePassiTasks() / len(tp.get_token()['completed_tasks_times']))
+    print("Espansioni media A*: ", tp.get_avg_espansioniA())
+    print("Numero medio passi/steps per task: ",
+          tp.get_totalePassiTasks() / len(tp.get_token()['completed_tasks_times']))
 
     # print all delta times
     # i = 0
