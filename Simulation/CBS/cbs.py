@@ -26,7 +26,6 @@ class Location(object):
     def __str__(self):
         return str((self.x, self.y))
 
-
 class State(object):
     def __init__(self, time, location):
         self.time = time
@@ -338,7 +337,7 @@ class CBS(object):
 
     def search(self):
         start = HighLevelNode()
-        espansioniA = 0
+        #espansioniA = 0
         # TODO: Initialize it in a better way
         start.constraint_dict = {}
         for agent in self.env.agent_dict.keys():
@@ -363,6 +362,8 @@ class CBS(object):
 
                 return self.generate_plan(P.solution), espansioniA
 
+
+            # in teoria qui non arrivi mai
             constraint_dict = self.env.create_constraints_from_conflict(conflict_dict)
 
             for agent in constraint_dict.keys():

@@ -78,6 +78,9 @@ class TokenPassing(object):
     def get_totalePassiTasks(self):
         return self.totaleStepTasks
 
+    def get_avg_espansioniA(self):
+        return self.sommaEspansioniA / self.chiamateCBS
+
     # in teoria agenti in idle hanno il path verso la loro posizione attuale (se sta caricando no)
     def get_idle_agents(self):
         agents = {}
