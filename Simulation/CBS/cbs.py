@@ -26,6 +26,7 @@ class Location(object):
     def __str__(self):
         return str((self.x, self.y))
 
+
 class State(object):
     def __init__(self, time, location):
         self.time = time
@@ -111,11 +112,13 @@ class Constraints(object):
 
 class Environment(object):
     # passo charging_stations come dizionario
-    def __init__(self, dimension, agents, obstacles, moving_obstacles=None, a_star_max_iter=-1, charging_stations=None):
+    def __init__(self, dimension, agents, obstacles, moving_obstacles=None, a_star_max_iter=-1, charging_stations=None, non_task_endpoints=None):
         if charging_stations is None:
             charging_stations = dict()
         if moving_obstacles is None:
             moving_obstacles = []
+        if non_task_endpoints is None:
+            non_task_endpoints = []
         self.dimension = dimension
         self.obstacles = obstacles
         self.moving_obstacles = moving_obstacles
@@ -132,6 +135,11 @@ class Environment(object):
         self.a_star = AStar(self)
 
         self.charging_stations = charging_stations
+        self.non_task_endpoints = non_task_endpoints
+
+    def check_movement(self, state, n, agent_name):
+        return self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state,n) and self.no_extra_slot_to_station(state, n) and self.station_only_if_goal(n, agent_name) and self.NON_te_only_if_goal(n, agent_name)
+
 
     def get_neighbors(self, state, agent_name):
         neighbors = []
@@ -142,19 +150,19 @@ class Environment(object):
             neighbors.append(n)
         # Up action
         n = State(state.time + 1, Location(state.location.x, state.location.y + 1))
-        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n) and self.station_only_if_goal(state, n, agent_name):
+        if self.check_movement(state, n, agent_name):
             neighbors.append(n)
         # Down action
         n = State(state.time + 1, Location(state.location.x, state.location.y - 1))
-        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n) and self.station_only_if_goal(state, n, agent_name):
+        if self.check_movement(state, n, agent_name):
             neighbors.append(n)
         # Left action
         n = State(state.time + 1, Location(state.location.x - 1, state.location.y))
-        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n) and self.station_only_if_goal(state, n, agent_name):
+        if self.check_movement(state, n, agent_name):
             neighbors.append(n)
         # Right action
         n = State(state.time + 1, Location(state.location.x + 1, state.location.y))
-        if self.state_valid(n) and self.transition_valid(state, n) and self.station_to_extra_slot(state, n) and self.no_extra_slot_to_station(state, n) and self.station_only_if_goal(state, n, agent_name):
+        if self.check_movement(state, n, agent_name):
             neighbors.append(n)
         return neighbors
 
@@ -253,7 +261,6 @@ class Environment(object):
                     return True
                 else:
                     return False
-
         return True
 
     # se la nuova posizione è una stazione, non ci posso arrivare dal mio extra slot
@@ -268,7 +275,7 @@ class Environment(object):
         return True
 
     # posso andare in una stazione solo se ho come goal quella stazione
-    def station_only_if_goal(self, state_old, state_new, agent_name):
+    def station_only_if_goal(self, state_new, agent_name):
         tup_new = [state_new.location.x, state_new.location.y]
         for s in self.charging_stations:
             if tup_new == s['pos']:
@@ -278,6 +285,15 @@ class Environment(object):
                     return False
         return True
 
+    def NON_te_only_if_goal(self, state_new, agent_name):
+        tup_new = tuple((state_new.location.x, state_new.location.y))
+        for n in self.non_task_endpoints:
+            if tup_new == n:
+                if self.is_at_goal(state_new, agent_name):
+                    return True
+                else:
+                    return False
+        return True
 
     def is_solution(self, agent_name):
         pass
@@ -337,7 +353,7 @@ class CBS(object):
 
     def search(self):
         start = HighLevelNode()
-        #espansioniA = 0
+        # espansioniA = 0
         # TODO: Initialize it in a better way
         start.constraint_dict = {}
         for agent in self.env.agent_dict.keys():
@@ -361,7 +377,6 @@ class CBS(object):
                 # print("Low level CBS - Solution found")
 
                 return self.generate_plan(P.solution), espansioniA
-
 
             # in teoria qui non arrivi mai
             constraint_dict = self.env.create_constraints_from_conflict(conflict_dict)

@@ -604,7 +604,7 @@ class TokenPassing(object):
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter,
-                          charging_stations=self.charging_stations)
+                          charging_stations=self.charging_stations, non_task_endpoints=self.non_task_endpoints)
         cbs = CBS(env)
         path_to_task_start = self.search(cbs)
 
@@ -625,7 +625,7 @@ class TokenPassing(object):
             agent = {'name': agent_name, 'start': closest_task[0], 'goal': closest_task[1]}
             env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                               moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter,
-                              charging_stations=self.charging_stations)
+                              charging_stations=self.charging_stations, non_task_endpoints=self.non_task_endpoints)
             cbs = CBS(env)
             path_to_task_goal = self.search(cbs)
             if not path_to_task_goal:
@@ -656,7 +656,7 @@ class TokenPassing(object):
         agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_stations'][station_name]['pos']}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter,
-                          charging_stations=self.charging_stations)
+                          charging_stations=self.charging_stations, non_task_endpoints=self.non_task_endpoints)
         cbs = CBS(env)
         path_to_station = self.search(cbs)
         self.chiamateCBS_recharge += 1
@@ -702,7 +702,7 @@ class TokenPassing(object):
 
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_endpoint}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, moving_obstacles_agents,
-                          a_star_max_iter=self.a_star_max_iter, charging_stations=self.charging_stations)
+                          a_star_max_iter=self.a_star_max_iter, charging_stations=self.charging_stations, non_task_endpoints=self.non_task_endpoints)
         cbs = CBS(env)
         path_to_non_task_endpoint = self.search(cbs)
         if not path_to_non_task_endpoint:
