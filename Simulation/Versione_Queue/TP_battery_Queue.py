@@ -34,6 +34,7 @@ class TokenPassing(object):
         self.heavy_consumption = self.simulation.get_heavy_consumption()
         self.chiamateCBS = 0
         self.chiamateCBS_recharge = 0
+        self.sommaEspansioniA = 0
         self.init_token()
         if self.move_consumption < 0.01 or self.wait_consumption < 0.01:
             self.round = 3
@@ -90,6 +91,9 @@ class TokenPassing(object):
 
     def get_chiamateCBS(self):
         return self.chiamateCBS
+
+    def get_avg_espansioniA(self):
+        return self.sommaEspansioniA / self.chiamateCBS
 
     def get_chiamateCBS_recharge(self):
         return self.chiamateCBS_recharge
@@ -243,8 +247,9 @@ class TokenPassing(object):
 
     def search(self, cbs):
 
-        path = cbs.search()
+        path, espansioniA = cbs.search()
         self.chiamateCBS += 1
+        self.sommaEspansioniA += espansioniA
         return path
 
     def set_task_name(self, agent_name, task_name):

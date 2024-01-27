@@ -36,7 +36,10 @@ class TokenPassing(object):
         self.chiamateCBS_recharge = 0
         self.sommaEspansioniA = 0
         self.init_token()
-        self.round = 3
+        if self.move_consumption < 0.01 or self.wait_consumption < 0.01:
+            self.round = 3
+        else:
+            self.round = 2
         # vedi sotto
 
     def init_token(self):

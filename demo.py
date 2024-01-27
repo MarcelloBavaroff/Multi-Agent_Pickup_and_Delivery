@@ -2,14 +2,14 @@ import argparse
 import yaml
 import json
 import os
-from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
-from Simulation.Versione_Change.simulation_Change2 import Simulation
+#from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
+#from Simulation.Versione_Change.simulation_Change2 import Simulation
 #from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
 #from Simulation.Versione_Preemption.simulation_Preem import Simulation
 #from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
 #from Simulation.Versione_Queue.simulation_Queue import Simulation
-#from Simulation.TP_battery_Queue_Long import TokenPassing
-#from Simulation.simulation_Queue_Long import Simulation
+from Simulation.TP_battery_Queue_Long import TokenPassing
+from Simulation.simulation_Queue_Long import Simulation
 
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
@@ -40,8 +40,8 @@ def read_tasks():
 
 if __name__ == '__main__':
     # random.seed(1234)
-    #seed = random.randint(0, 100000)
-    seed = 95708
+    seed = random.randint(0, 100000)
+    #seed = 95708
     random.seed(seed)
     print("Seed: ", seed)
     parser = argparse.ArgumentParser()
@@ -121,8 +121,8 @@ if __name__ == '__main__':
     print("Chiamate a CBS per ricaricarsi: ", tp.get_chiamateCBS_recharge())
     print("Chiamate a CBS: ", tp.get_chiamateCBS())
     print("Espansioni media A*: ", tp.get_avg_espansioniA())
-    print("Numero medio passi/steps per task: ",
-          tp.get_totalePassiTasks() / len(tp.get_token()['completed_tasks_times']))
+    # print("Numero medio passi/steps per task: ",
+    #       tp.get_totalePassiTasks() / len(tp.get_token()['completed_tasks_times']))
 
     # print all delta times
     # i = 0
