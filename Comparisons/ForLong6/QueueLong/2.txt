@@ -188,3 +188,14 @@ Tempo medio di servizio: 38.0466
 Deviazione standard media: 26.25451257326527
 Chiamate a CBS per stazioni di ricarica: 24112.0
 Chiamate a CBS totali: 26763.75
+
+
+0 VersioneQueue 77440
+('Number of completed tasks: ', 1000, '/', 1000)
+('Number of dead agents: ', 0)
+('Makespan: ', 9922)
+('Average service time: ', 39.337)
+('Standard deviation: ', 26.389911538313424)
+('Chiamate a CBS per stazioni di ricarica: ', 21393)
+('Chiamate a CBS: ', 24027)
+('Espansioni medie di A*: ', 760.2873434053357)

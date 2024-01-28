@@ -11,10 +11,10 @@ from Simulation.tasks_and_delays_maker import *
 #from Simulation.Versione_Change.simulation_Change2 import Simulation
 #from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
 #from Simulation.Versione_Preemption.simulation_Preem import Simulation
-from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
-from Simulation.Versione_Queue.simulation_Queue import Simulation
-#from Simulation.TP_battery_Queue_Long import TokenPassing
-#from Simulation.simulation_Queue_Long import Simulation
+#from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
+#from Simulation.Versione_Queue.simulation_Queue import Simulation
+from Simulation.TP_battery_Queue_Long import TokenPassing
+from Simulation.simulation_Queue_Long import Simulation
 
 
 def parameters(seed):
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     sum_dead_agents1 = 0
     sum_avg_espansioniA1 = 0
 
-    file_name = 'Comparisons/ForLong6/Queue/2.txt'
+    file_name = 'Comparisons/ForLong6/QueueLong/2.txt'
     move_consumption = 1
     move_heavy_consumption = move_consumption
     wait_consumption = 0.1

@@ -188,3 +188,34 @@ Tempo medio di servizio: 51.42069999999999
 Deviazione standard media: 50.35394728553688
 Chiamate a CBS per stazioni di ricarica: 11603.65
 Chiamate a CBS totali: 15132.15
+
+
+0 VersioneQueue 77440
+('Number of completed tasks: ', 1000, '/', 1000)
+('Number of dead agents: ', 0)
+('Makespan: ', 9985)
+('Average service time: ', 51.638)
+('Standard deviation: ', 45.50258186081314)
+('Chiamate a CBS per stazioni di ricarica: ', 9974)
+('Chiamate a CBS: ', 13585)
+('Espansioni medie di A*: ', 634.0627898417372)
+
+1 VersioneQueue 7986
+('Number of completed tasks: ', 1000, '/', 1000)
+('Number of dead agents: ', 0)
+('Makespan: ', 9952)
+('Average service time: ', 51.585)
+('Standard deviation: ', 46.5391101655371)
+('Chiamate a CBS per stazioni di ricarica: ', 10611)
+('Chiamate a CBS: ', 14046)
+('Espansioni medie di A*: ', 673.8514879681048)
+
+2 VersioneQueue 21251
+('Number of completed tasks: ', 1000, '/', 1000)
+('Number of dead agents: ', 0)
+('Makespan: ', 9470)
+('Average service time: ', 67.924)
+('Standard deviation: ', 103.17080121817409)
+('Chiamate a CBS per stazioni di ricarica: ', 6717)
+('Chiamate a CBS: ', 10826)
+('Espansioni medie di A*: ', 524.4071679290597)
