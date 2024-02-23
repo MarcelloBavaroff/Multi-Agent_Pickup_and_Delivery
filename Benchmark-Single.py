@@ -6,14 +6,15 @@ import os
 
 import RoothPath
 from Simulation.tasks_and_delays_maker import *
-from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
-from Simulation.Versione_Queue.simulation_Queue import Simulation
-#from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
-#from Simulation.Versione_Preemption.simulation_Preem import Simulation
+
 #from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
 #from Simulation.Versione_Change.simulation_Change2 import Simulation
-#from Simulation.TP_battery_Queue_Long import TokenPassing
-#from Simulation.simulation_Queue_Long import Simulation
+#from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
+#from Simulation.Versione_Preemption.simulation_Preem import Simulation
+#from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
+#from Simulation.Versione_Queue.simulation_Queue import Simulation
+from Simulation.TP_battery_Queue_Long import TokenPassing
+from Simulation.simulation_Queue_Long import Simulation
 
 
 def parameters(seed):
@@ -73,7 +74,7 @@ def parameters(seed):
 
 
 def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev,cbs_calls,
-                     index_run, cbs_calls_recharge, random_seed=1234, file_name='Comparisons/Comp1/test3.txt'):
+                     index_run, cbs_calls_recharge, random_seed=1234, file_name='Comparisons/Comp1/test3.txt', avg_espansioniA=0):
     with open(file_name, 'a') as file:
         file.write("\n\n" + str(index_run) + " " + version + " " + str(random_seed) + "\n")
         s_completed_tasks = "Number of completed tasks: ", completed_tasks, "/", n_tasks
@@ -84,9 +85,10 @@ def print_comparison(version, completed_tasks, n_tasks, dead_agents, makespan, a
         s_std_dev = "Standard deviation: ", std_dev
         s_cbs_calls_recharge = "Chiamate a CBS per stazioni di ricarica: ", cbs_calls_recharge
         s_cbs_calls = "Chiamate a CBS: ", cbs_calls
+        s_avg_espansioniA = "Espansioni medie di A*: ", avg_espansioniA
 
         file.write(str(s_completed_tasks) + '\n' + str(s_dead_agents) + '\n' + str(s_makespan) + '\n' + str(
-            s_average_service_time) + '\n' + str(s_std_dev) + '\n' + str(s_cbs_calls_recharge) + '\n' + str(s_cbs_calls))
+            s_average_service_time) + '\n' + str(s_std_dev) + '\n' + str(s_cbs_calls_recharge) + '\n' + str(s_cbs_calls) + '\n' + str(s_avg_espansioniA))
 
 
 def single_run(index_run, random_seed, file_name, move_consumption=1.0, move_heavy_consumption=1.0, wait_consumption=1.0):
@@ -117,11 +119,12 @@ def single_run(index_run, random_seed, file_name, move_consumption=1.0, move_hea
 
     cbs_calls = tp.get_chiamateCBS()
     cbs_calls_recharge = tp.get_chiamateCBS_recharge()
+    avg_espansioniA = tp.get_avg_espansioniA()
 
     print_comparison("VersioneQueue", completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev,cbs_calls,
-                     index_run, cbs_calls_recharge, random_seed, file_name)
+                     index_run, cbs_calls_recharge, random_seed, file_name, avg_espansioniA)
 
-    return completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev, cbs_calls, cbs_calls_recharge  # , completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, cbs_calls_recharge2
+    return completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev, cbs_calls, cbs_calls_recharge, avg_espansioniA  # , completed_tasks2, n_tasks2, dead_agents2, makespan2, average_service_time2, cbs_calls2, cbs_calls_recharge2
 
 
 if __name__ == '__main__':
@@ -134,9 +137,10 @@ if __name__ == '__main__':
     sum_cbs_calls1 = 0
     sum_cbs_calls_recharge1 = 0
     sum_dead_agents1 = 0
+    sum_avg_espansioniA1 = 0
 
-    file_name = 'Comparisons/ForLong6/Queue/6.txt'
-    move_consumption = 0.5
+    file_name = 'Comparisons/ForLong6/QueueLong/2.txt'
+    move_consumption = 1
     move_heavy_consumption = move_consumption
     wait_consumption = 0.1
 
@@ -149,7 +153,7 @@ if __name__ == '__main__':
         print("Run numero: ", i + 1)
         # random_seed = random.randint(0, 100000)
         random_seed = int(seeds[i])
-        completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev, cbs_calls, cbs_calls_recharge = single_run(
+        completed_tasks, n_tasks, dead_agents, makespan, average_service_time, std_dev, cbs_calls, cbs_calls_recharge, avg_espansioniA = single_run(
             i, random_seed, file_name, move_consumption, move_heavy_consumption, wait_consumption)
 
         if completed_tasks == n_tasks:
@@ -159,6 +163,7 @@ if __name__ == '__main__':
             sum_std_dev1 += std_dev
             sum_cbs_calls1 += cbs_calls
             sum_cbs_calls_recharge1 += cbs_calls_recharge
+            sum_avg_espansioniA1 += avg_espansioniA
 
         sum_completed_tasks1 += completed_tasks
         sum_dead_agents1 += dead_agents
@@ -176,6 +181,7 @@ if __name__ == '__main__':
         print("Deviazione standard media: ", sum_std_dev1 / run_complete1)
         print("Chiamate a CBS per stazioni di ricarica: ", sum_cbs_calls_recharge1 / run_complete1)
         print("Chiamate a CBS totali: ", sum_cbs_calls1 / run_complete1)
+        print("Espansioni medie di A*: ", sum_avg_espansioniA1 / run_complete1)
     except:
         print("0 run completate")
 
@@ -189,6 +195,7 @@ if __name__ == '__main__':
             file.write("Deviazione standard media: " + str(sum_std_dev1 / run_complete1) + "\n")
             file.write("Chiamate a CBS per stazioni di ricarica: " + str(sum_cbs_calls_recharge1 / run_complete1) + "\n")
             file.write("Chiamate a CBS totali: " + str(sum_cbs_calls1 / run_complete1) + "\n")
+            file.write("Espansioni medie di A*: " + str(sum_avg_espansioniA1 / run_complete1) + "\n")
         except:
             file.write("0 run completate")
 

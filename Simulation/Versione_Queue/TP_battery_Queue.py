@@ -34,6 +34,7 @@ class TokenPassing(object):
         self.heavy_consumption = self.simulation.get_heavy_consumption()
         self.chiamateCBS = 0
         self.chiamateCBS_recharge = 0
+        self.sommaEspansioniA = 0
         self.init_token()
         if self.move_consumption < 0.01 or self.wait_consumption < 0.01:
             self.round = 3
@@ -90,6 +91,9 @@ class TokenPassing(object):
 
     def get_chiamateCBS(self):
         return self.chiamateCBS
+
+    def get_avg_espansioniA(self):
+        return self.sommaEspansioniA / self.chiamateCBS
 
     def get_chiamateCBS_recharge(self):
         return self.chiamateCBS_recharge
@@ -243,8 +247,9 @@ class TokenPassing(object):
 
     def search(self, cbs):
 
-        path = cbs.search()
+        path, espansioniA = cbs.search()
         self.chiamateCBS += 1
+        self.sommaEspansioniA += espansioniA
         return path
 
     def set_task_name(self, agent_name, task_name):
@@ -599,7 +604,7 @@ class TokenPassing(object):
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter,
-                          charging_stations=self.charging_stations)
+                          charging_stations=self.charging_stations, non_task_endpoints=self.non_task_endpoints)
         cbs = CBS(env)
         path_to_task_start = self.search(cbs)
 
@@ -620,7 +625,7 @@ class TokenPassing(object):
             agent = {'name': agent_name, 'start': closest_task[0], 'goal': closest_task[1]}
             env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                               moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter,
-                              charging_stations=self.charging_stations)
+                              charging_stations=self.charging_stations, non_task_endpoints=self.non_task_endpoints)
             cbs = CBS(env)
             path_to_task_goal = self.search(cbs)
             if not path_to_task_goal:
@@ -651,7 +656,7 @@ class TokenPassing(object):
         agent = {'name': agent_name, 'start': agent_pos, 'goal': self.token['charging_stations'][station_name]['pos']}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                           moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter,
-                          charging_stations=self.charging_stations)
+                          charging_stations=self.charging_stations, non_task_endpoints=self.non_task_endpoints)
         cbs = CBS(env)
         path_to_station = self.search(cbs)
         self.chiamateCBS_recharge += 1
@@ -697,7 +702,7 @@ class TokenPassing(object):
 
         agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_endpoint}
         env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents, moving_obstacles_agents,
-                          a_star_max_iter=self.a_star_max_iter, charging_stations=self.charging_stations)
+                          a_star_max_iter=self.a_star_max_iter, charging_stations=self.charging_stations, non_task_endpoints=self.non_task_endpoints)
         cbs = CBS(env)
         path_to_non_task_endpoint = self.search(cbs)
         if not path_to_non_task_endpoint:
