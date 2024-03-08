@@ -1,6 +1,6 @@
 {
     "input_path": "Environments",
-    "input_name": "input_small_battery_6a_3r_coda.yaml",
+    "input_name": "input_big_separated_battery.yaml",
     "visual_postfix": "_tmp",
     "experiments_path": "Experiments",
     "experiments_name": "experiments.json"

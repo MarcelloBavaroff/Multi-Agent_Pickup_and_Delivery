@@ -101,6 +101,7 @@ class Animation:
             self.patches.append(self.agents[name])
             self.T = max(self.T, schedule["schedule"][name][-1]["t"])
             self.agent_names[name] = self.ax.text(d["start"][0], d["start"][1], name.replace('agent', ''))
+            #self.agent_names[name] = self.ax.text(d["start"][0], d["start"][1], " ")
             self.agent_names[name].set_horizontalalignment('center')
             self.agent_names[name].set_verticalalignment('center')
             self.artists.append(self.agent_names[name])
