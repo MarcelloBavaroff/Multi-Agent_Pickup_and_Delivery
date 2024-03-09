@@ -38,7 +38,8 @@ def aggiungi_valori_sopra_barre(barre):
                     xy=(barra.get_x() + barra.get_width() / 2, altezza),
                     xytext=(0, 3),
                     textcoords='offset points',
-                    ha='center', va='bottom')
+                    ha='center', va='bottom',
+                    fontsize=8)
 
 # Aggiunta dei valori sopra le barre
 aggiungi_valori_sopra_barre(barre1)
