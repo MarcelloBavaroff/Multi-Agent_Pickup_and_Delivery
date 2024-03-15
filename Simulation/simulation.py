@@ -4,9 +4,9 @@ import json
 import os
 import time
 from collections import defaultdict
-from Simulation.TP_with_recovery import TokenPassingRecovery
+from Simulation.TP import TokenPassingRecovery
 import RoothPath
-from Simulation.tasks_and_delays_maker import *
+from Simulation.tasks_maker import *
 
 
 class SimulationNewRecovery(object):

@@ -2,10 +2,10 @@ import argparse
 import yaml
 import json
 import os
-from Simulation.TP_with_recovery import TokenPassingRecovery
+from Simulation.TP import TokenPassingRecovery
 import RoothPath
-from Simulation.simulation_new_recovery import SimulationNewRecovery
-from Simulation.tasks_and_delays_maker import *
+from Simulation.simulation import SimulationNewRecovery
+from Simulation.tasks_maker import *
 from statistics import *
 import matplotlib.pyplot as plt
 from Utils.pool_with_subprocess import PoolWithSubprocess

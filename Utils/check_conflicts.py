@@ -3,11 +3,11 @@ from collections import defaultdict
 import yaml
 import json
 import os
-from Simulation.TP_with_recovery import TokenPassingRecovery
+from Simulation.TP import TokenPassingRecovery
 import RoothPath
 from Simulation.simulation_old import Simulation
-from Simulation.simulation_new_recovery import SimulationNewRecovery
-from Simulation.tasks_and_delays_maker import *
+from Simulation.simulation import SimulationNewRecovery
+from Simulation.tasks_maker import *
 import time
 
 if __name__ == '__main__':
