@@ -2,9 +2,9 @@ import argparse
 import yaml
 import json
 import os
-from Simulation.TP import TokenPassingRecovery
+from Simulation.TP import TokenPassing
 import RoothPath
-from Simulation.simulation import SimulationNewRecovery
+from Simulation.simulation import Simulation
 from Simulation.tasks_maker import *
 from statistics import *
 import matplotlib.pyplot as plt
@@ -56,12 +56,12 @@ def run_sim(param, n_sim, args, k_or_p_max):
                                              param['n_tasks'], freq, param['n_delays_per_agent'], delay_interval)
         # simulation = Simulation(tasks, agents, delays=delays)
         # tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=2000, k=k)
-        simulation = SimulationNewRecovery(tasks, agents, delays=delays)
+        simulation = Simulation(tasks, agents, delays=delays)
         # tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=1000,
         #                          k=k, new_recovery=True)
-        tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation,
-                                  a_star_max_iter=a_star_max_iter, k=k, replan_every_k_delays=replan_every_k_delays,
-                                  pd=pd, p_max=p_max, p_iter=p_iter, new_recovery=new_recovery)
+        tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,
+                          a_star_max_iter=a_star_max_iter, k=k, replan_every_k_delays=replan_every_k_delays,
+                          pd=pd, p_max=p_max, p_iter=p_iter, new_recovery=new_recovery)
         start = time.time()
         while tp.get_completed_tasks() != len(tasks):
             simulation.time_forward(tp)
@@ -126,12 +126,12 @@ def run_sim_parall(param, args, k_or_p_max, n_single_sim):
                                          param['task_freq'], param['n_delays_per_agent'])
     # simulation = Simulation(tasks, agents, delays=delays)
     # tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=2000, k=k)
-    simulation = SimulationNewRecovery(tasks, agents, delays=delays)
+    simulation = Simulation(tasks, agents, delays=delays)
     # tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=1000,
     #                          k=k, new_recovery=True)
-    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation,
-                              a_star_max_iter=a_star_max_iter, k=k, replan_every_k_delays=replan_every_k_delays,
-                              pd=pd, p_max=p_max, p_iter=p_iter, new_recovery=new_recovery)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,
+                      a_star_max_iter=a_star_max_iter, k=k, replan_every_k_delays=replan_every_k_delays,
+                      pd=pd, p_max=p_max, p_iter=p_iter, new_recovery=new_recovery)
     start = time.time()
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)

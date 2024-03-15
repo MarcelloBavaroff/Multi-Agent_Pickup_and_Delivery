@@ -2,10 +2,10 @@ import argparse
 import yaml
 import json
 import os
-from Simulation.TP import TokenPassingRecovery
+from Simulation.TP import TokenPassing
 import RoothPath
 from Simulation.tasks_maker import *
-from Simulation.simulation import SimulationNewRecovery
+from Simulation.simulation import Simulation
 import subprocess
 import sys
 import ast
@@ -28,8 +28,6 @@ def read_tasks():
 
     return data_list
 
-
-
 if __name__ == '__main__':
     #random.seed(1234)
     parser = argparse.ArgumentParser()
@@ -39,11 +37,6 @@ if __name__ == '__main__':
     parser.add_argument('-not_rand', help='Use if input has fixed tasks and delays', action='store_true')
 
     args = parser.parse_args()
-
-    # if args.k is None:
-    #     args.k = 0
-    # if args.p is None:
-    #     args.p = 1
 
     with open(os.path.join(RoothPath.get_root(), 'config.json'), 'r') as json_file:
         config = json.load(json_file)
@@ -76,9 +69,9 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = SimulationNewRecovery(tasks, agents)
-    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation,
-                              a_star_max_iter=args.a_star_max_iter, new_recovery=True)
+    simulation = Simulation(tasks, agents)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,
+                      a_star_max_iter=args.a_star_max_iter, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 
@@ -86,8 +79,7 @@ if __name__ == '__main__':
     for path in simulation.actual_paths.values():
         cost = cost + len(path)
     output = {'schedule': simulation.actual_paths, 'cost': cost,
-              'completed_tasks_times': tp.get_completed_tasks_times(),
-              'n_replans': tp.get_n_replans()}
+              'completed_tasks_times': tp.get_completed_tasks_times()}
     with open(args.output, 'w') as output_yaml:
         yaml.safe_dump(output, output_yaml)
 

@@ -2,10 +2,10 @@ import argparse
 import yaml
 import json
 import os
-from Simulation.TP import TokenPassingRecovery
+from Simulation.TP import TokenPassing
 import RoothPath
 from Simulation.tasks_maker import *
-from Simulation.simulation import SimulationNewRecovery
+from Simulation.simulation import Simulation
 import subprocess
 import sys
 
@@ -61,11 +61,11 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = SimulationNewRecovery(tasks, agents, delays=delays)
-    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation,
-                              a_star_max_iter=args.a_star_max_iter, k=args.k,
-                              replan_every_k_delays=False, pd=args.pd, p_max=args.p, p_iter=args.p_iter,
-                              new_recovery=True)
+    simulation = Simulation(tasks, agents, delays=delays)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation,
+                      a_star_max_iter=args.a_star_max_iter, k=args.k,
+                      replan_every_k_delays=False, pd=args.pd, p_max=args.p, p_iter=args.p_iter,
+                      new_recovery=True)
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 

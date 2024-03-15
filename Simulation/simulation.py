@@ -3,13 +3,12 @@ import yaml
 import json
 import os
 import time
-from collections import defaultdict
-from Simulation.TP import TokenPassingRecovery
+from Simulation.TP import TokenPassing
 import RoothPath
 from Simulation.tasks_maker import *
 
 
-class SimulationNewRecovery(object):
+class Simulation(object):
     def __init__(self, tasks, agents):
         self.tasks = tasks
         self.agents = agents
@@ -29,7 +28,7 @@ class SimulationNewRecovery(object):
             self.actual_paths[agent['name']] = [{'t': 0, 'x': agent['start'][0], 'y': agent['start'][1]}]
 
 
-    #questa viene chiamata per simulare un singolo timestep in avanti
+    #viene chiamata per simulare un singolo timestep in avanti
     def time_forward(self, algorithm):
         self.time = self.time + 1
         print('Time:', self.time)
@@ -41,7 +40,7 @@ class SimulationNewRecovery(object):
         self.agents_moved = set()
         agents_to_move = self.agents
         random.shuffle(agents_to_move)
-        # First "move" idle agents or agents stopped by delays
+
         for agent in agents_to_move:
             #ultimo elemento della lista dei path
             current_agent_pos = self.actual_paths[agent['name']][-1]
@@ -135,15 +134,14 @@ if __name__ == '__main__':
         yaml.safe_dump(param, param_file)
 
     # Simulate
-    simulation = SimulationNewRecovery(tasks, agents)
-    tp = TokenPassingRecovery(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000, new_recovery=True)
+    simulation = Simulation(tasks, agents)
+    tp = TokenPassing(agents, dimensions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000, new_recovery=True)
     while tp.get_completed_tasks() != len(tasks):
         simulation.time_forward(tp)
 
     cost = 0
     for path in simulation.actual_paths.values():
         cost = cost + len(path)
-    output = {'schedule': simulation.actual_paths, 'cost': cost, 'completed_tasks_times': tp.get_completed_tasks_times(),
-              'n_replans': tp.get_n_replans()}
+    output = {'schedule': simulation.actual_paths, 'cost': cost, 'completed_tasks_times': tp.get_completed_tasks_times()}
     with open(args.output, 'w') as output_yaml:
         yaml.safe_dump(output, output_yaml)

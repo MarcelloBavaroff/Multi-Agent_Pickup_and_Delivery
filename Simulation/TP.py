@@ -1,15 +1,9 @@
-"""
-Python implementation of Token Passing algorithms to solve MAPD problems with delays
-author: Giacomo Lodigiani (@Lodz97)
-"""
 from math import fabs
 import random
 from Simulation.CBS.cbs import CBS, Environment
-#from Simulation.markov_chains import MarkovChainsMaker
-#from collections import defaultdict
 
 
-class TokenPassingRecovery(object):
+class TokenPassing(object):
     def __init__(self, agents, dimesions, obstacles, non_task_endpoints, simulation, a_star_max_iter=4000, new_recovery=False):
         self.agents = agents
         self.dimensions = dimesions
@@ -36,12 +30,10 @@ class TokenPassingRecovery(object):
             self.token['start_tasks_times'][t['task_name']] = self.simulation.get_time()
         self.token['agents_to_tasks'] = {}
         self.token['completed_tasks'] = 0
-        self.token['n_replans'] = 0
         self.token['path_ends'] = set()
         self.token['occupied_non_task_endpoints'] = set()
         self.token['agent_at_end_path'] = []
         self.token['agent_at_end_path_pos'] = []
-        self.token['agents_in_recovery_trial'] = []
         for a in self.agents:
             #dovrebbe essere prendi gli agenti del token e poi nello specifico quello col nome specifico
             self.token['agents'][a['name']] = [a['start']]
@@ -59,7 +51,6 @@ class TokenPassingRecovery(object):
     def admissible_heuristic(self, task_pos, agent_pos):
         return fabs(task_pos[0] - agent_pos[0]) + fabs(task_pos[1] - agent_pos[1])
 
-    #in teoria task più vicino al robot
     def get_closest_task_name(self, available_tasks, agent_pos):
         closest = random.choice(list(available_tasks.keys()))
         dist = self.admissible_heuristic(available_tasks[closest][0], agent_pos)
@@ -140,8 +131,6 @@ class TokenPassingRecovery(object):
     def get_completed_tasks_times(self):
         return self.token['completed_tasks_times']
 
-    def get_n_replans(self):
-        return self.token['n_replans']
 
     def get_token(self):
         return self.token
@@ -172,15 +161,6 @@ class TokenPassingRecovery(object):
             self.token['agents'][agent_name] = []
             for el in path_to_non_task_endpoint[agent_name]:
                 self.token['agents'][agent_name].append([el['x'], el['y']])
-
-    def get_random_close_cell(self, agent_pos, r):
-        while True:
-            cell = (agent_pos[0] + random.choice(range(-r - 1, r + 1)), agent_pos[1] + random.choice(range(-r - 1, r + 1)))
-            if cell not in self.obstacles and cell not in self.token['path_ends'] and \
-                    cell not in self.token['occupied_non_task_endpoints'] \
-                    and cell not in self.get_agents_to_tasks_goals() \
-                    and 0 <= cell[0] < self.dimensions[0] and 0 <= cell[1] < self.dimensions[1]:
-                return cell
 
     def update_copleted_tasks(self):
         # Update completed tasks
@@ -218,7 +198,6 @@ class TokenPassingRecovery(object):
 
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
-            # agent_name = list(idle_agents.keys())[0]
             all_idle_agents = self.token['agents'].copy()
             all_idle_agents.pop(agent_name)
 
@@ -240,7 +219,7 @@ class TokenPassingRecovery(object):
                 moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents'], 0)
                 idle_obstacles_agents = self.get_idle_obstacles_agents(all_idle_agents.values(), 0)
                 agent = {'name': agent_name, 'start': agent_pos, 'goal': closest_task[0]}
-                #penso sia l'unione di obstacles e idle_obastacles
+
                 env = Environment(self.dimensions, [agent], self.obstacles | idle_obstacles_agents,
                                   moving_obstacles_agents, a_star_max_iter=self.a_star_max_iter)
                 cbs = CBS(env)
