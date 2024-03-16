@@ -2,7 +2,7 @@ import re
 import statistics
 
 # Leggi il file e ottieni le righe che contengono il makespan
-with open('Comparisons/BigSeparate/change/test17.txt', 'r') as file:
+with open('../Comparisons/BigSeparate/change/test17.txt', 'r') as file:
     makespan_lines = [line for line in file if 'Makespan:' in line]
 
 # Estrai i valori di makespan dalle righe usando espressioni regolari, escludendo i valori pari a 30000

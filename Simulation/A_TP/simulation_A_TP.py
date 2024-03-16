@@ -1,5 +1,5 @@
 import time
-from Simulation.tasks_and_delays_maker import *
+from Simulation.tasks_maker import *
 
 
 class Simulation(object):

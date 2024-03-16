@@ -5,16 +5,16 @@ import os
 # import random
 
 import RoothPath
-from Simulation.tasks_and_delays_maker import *
+from Simulation.tasks_maker import *
 
-#from Simulation.Versione_Change.TP_battery_Change2 import TokenPassing
-#from Simulation.Versione_Change.simulation_Change2 import Simulation
-#from Simulation.Versione_Preemption.TP_battery_Preem import TokenPassing
-#from Simulation.Versione_Preemption.simulation_Preem import Simulation
+#from Simulation.G_TP.TP_battery_Change2 import TokenPassing
+#from Simulation.G_TP.simulation_Change2 import Simulation
+#from Simulation.A_TP.TP_battery_Preem import TokenPassing
+#from Simulation.A_TP.simulation_Preem import Simulation
 #from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
 #from Simulation.Versione_Queue.simulation_Queue import Simulation
-from Simulation.TP_battery_Queue_Long import TokenPassing
-from Simulation.simulation_Queue_Long import Simulation
+from Simulation.Versione_Queue_Extended.TP_battery_Queue_Extended import TokenPassing
+from Simulation.Versione_Queue_Extended.simulation_Queue_Extended import Simulation
 
 
 def parameters(seed):

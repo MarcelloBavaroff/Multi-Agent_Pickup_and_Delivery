@@ -48,9 +48,5 @@ aggiungi_valori_sopra_barre(barre3)
 aggiungi_valori_sopra_barre(barre4)
 
 
-
-
-
-
 # Mostrare il grafico
 plt.show()
