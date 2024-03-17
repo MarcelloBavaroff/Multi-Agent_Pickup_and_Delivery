@@ -108,9 +108,8 @@ class TokenPassing(object):
     def admissible_heuristic(self, task_pos, agent_pos):
         return fabs(task_pos[0] - agent_pos[0]) + fabs(task_pos[1] - agent_pos[1])
 
-    # In teoria task più vicino al robot, in discarded tasks quelli già considerati e che
-    # non rispettano le condizioni. In teoria ritorna sempre qualcosa, se tutti scartati
-    # non dovrei nemmeno chiamarlo
+    # Task più vicino al robot, in discarded tasks quelli già considerati e che
+    # non rispettano le condizioni.
     def get_closest_task_name(self, available_tasks, agent_pos, discarded_tasks):
 
         admissible_tasks = {}
@@ -464,7 +463,7 @@ class TokenPassing(object):
         self.token['charging_stations'][station_name]['booked'] = agent_name
         # self.token['preemption_ends'].add(tuple(self.token['agents_preemption'][agent_name][-1]))
 
-    def use_preempted_path_to_station(self, agent_name):
+    def use_reserved_path_to_station(self, agent_name):
 
         station_name = 'Error'
         station_pos = None
@@ -497,6 +496,7 @@ class TokenPassing(object):
         self.token['occupied_charging_stations'][agent_name] = station_name
         self.token['charging_stations'][station_name]['free'] = agent_name
 
+    #PLANNING PATH
     def compute_real_path(self, agent_name, agent_pos, closest_task, all_idle_agents,
                           predicted_consumption_to_station):
         moving_obstacles_agents = self.get_moving_obstacles_agents(self.token['agents_preemption'], 0, agent_name)
@@ -638,7 +638,6 @@ class TokenPassing(object):
 
         return round(consumption, self.round)
 
-
     # se hai un percorso di ricarica, ma non hai la batteria uguale al minimo per andarci controlli
     # se anche al turno dopo avrai un percorso valido per andare. Se si cambi il preemption path con quello
     # altrimenti vai a caricarti con il path già deciso
@@ -712,14 +711,14 @@ class TokenPassing(object):
         else:
             return False
 
-    def decide_if_charge(self, agent_name, agent_pos, all_idle_agents, idle_agents):
+    def go_to_charge(self, agent_name, agent_pos, all_idle_agents, idle_agents):
         # controllo se ho un path per andarmi a caricare
         if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
                 self.token['agents_preemption'][agent_name]) and len(self.token['agents_preemption'][agent_name]) != 0:
 
             changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
             if not changed:
-                self.use_preempted_path_to_station(agent_name)
+                self.use_reserved_path_to_station(agent_name)
 
             # # se con la mia batteria arrivo giusto a caricarmi ci vado
             # if self.last_time_to_charge(agent_name):
@@ -742,7 +741,7 @@ class TokenPassing(object):
                 # else:
                 changed = self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, False)
                 if not changed:
-                    self.use_preempted_path_to_station(agent_name)
+                    self.use_reserved_path_to_station(agent_name)
 
     # qui io non sono già in un NONTE
     def choose_NON_task_endpoint_and_station(self, agent_name, agent_pos, all_idle_agents):
@@ -951,8 +950,6 @@ class TokenPassing(object):
 
         return consumption
 
-
-
     def controllo_errori_stazioni(self):
         stazioni_occupate = 0
         for s in self.token['charging_stations']:
@@ -964,8 +961,9 @@ class TokenPassing(object):
 
     def time_forward(self):
 
-        self.update_completed_tasks()
-        self.collect_new_tasks()
+        self.update_completed_tasks() # Line2 2->6 alg
+        self.collect_new_tasks() # Line 7 alg
+
         idle_agents = self.get_idle_agents()
         for a in idle_agents:
             self.check_if_dead(idle_agents[a][0], a)
@@ -976,6 +974,7 @@ class TokenPassing(object):
         # controllo stazioni occupate coerenti
         self.controllo_errori_stazioni()
 
+        # Lines 8->25 alg
         while len(idle_agents) > 0:
             agent_name = random.choice(list(idle_agents.keys()))
             all_idle_agents = self.token['agents'].copy()
@@ -983,27 +982,29 @@ class TokenPassing(object):
             agent_pos = idle_agents.pop(agent_name)[0]
             available_tasks = self.find_available_tasks(agent_pos)
 
+            # Line 13 alg
             if len(available_tasks) > 0:
-
+                #TASK AND CHARGE
                 assigned = self.choose_task_and_station(agent_name, agent_pos, all_idle_agents, available_tasks)
 
                 if not assigned and len(available_tasks) > 0:
                     # questo implica che in passato qualcuno ha già calcolato il mio path per andare a caricarmi
                     # self.decide_if_charge(agent_name, agent_pos, all_idle_agents, idle_agents)
-
                     if agent_name in self.token['occupied_charging_stations']:
                         print(agent_name, ' is already charging')
+                        # TASK AND CHARGE
                         if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):
                             print(agent_name, "non ha trovato un NON-T.E. appropriato")
 
                     else:
+                        # GO TO STATION
                         if agent_name in self.token['agents_preemption'] and len(
                                 self.token['agents'][agent_name]) != len(
                             self.token['agents_preemption'][agent_name]) and len(
                             self.token['agents_preemption'][agent_name]) != 0:
 
                             # uso il path preemption per andarmi a caricare
-                            self.use_preempted_path_to_station(agent_name)
+                            self.use_reserved_path_to_station(agent_name)
 
                         # Se non ho un path per andarmi a caricare, lo calcolo. Caso specifico in cui probabilmente non mi sono
                         # mai mosso dal mio non task endpoint e quindi non ho mai calcolato un path per andarmi a caricare
@@ -1011,29 +1012,27 @@ class TokenPassing(object):
                             if self.find_new_path_to_station(agent_name, agent_pos, all_idle_agents, True):
 
                                 print("Nuovo percorso per andare a caricarsi calcolato correttamente - ", agent_name)
-                                self.use_preempted_path_to_station(agent_name)
+                                self.use_reserved_path_to_station(agent_name)
                             else:
                                 print("Errore nel calcolo del percorso per andare a caricarsi dell'", agent_name,
                                       " che non aveva un path precedente")
 
-            # righe 13-14 alg
+            # Line 16 alg
             # se sono in safe_idle nel momento in cui ho la batteria minima per caricarmi secondo l'euristica vado a caricarmi
             # anche qui se serve cambio il path degli altri agenti
             elif self.check_safe_idle_strict(agent_pos):
-                # quindi ho la stazione prenotata
-                self.decide_if_charge(agent_name, agent_pos, all_idle_agents, idle_agents)
+                self.go_to_charge(agent_name, agent_pos, all_idle_agents, idle_agents)
 
-            # righe 15-16 alg
+            # Line 18 alg
             else:
+                # TASK AND CHARGE
                 if agent_name in self.token['agents_preemption'] and len(self.token['agents'][agent_name]) != len(
                         self.token['agents_preemption'][agent_name]) and len(
                     self.token['agents_preemption'][agent_name]) != 0:
 
                     # se non ho un percorso per andarmi a caricare dopo che vado nel NON task endpoint, vado a caricarmi
                     if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):
-                        self.use_preempted_path_to_station(agent_name)
-
-                # sono in una stazione
+                        self.use_reserved_path_to_station(agent_name)
                 else:
                     if not self.choose_NON_task_endpoint_and_station(agent_name, agent_pos, all_idle_agents):
                         print("sono in una stazione di ricarica e non riesco a trovare un NON-T.E.")

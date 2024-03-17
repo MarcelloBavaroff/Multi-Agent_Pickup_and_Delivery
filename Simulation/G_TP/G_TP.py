@@ -953,6 +953,7 @@ class TokenPassing(object):
                     # print("Nessun task assegnato anche se c'erano")
                     if agent_name in self.token['occupied_charging_stations']:
                         print(agent_name, ' is already charging')
+                        # TASK OR CHARGE
                         self.go_to_closest_non_task_endpoint_or_charge(agent_name, agent_pos, all_idle_agents,
                                                                        idle_agents, 0)
                     else:

@@ -2,10 +2,10 @@ import argparse
 import yaml
 import json
 import os
-from Simulation.G_TP.G_TP import TokenPassing
-from Simulation.G_TP.simulation_G_TP import Simulation
-#from Simulation.A_TP.TP_battery_Preem import TokenPassing
-#from Simulation.A_TP.simulation_Preem import Simulation
+#from Simulation.G_TP.G_TP import TokenPassing
+#from Simulation.G_TP.simulation_G_TP import Simulation
+from Simulation.A_TP.A_TP import TokenPassing
+from Simulation.A_TP.simulation_A_TP import Simulation
 #from Simulation.Versione_Queue.TP_battery_Queue import TokenPassing
 #from Simulation.Versione_Queue.simulation_Queue import Simulation
 #from Simulation.TP_battery_Queue_Long import TokenPassing
