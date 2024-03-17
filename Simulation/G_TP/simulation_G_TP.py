@@ -27,8 +27,6 @@ class Simulation(object):
         else:
             self.round = 2
 
-
-
         for i, a in enumerate(self.agents):
             self.max_autonomies[a['name']] = autonomies[i]
             self.batteries_level[a['name']] = autonomies[i]
@@ -102,7 +100,6 @@ class Simulation(object):
                 # self.batteries_level[agent['name']] += 10
                 self.batteries_level[agent['name']] = round(self.batteries_level[agent['name']] + 10, self.round)
 
-                # se carica completa lo metto in idle?
                 if self.batteries_level[agent['name']] >= self.max_autonomies[agent['name']]:
                     self.batteries_level[agent['name']] = self.max_autonomies[agent['name']]
 
